@@ -1,0 +1,30 @@
+* Webinar Datadog: Kubernetes em escala
+** acessado a partir de:
+https://www.datadoghq.com/pt/dg/webinars/k8-brazil-2023/thankyou.html?utm_source=Content&utm_medium=OnDemandWebinar&utm_campaign=OnDemand-2023-KubernetesPT
+
+localizado em: https://www.youtube.com/watch?v=3jOEpTCcqgU
+
+Apresentador: Renan Menezes
+** Datadog
+surgiu em 2010
+Mais de 650 plugins disponíveis
+** Kubernetes
+Ver no menu principal da esquerda no Datadog em "Infrastricture -> Containers -> Kubernets"
+*** é considerado um 'sistema operacional' emergente da nuvem
+*** Top 3 desafios com Kubernetes
+**** Orquestrações de Clusters
+**** Otimização de Custos
+Exemplo numa máquina com 64GB de ram quando a separamos em vários segmentos de memória cada um rodando um container pode ser que um, ou mais, blocos não estejam em uso.
+O Datadog surgere oportunidades de economia com base nos dados de utilização dos contêineres.
+**** Segurança de aplicações
+O Datadog detecta vulnerabilidades na infraestrutura de contêineres antes que elas afetem o ambiente de produção.
+- Identifique vulnerabilidades em imagens de contêineres em seus hosts antes que elas cheguem à produção
+- Clique em qualquer vulnerabilidade para saber mais, incluindo gravidade, número de de contêineres afetados e instruções de correção (CVE) (Pro: Exemplo de vulnerabilidade: biblioteca de terceiros)
+** Instalando e usando o Datadog no k8s 
+ddog.io/k8s-trial
+
+Instale o agente datadog através de qualquer um dos 3 métodos:
+1) Datadog Operator
+2) Helm Chart
+3) DaemonSet
+

@@ -48,9 +48,56 @@ Imagem: podemos ter várias cópias do mesmo conteiner. Podemos criar uma imagem
 Container é como se fosse um sistema rodando. Entre si, containers se enxergam como isolados.
 imagem: é o que permite o sistema rodar (as configurações - o que é necessário para esse sistema)
 
-
 ** (Testes funcionais)
 No curso de QA foi dito que os testes funcionais são os testes do QA.
+** O que é Observabilidade?
+*** Pilares de Observabilidade
+**** Métricas (Metrics)
+softwares: 
+- Prometheus (base de dados para métricas)
+- Grafana (visualiza as métricas do Prometheus)
+**** Traços Distribuídos (Distributed tracing)
+Conseguir investigar uma requisição por todos os sistemas que ela passou
+(AP: Exemplo de traço distribuído: no devtools do mozilla, aquelas linas da parte de cima (em Networking) que são formadas e vão crescendo conforme vai passando o tempo)
+
+Software:
+Jaeger, Servoce Mesh (Pro/AP: Quando usa k8s) (Istio), Proxy (Envoy, Traefik, Kong)
+**** Logs
+***** sidecar (esse foi o nome dado a um pattern de microserviços também)
+Há duas formas de entender sidecar: 
+- no contexto de deixar código em um jar a ser importado por outros microsseriços
+- no contexto de ter um microsseriço com o código a ser requisitado (subindo o microsserviço) por outros microsserviços - que é o caso de nosso contexto aqui - um microsserivço que subimos só para fazer logs, por exemplo 
+***** Logging agent instalado no Host
+***** Shell script
+*** Visualização de Logs
+software: Graylog
+** Monitorando aplicações: 4 Golden Signals (TODO Borsatto - Falta assistir)
+** O que é Serverless?
+Serveless é o paradigma de executar código sem se preocupar com servidores. Ao contrário do que o nome sugere, os servidores ainda existem.
+
+O servidor é completamente executado por provedor.
+
+*** Prós:
+- Paga somente pelo que usa
+- Cada função pode ser criada em uma linguagem diferente
+- Muitos eventos pré-configurados na Cloud ajudam a criar arquiteturas orientadas a eventos (como operações lambda da AWS, por exemplo, (AP:  executando requisições no banco de dados))
+- Auto-escalável/Altamente disponível por natureza
+
+*** Contras:
+- Duraçã de execução (na AWS, uma lambda pode ser executada no máximo em 15 mins)
+- Vendor Lock-In (não dá depois de mudar da AWS pra Azure, por exemplo)
+- Difícil de debugar (como debugar em serveless: através de logs gerando métricas, não tem como debugar)
+- É necessária configuração extra para controlar (parcialmente) o ambiente de execução (Lambda layers)
+
+*** Componentes Serverless de exemplo da AWS:
+****  executador de código
+- Lambda
+**** não executadores de código
+- API Gateway
+- SQS
+- DynamoDB
+- SNS
+- S3
 * Curso de Integração Contínua: mais qualidade e menos risco no desenvolvimento
 Integração contínua é mais focada no desenvolvedor, enquanto que a entrega contínua envolve pessoas/áreas totalemente diferentes.
 ** O que é integração contínua? 

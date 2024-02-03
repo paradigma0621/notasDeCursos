@@ -133,6 +133,10 @@ se temos vários serviços podemos precisar compartilha-los
 **** determine o processo comum (ex: realizar log. Mas que vai crescer conforme o serviço cresce, precisarem escalar a funcionalidade)
 **** construa um módulo compartilhável (ex: no java, criar um pacote com maven ou gradle, de forma independente. só que o código está num lugar só, de modo que se eu atualizá-lo vai mudar todos que o acessam)
 **** aplique esse sidecar nos serviços que precisam dele
+**** Obs sobre sidecar
+Há duas formas de entender sidecar: 
+- no contexto de deixar código em um jar a ser importado por outros microsseriços - que foi o mencionado nesse tópico
+- no contexto de ter um microsseriço com o código a ser requisitado (subindo o microsserviço) por outros microsserviços
 ** Integrando serviços
 *** API Gateway (é um padrão. ver notas nas anotações acima)
 *** Agregador de processos
@@ -272,7 +276,7 @@ Alternativa correta! Containers conseguem compartilhar recursos com o sistema op
 Alternativa errada! Existe uma grande diferença entre ambos.
 **** Facilidade de configuração.
 Alternativa errada! Isso é muito relativo, mas na maioria das vezes a dificuldade é a mesma. Ambas abordagens possuem ferramentas facilitadoras.
-*** Como se comunicar
+** Como se comunicar
 **** Visão geral
 Possíveis problemas de Microsserviços se comunicando livremente:
 - Dependências descontroladas
@@ -326,7 +330,7 @@ podemos usar DNS (mesmo não sendo DNS público)
 DNS pode ser utilizado como service registry para sabermos como acessar cada serviço. Podemos fazer isso com o Docker, por exemplo.
 
 Pro/AP: podemos configurar nosso DNS no roteador caseiro ou configurar nosso arquivo de host
-*** Segurança de serviços
+** Segurança de serviços
 **** Segurança geral
 ***** Segurança no transporte
 ****** HTTPS
@@ -359,3 +363,13 @@ ex: O microserviço verifica se o fulano tem o papel de professor antes de publi
 ****** On behalf of
 na requisições de um microsserviço para outro 
 você também envia informações do cliente original
+**** Segurança na rede				
+***** Redes virtuais (VPN)
+só são trafegas informações para uma máquina que está dentro da rede
+***** Sistemas de firewall
+colocando um firewall no API Gateway (que é o único ponto de entrada).
+***** Lista de IPs
+Ou que o API Gateway só aceite requisições de uma lista de IPs.
+**** Defense in Depth
+Por exemplo: você precisa deixar os seus microsserviços em uma rede virtual, liberar acesso apenas ao API Gateway do IP dele acessar, ter um firewall no seu API Gateway e ter autenticação e autorização na sua aplicação ter HTTPS para a segurança de transporte. Tudo isso junto vai tornar o seu sistema realmente um pouco mais seguro.
+

@@ -1,0 +1,8 @@
+versão do Spring Boot do curso antigo: 2.1.4
+* Curso de Java Servlet: programação web Java
+** 
+Atenção! No curso foi utilizada a versão 9 do tomcat.
+
+A partir da versão 10 do tomcat foram efetuadas mudanças em sua arquitetura, que impossibilitam o import de classes/interfaces do pacote javax.*.
+
+Com isso, recomendamos que seja utilizada a versão 9 do tomcat, para evitar problemas ao longo do curso.
