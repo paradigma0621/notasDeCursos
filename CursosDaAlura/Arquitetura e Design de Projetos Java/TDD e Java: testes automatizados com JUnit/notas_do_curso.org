@@ -1,0 +1,29 @@
+* Arquitetura e Design de Projetos Java
+** Testes
+*** Curso de TDD e Java: testes automatizados com JUnit
+**** Testes automatizados
+Segurança ao mexer no código
+Favorece a melhoria do código (refactoring)
+**** Assertivas do *JUnit 4/5*
+No curso utilizaremos a versão 5 do JUnit, sendo que nesta nova versão da biblioteca algumas mudanças em seus pacotes de classes foram realizadas.
+
+****** No JUnit 4 as classes e anotações devem ser importadas de seu pacote org.junit. Por exemplo:
+
+import org.junit.Test;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.After;
+import org.junit.AfterClass;COPIAR CÓDIGO
+
+****** Mas na versão 5 do JUnit houve uma reestruturação nos pacotes, sendo que agora os imports devem vir do pacote org.junit.jupiter.api. Exemplo:
+
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.AfterAll;COPIAR CÓDIGO
+****** Exceção
+A única exceção foi a classe Assert, que permanece no pacote org.junit. Entretanto, no JUnit 5 uma nova classe chamada Assertions, presente no pacote org.junit.jupiter.api, foi criada e recomenda-se a sua utilização em substituição à antiga classe Assert.
+
+**** Dicas de casos de teste
+Se o valor testado é numérico: testar valores maior, menor e igual

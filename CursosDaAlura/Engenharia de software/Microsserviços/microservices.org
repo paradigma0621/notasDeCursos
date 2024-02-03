@@ -1,0 +1,361 @@
+* Aulas Gerais
+** 01_O que são Microsserviços?
+Microsserviços são um abordagem arquitetônica e organizacional do desenvolvimento de software na qual o software consiste em pequenos serviços independentes que se comunicam usando APIs bem definidas. Esses serviços  pertencem a pequenas equipes autossuficientes.
+
+** 02_Tipos de Microservices
+*** 1) Data service
+é um serviço que fornece acesso direto a  determinada fonte de dados
+*** 2) Business service
+aglomerado de data service
+*** 3) Translation service
+permite a entrada de dados a partir de nosso sistema, e as transformam num modo que uma API ou serviço externo entenda
+*** 4) Edge service
+padrão de arquitetura de microserviços que nos permite expor um serviço específico para cada cliente
+permite fornecer especificidade para cada cliente (ex: fornecer os videos da Alura para os certos alunos, mas sem fornecer as transcrições do video).
+** 03_Microsserviços com .NET Core: Comunicação Entre Serviços (artigo)
+Criar uma arquitetura que suporta aplicativos baseados em microsserviços traz benefícios para a gestão do ciclo de vida do projeto:
+	ela promove as práticas de integração e entrega contínua, graças à modularidade e alta granularidade dos serviços.
+
+	Vamos considerar apenas alguns padrões de arquitetura de comunicação que podem ser usados em uma solução com microsserviços.
+	Um dos padrões mais comumente encontrados é o Bounded Context (Contexto Delimitado), que normalmente é associado ao conjunto de padrões conhecido como DDD (Domain Driven Design). Com o contexto delimitado, cada serviço tem seu próprio modelo de dados, que é independente do modelo de outros serviços.
+	Com isso, o modelo de um serviço pode ser refinado continuamente, sem afetar outros serviços. Os dados do modelo de cada serviço podem ser persistidos em uma base de dados diferente.
+	
+Para sistemas orientados a mensagem, o protocolo AMQP possibilita pub-sub (publicação/assinatura) e enfileiramento de mensagens assíncronas. Quando a comunicação entre serviços precisa ser bidirecional e feita em tempo real, os WebSockets são a melhor opção.	
+
+
+Quando os serviços rodam em aplicações e processos separados, a comunicação entre eles pode ser feita de forma assíncrona e desacoplada:
+	Em vez de dependências e chamadas diretas, a comunicação é feita através de mensagens. Isso permite que uma aplicação possa delegar uma tarefa a outro serviço, sem ter que esperar pelo término da sua execução.
+
+
+No final, quando o pedido é gravado no banco de dados, o serviço OrdemDeCompra publica uma mensagem em tempo real, feita através de WebSockets com o SignalR.NET, notificando o cliente JavaScript *da aplicação MVC*, indicando que o novo pedido foi gerado.
+** 04_O que é um API Gateway?
+O que é um API Gateway?
+é um padrão (AP: não um padrão no nível de design, mas um padrão em um nível arquitetural)
+
+intenção: centralizar o acesso a vários serviços
+
+ponto único de acesso:
+um único domínio, acessando numa única porta
+
+fornece um proxy (fornece uma fachada - padrão Facade (não num nível de design, mas sim num nível arquitetural))
+
+desvantagem:
+pode ser um ponto central de falha. se o ponto único cai, a aplicação inteira cai
+
+além de simplesmente redirecionar requisições, ele tb faz:
+1) roteamento
+2) load balancing
+3) realizar log de tudo o que entra na aplicação
+4) avisar o client como deve ser realizado o cache de cada url
+5) autenticação 
+6) cuidar do SSL (certificado do HTTP)
+
+pode ter um Decorator - adicionando por exemplo informações nos requests, ou removendo informações desnecessárias (ex: para um cliente mobile não precisamos de alguns tipos de informação)
+** 05_O que é Service Mesh?
+(malha de serviços)
+O que é e para quê serve?
+Um service mesh é uma camada dedicada de infraestrutura que você pode adicionar às sua aplicações.
+O service mesh permite que você, de forma transparente, adicione capacidades como observabilidade, gerenciamento de tráfedo e segurança sem precisar adicioná-los no código.
+
+é um conjunto de ferramentas que fica entre cada um dos serviços que vão se comunicar
+
+- comunicação vertical:  exemplo: comunicação entre o API Gateway e os microserviços (é chamada de trafego de norte e sul)
+- comunicação entre leste e oeste: que acontece entre a rede interna de serviços. *é aqui que entra o service mesh*.
+
+com service mesh: cada service não faz comunicação direta com outro service. O service mesh fornece proxy's entre as comunicações. Numa imagem da aula foi apresentado uma "service" dita acima (que se comunica com outra service) como o nome de Instância. (AP: Seriam as instâncias dum mesmo microserviço que esão se comunicando entre si? Ex: comunicação entre 2 microserviços APIs com 2 do Core?)
+
+para remover algumas responsabilidade que poderiam ficar no código
+	ex: trace, enviar informações para observabilidade
+	
+é algo adicionado na infraestrutura (ou seja: não é digitado código) na estrutura de microserviços para que se tire algumas responsabilidades do código
+
+com o service mesh podemos enviar métricas para um painel de controle. Podemos adicionar certificados SSL, etc...
+
+* Curso de: Microsserviços: padrões de projeto
+** Separando serviços
+*** Serviços de domínio
+- Domain-driven Design
+- Comece modelando seu domínio, não pensando na persistência
+- Avalie as ações que serão disponibilizadas
+- Construa o serviço, pensando primeiro no contrato
+- REST e RPC podem andar juntos (remote procedure call)
+		REST: representação de recursos
+		RPC: envolve chamada de ações, de funcionalidades
+
+*** Pergunta: Aprendemos neste vídeo sobre Domain Services, que são um tipo possível de Data Services. Qual o propósito deste tipo de serviço?
+R:  Fornecer acesso a determinado domínio e suas regras
+	Alternativa correta! Um domain service fornece acesso a um único domínio da aplicação e lá suas regras estão contidas.
+*** Serviços de negócio
+as vezes precisamos de operações que demandam mais de um domínio - para isso temos os serviços de negócio (ou business services)
+
+serviços de negócio são a junção de diversos data services, ou serviços de domínio
+
+matricular um aluno as vezes precisa de mais de um modelo, de mais de uma parte de nosso domínio. Não envolve apenas inserir um aluno. Talvez precisemos adicioná-lo no financeiro, adiciona-lo como jogdor na gamificação.
+
+- inserir jogador não é um processo de domínio, mas sim 
+processo do domínio do negócio:
+ex: matricular aluno
+
+exemplo de data services:
+ inserir aluno
+ inserir matrícula financeira
+ inserir aluno jogador
+
+criar um serviço de negócio
+- Proveem uma funcionalidade de negócio de mis alto nível
+- Permite ecapsular domínios relacionados
+- vai consumir os data services, que são nossos domínios
+- identifique o processo que você pretende expor (se não existe processo, não existe um serviço de domínio.  ex: inserir um aluno, não é um processo do negócio, mas "Matricular aluno" sim... ele contêm os domínios:  inserir aluno,  inserir matrícula financeira,  inserir aluno jogador
+- identifique os domínios que serão necessários nesse serviço
+- defina a API que será utilizada, focando no domínio e não nos dados
+- consuma serviços de domínio para executar processos
+*** Padrões
+*** Strangler pattern
+começar com um monolito, depois estrangular ele até extrair pequenas partes, até se chegar na arquitetura de microserviços
+- quebrar um monolito, tirando as funcionalidade dele
+- podemos começar isolando os dados
+- ou podemos começar isolando o domínio
+
+ex: monolito da aluna... migração para microserviços - vamos extraindo desse monolito e o transformamos em vários microserviços
+**** começar separando o banco de dados. há 2 formas: 
+separo o banco de dados e realizo alguma sincronização aqui direto na parte de infraestrutura, de forma que os bancos de dados vão se conhecer
+ou
+altero no monolito a parte do sistema que precise de aluno, por exemplo, para se conectar a esse novo banco de dados
+**** ou, fazer o contrário
+pega a parte que busca alunos, e separar num novo serviço, mas que por enquanto se conecta ao  mesmo banco de dados, pra que depois eu realize a migração e separa esse banco de dados
+**** Pergunta do curso da Alura: Por que é interessante quebrar a aplicação em serviços depois que ela já está desenvolvida e funcionando?
+Porque neste momento conhecemos melhor o negócio
+Com uma aplicação já funcional, é muito mais fácil identificar os domínios que precisam ser separados e o que não é tão crítico, além de termos mais confiança nas implementações das regras.
+*** Sidecar pattern 
+se temos vários serviços podemos precisar compartilha-los 
+
+(não vai ter novo serviço, mas sim um código só compartilhado por vários serviços)
+**** determine o processo comum (ex: realizar log. Mas que vai crescer conforme o serviço cresce, precisarem escalar a funcionalidade)
+**** construa um módulo compartilhável (ex: no java, criar um pacote com maven ou gradle, de forma independente. só que o código está num lugar só, de modo que se eu atualizá-lo vai mudar todos que o acessam)
+**** aplique esse sidecar nos serviços que precisam dele
+** Integrando serviços
+*** API Gateway (é um padrão. ver notas nas anotações acima)
+*** Agregador de processos
+agregando processos
+1 serviço de negócio agrega vários serviços de domínio para que tenham um processo completo
+
+agregando processos
+agraga diversos serviços de negócio
+faz-se isso quando processos dependem de outros processos, exemplo:  na renovação de matrícula além serviço de matrícula, queremos gerar relatórios de tudo o que o aluno fez no ano
+ 
+**** Process Aggregator Pattern
+ - Agregadores fazem as chamadas para os seriços necessários e montam a resposta correta
+ - Pode (e deve) ter lógica de processamento. Por exemplo, no serviço de matrícula, podemos ter mensagens para o aluno: "Bem vindo!", e o relatório de tudo o que ele fez anteriormente - ficando: "Obrigado por ficar conosco" - fazendo ainda por exemplo: retirar os dados, ou, adicionar algo que faz mais sentido.
+ - defina *um novo modelo* para apresentar os dados agregados
+ - a partir deste modelo, pense na API que fornecerá as operações - Ex: Domínio de renovação de matrícula - que à partir dele pensaremos numa API para este processo, um endpoint para ele, por exemplo. Um novo sub-domínio, um mini-mundo.
+ 
+*** Edge Pattern
+Gateways específicos para cada cliente recebem o nome Edge pattern (AP/Pro: Egde services)
+
+Foco nas necessidades reais de determinados clientes
+
+por cliente, se entende:
+	- cliente HTTP (ex: mobile, desktop, ...)
+	- cliente mesmo (Branco e Branco, Gocil, ...)
+	
+para o mobile podemos enviar só o video, sem a transcrição, por exemplo
+
+- Identifique o cliente e suas necessidades
+- construa contratos específicos para o cliente
+- modifique os dados que são transferidos para garantir otimização do processo
+- *existe a possibilidade de ter apenas Edges Services, e não Gateway*
+** Lidando com Dados
+*** Um ou mais DBs?
+**** Single service database
+Problema: escalabilidade do serviço e do banco são fortemente relacionados
+Solução: cada serviço (que precisar) terá seu próprio banco de dados
+**** Shared service database
+Problema: Às vezes precisamos centralizar os dados (até por motivos contratuais)
+Solução: trate esse banco em cada serviço como se ele fosse separado
+*** Padrões de codificação
+Como um padrão *de código* pode ajudar-nos em microsserviços:
+Padrão CQRS (Commmand Query Responsability Segregation - "Segregação da responsabilidade entre um comando e uma busca")
+no seu núcleo é a noção que podemos usar modelos diferentes para escrever e ler informações
+
+ex: um banco de dados só de escrita e um banco de dados só para leitura, com uma sincronização entre os dois
+
+Aumenta (MUITO) a complexidade ao sistema
+
+AP: Deixei "*De código*" em negrito pois foi mencionado no curso, com a adição que uma forma é ter uma classe só pra escrita e uma só pra leitura do banco de dados.
+video complementar: https://www.youtube.com/watch?v=yd6V4w19iJU
+*** Eventos assíncronos
+(padrão a se estudar no contexto ligado a  microsserviços)
+- Determinados problemas NÃO PODEM ser resolvidos na hora (em tempo real)
+- Um serviço emite um evento que será tratado em seu devido tempo
+- Tecnologias como mensagerias (ex: RabbitMQ) e serviços de stream de dados (ex: Kafka) brilham
+*** 
+** Operações
+*** Lidando com logs
+agregar log de todos microsserviços
+**** Agregando Logs
+- formatos de log DEVEM ser compartilhados entre os serviços
+(Precisamos ter um formato único. Não: um em xml, outro em txt, ...)
+- uma taxonomia comum deve ser compartilhada (ex: ERROR, WARN, ...)
+- Logs de monolitos são agregados por padrão. Com microsserviços o buraco é mais embaixo
+- parte da tarefa de agragação pode ser o parsing dos logs para categorizar corretamente (podemos por exemplo ter um serviço ou ferramenta específicos para isso)
+**** Rastreando chamadas
+- Uma parte importante de realizar logs é rastrear chamadas de uma execução (tracing (stack trace))
+- devemos poder reconstruir uma operação a partir de um identificador
+- isso é equivalente à call stack de um sistema monolítico
+- use padrões de trace ID para gerar os logs
+- use ferramentas de gerenciamento (APMs) para visualizar
+*** Agregando métricas
+status como um todo do sistema
+- enquanto logs precisam de desenvolvimento, métricas "só" precisam de instrumentação (não precisam de codificação)
+- Métricas nos permitem saber o que está acontecendo em determinado momento
+- construa ou use dashboards de alto nível para ter uma fácil visão do status atual da aplicação
+- depois, tenha dashboards específicos para cada serviço, com mais detalhes
+* Curso de: Microsserviços: explorando os conceitos
+** Arquitetando microsserviços
+*** Componentes de um microserviço
+De que é composto *um* microsserviços?
+*um* microserviço pode ser composto por vários componentes - exemplo: 4 instâncias de API + 2 réplicas banco de dados + 1 serviço de mensageria + 1 de tarefas agendadas
+AP: Dúvida pessoal: esse exemplo de 4 instâncias de API são 4 services do microserviço API, rodando cada um numa porta diferente? Esse serviço de mensageria entendo que seja uma biblioteca jar, o mesmo com as tarefas agendadas? OBS: RESPOSTA NA PERGUNTA DA ALURA ABAIXO!!:
+**** pergunta do curso da Alura: Neste vídeo falamos bastante sobre os diferentes "componentes" de um microsserviço como API, banco de dados, processador de mensagens, etc. O que significa um "componente" neste contexto?
+***** Uma aplicação, normalmente uma API.
+Alternativa errada! Nem só de APIs vivem microsserviços.
+***** Um servidor, ou seja, uma máquina física ou virtual.
+Alternativa errada! Mais de uma aplicação em um mesmo servidor podem ser vistas como mais de um componente.
+***** Um servidor, uma aplicação ou infraestrutura de apoio.
+Alternativa correta! Uma máquina (servidor) pode ser considerada um componente. Várias aplicações em uma mesma máquina podem ser vários componentes. Um serviço de apoio (como banco de dados ou fila de mensageria) pode ser um componente. Qualquer coisa que efetivamente componha o serviço, é um componente.
+*** Contratos de microsserviços
+Um microsserviço expõe alguma forma de comunicação (uma API). Isso é o contrato entre este microsserviço e seus clientes
+**** Apenas faça modificações aditivas
+- novos endpoints
+- novos campos (opcionais) em cada recurso (AP: novo @RequestParam não obrigatório)
+**** Versionamento de APIs
+-ao lançar uma v2, a v1 deve continuar funcionando, inalterada
+**** Manter equipes separadas, donas de cada serviço
+- A mesma equipe não vai alterar os clientes
+- Para adicionar funcionalidades que dependam de outros times de devs, solicitações formais podem ser feitas (aos outros times de devs)
+**** Pergunta da Alura: É comum usarmos o termo API (Application Programming Interface) sem darmos muita atenção para ele. Qual das seguintes alternativas NÃO pode ser chamada de API?
+***** Uma URL
+Alternativa correta! Uma URL não é uma API. Ela é uma interface do mundo externo com um servidor, mas não necessariamente uma interface de programação, ou seja, ela pode não expor funcionalidade alguma.
+***** Uma aplicação acessível a outras aplicações.
+Pro:Alternativa incorreta. 
+AP: *Então "Uma aplicação acessível a outras aplicações" pode ser chamada de API.*
+***** Um método público de uma classe.
+Alternativa errada! Um método ou um conjunto de métodos públicos fazem parte da API de uma classe. Isso é o que chamamos de interface pública, ou seja, o que está acessível a partir de outras classes. É um termo pouco usado, porém correto.
+*** Identificando as barreiras
+**** Recordando
+-Falamos no treinamento de padrões que o ideal é uma abordagem "monotith  first".
+-Cada módulo pode ser separado em um microsserviço
+-DDD pode nos ajudar muito. Bounded contexts podem virar microsserviços.
+**** Pense antes de implementar
+- desenhe um fluxo real usando uma arquitetura de microsserviços. Desta forma os problemas de cada abordagem surgirão.
+*** Para saber mais
+Texto abaixo apresentado num artigo a que a seção da Alura fazia referência:
+
+Decisões de como organizar nosso código de forma que ele continue "utilizável" após determinado período é o propósito mais simples de uma arquitetura.
+
+Arquitetura, segundo nosso querido Google, é: "arte e técnica de organizar espaços e criar ambientes para abrigar os diversos tipos de atividades humanas, visando tb. a determinada intenção plástica."
+
+Se trazemos isso para o mundo do desenvolvimento temos uma definição semelhante à seguinte: "A arquitetura de software de um sistema consiste na definição dos componentes de software, suas propriedades externas, e seus relacionamentos com outros softwares."
+
+Você pode encontrar inúmeras definições para esse termo, mas em sua essência, arquitetura de software nos ajuda a definir como organizar nosso código, torná-lo mais compreensível, manutenível a longo prazo, e separar a responsabilidades de domínio (regras de negócio) da infraestrutura (banco de dados, log, envio de e-mails, etc).
+
+** Criação de serviços
+*** Cuidando do host
+Pergunta do curso da Alura:
+
+Vimos neste vídeo diferentes formas de termos hosts para nossas aplicações como VMs, Clouds e Containers. Máquinas virtuais e Containers possuem muitas semelhanças.
+
+Qual a principal diferença entre o uso de Containers e Máquinas Virtuais?
+**** Consumo de recursos.
+Alternativa correta! Containers conseguem compartilhar recursos com o sistema operacional host, enquanto cada máquina virtual é um novo sistema operacional. Isso exige muito menos recursos.
+**** Não há diferença. São sinônimos.
+Alternativa errada! Existe uma grande diferença entre ambos.
+**** Facilidade de configuração.
+Alternativa errada! Isso é muito relativo, mas na maioria das vezes a dificuldade é a mesma. Ambas abordagens possuem ferramentas facilitadoras.
+*** Como se comunicar
+**** Visão geral
+Possíveis problemas de Microsserviços se comunicando livremente:
+- Dependências descontroladas
+- Falhas em cascata
+- Performance prejudicada
+
+***** Pergunta da Alura: Vimos neste vídeo que se comunicar diretamente entre serviços pode nos trazer problemas (vamos falar mais sobre isso).
+
+Qual das alternativas representa uma vantagem do uso de um API Gateway?
+****** Podemos filtrar requisições em um ponto único.
+Alternativa errada! É possível implementar autenticação, por exemplo, em um API Gateway ou backend-for-frontend (BFF, ou edge service). Podemos filtrar por IPs também ou fazer outras verificações de segurança.
+****** Podemos ter autenticação em nossa aplicação.
+Alternativa errada! Isso é possível sem um API Gateway.
+****** Podemos monitorar toda a aplicação de um único ponto.
+Alternativa correta! Através do API Gateway podemos monitorar acessos a nossa aplicação, podemos ter uma ideia geral de erros que estejam acontecendo, monitorar performance, etc.
+**** Comunicação síncrona
+Quando o pedido deve esperar pela resposta. 
+Pode ser feita por: HTTP, gRPC (roda em cima do HTTP2), criar Protocolos personalizados (pode-se abre-se um socket (usando TCP) de um serviço para outro serviço e definir um padrão).
+
+Pro/AP: Por HTTP pode-se comunicar utilizando RESTful ou SOAP.
+**** Comunicação assíncrona
+Existem cenários onde a resposa não precisa ser obtida imediatamente.
+
+Podemos usar:
+- CQRS (Command Query Responsability Segregation) (background tasks)
+- Eventos (mensageria)
+
+Exemplo de pedido que pode ser feito de forma assíncrona:
+- Dados precisam ser validados
+- Pagamento deve ser processado
+- Estoque deve ser separado
+- Logística deve ser iniciada
+A cada passo podemos enviar um email ou SMS para o cliente, por exemplo.
+**** Lidando com falhas
+***** com comunicação síncrona
+****** Circuit breaker
+um proxy é colocado na frente.
+para evitar uma sobrecarga da rede o circuito é aberto e espera-se um tempo (com isso as mensagens não chegam no servidor, o que poderia ocasionar problemas maiores caso ocorresse as várias chamadas estando o servidor com algum problema momentaneamente). Passado um tempo tenta-se reestabelecer a conexão (por exemplo com reinicialização do servidor)
+****** Cache
+***** com comunicação assíncrona
+- Simple retry
+- Retry com back-off (algo parecido com circuit breaker - da-se um tempo antes de tentar denovo)
+- Fila de mensagens mortas
+- Mensagens devem poder ser lidas fora de ordem
+- Mensagens devem poder ser recebidas repetidamente ( mensagens duplicadas por exemplo. É preciso atingir o conceito da "idempotência" = se você chamar o mesmo método várias vezes, o resultado deve ser sempre o mesmo. Ex: chamando a compra 3x, deve ser processado só 1x)
+Em mensageria: tudo isso possivelmente já está implementado
+**** Service Discovery 
+= Como um serviço saber onde encontrar outro
+Precisamos de um serviço que dê um nome para nossos serviços.
+podemos usar DNS (mesmo não sendo DNS público)
+DNS pode ser utilizado como service registry para sabermos como acessar cada serviço. Podemos fazer isso com o Docker, por exemplo.
+
+Pro/AP: podemos configurar nosso DNS no roteador caseiro ou configurar nosso arquivo de host
+*** Segurança de serviços
+**** Segurança geral
+***** Segurança no transporte
+****** HTTPS
+criptografia dos dados (AP: durante todo o percurso da informação na rede)
+***** Segurança no repouso
+****** Criptografia
+- de disco
+- de banco de dados (Bancos de dados cifrados)
+- em backups
+****** Anonimização
+qunado por exemplo: se precisam de infomormações métricas sobre dados dos clientes (ex: faixa de idade de pessoas que compra o produto X).
+**** Autenticação e autorização (em microsseriços)
+***** cada requisição deve informar quem é o cliente
+não basta HTTPS, criptografia, anonimização
+****** Basic HTTP
+Cada requisição HTTP armazena usuário e senha
+****** Tokens (utilizar JWT, por exemplo)
+****** OAuth
+técnica de autenticação que permite comunica-se utilizando certificados usando dados de terceiros (ex: logar na Alura usando email do Gmail) - não se tem acesso ao usuário e senha do cliente
+****** OpenID Connect
+***** Autenticação vs Autorização
+A autenticação nos permite saber quem está realizando determinada chamada.
+
+A partir do processo de autorização decidiremos se a pessoa autenticada por realizar tal ação.
+Técnicas
+****** ACL (Access control list)
+****** RBAC (Role-based access control)
+controle de acesso baseado em papéis.
+ex: O microserviço verifica se o fulano tem o papel de professor antes de publicar um curso. Obs: pode-se ter mais de um papel, enquanto que na ACL teríamos que ter mais de uma lista para isso.
+****** On behalf of
+na requisições de um microsserviço para outro 
+você também envia informações do cliente original

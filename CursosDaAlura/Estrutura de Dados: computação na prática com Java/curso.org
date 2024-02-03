@@ -1,0 +1,139 @@
+https://www.alura.com.br/artigos/estrutura-dados-computacao-na-pratica-com-java
+Estrutura de Dados: computação na prática com Java
+* Armazenamento sequencial e Vetores
+** Vetor.java
+public class Vetor {
+ private Aluno[] alunos = new Aluno[100];
+
+//Métodos abordados nos tópicos abaixo são inseridos aqui
+}
+** adiciona
+*** versão 1
+public void adiciona(Aluno aluno) {
+    for(int i = 0; i < alunos.length; i++) {
+        if(alunos[i] == null) {
+            alunos[i] = aluno;
+            break;
+        }
+    }
+}
+*** versão 2
+ private Aluno[] alunos = new Aluno[100];
+ private int totalDeAlunos = 0;
+
+ public void adiciona(Aluno aluno) {
+    this.alunos[totalDeAlunos] = aluno;
+    totalDeAlunos++;
+ }
+** tamanho
+public int tamanho() {
+    return totalDeAlunos;
+}
+
+//main()
+        System.out.println(lista.tamanho());
+        lista.adiciona(a1);
+        System.out.println(lista.tamanho());
+        lista.adiciona(a2);
+        System.out.println(lista.tamanho());
+
+//saída
+0
+1
+2
+[Joao, Jose, null, null, null...]
+** contem
+    public boolean contem(Aluno aluno) {
+
+        for(int i = 0; i < totalDeAlunos; i++) {
+            if(aluno.equals(alunos[i])) {
+                return true;
+            }
+        }
+        return false;
+    }
+// Obs: com o equals implementado
+@Override
+public boolean equals(Object obj) {
+    Aluno outro = (Aluno) obj;
+    return outro.getNome().equals(this.nome);
+}
+
+** pega
+public Aluno pega(int posicao) {
+    return alunos[posicao];
+}
+
+//Pode gerar ArrayIndexOutOfBounds quando pedida uma posicao maior que o tamanho do vetor. Abaixo como resolver:
+
+private boolean posicaoOcupada(int posicao) {
+    return posicao >= 0 && posicao < totalDeAlunos;
+}
+
+public Aluno pega(int posicao) {
+
+    if(!posicaoOcupada(posicao)) {
+        throw new IllegalArgumentException("posiçao invalida");
+    }
+
+    return alunos[posicao];
+}
+
+** Redimensionando o array
+Já implementamos os principais métodos do nosso Vetor. Porém, perceba que o tamanho do array é constante, valendo 100. Nós queremos que ele seja mutável de acordo com o número de alunos.
+
+Em Java não conseguimos mudar o tamanho de um array, então teremos que criar um novo maior e copiar tudo que está no antigo para este. Criamos o método "garanteEspaço":
+
+private void garanteEspaco() {
+    if(totalDeAlunos == alunos.length) {
+        Aluno[] novoArray = new Aluno[alunos.length*2];
+        for(int i = 0; i < alunos.length; i++) {
+            novoArray[i] = alunos[i];
+        }
+        this.alunos= novoArray;
+    }
+
+}
+* ArrayList
+O Java já tem uma implementação de Vetor, é a classe conhecida por "ArrayList". Ela é bem parecida com tudo o que fizemos até agora e funciona como um armazenamento sequencial.
+
+A essa lista nós damos o nome de lista ligada. A diferença dela para o Vetor é que neste os elementos estão um do lado do outro na memória, enquanto que na lista ligada eles estão em lugares diferentes.
+
+	AP: O material trazido por esse artigo apresentou o exemplo de um caso de uma ArrayList onde cada elemento tinha referência no objeto Aluno tanto para o anterior como para o próximo. O interessante é que poderíamos adicionar um último elemento lá no final da ArrayList sendo que ele estivesse como 5o Aluno, por exemplo - ou seja: depois do 4o e antes do 6o, bastando utilizar o recurso dos campos: Aluno.proximo e Aluno.anterior.
+	No artigo foi apresentada toda a implementação "braçal" usando apenas ArrayList, e pro fim menciou que o Java já tem tudo isso implementado por meio da Classe LinkedList.
+
+* Pilhas
+Já aprendemos sobre listas ligadas e duplamente ligadas. Tais listas possuíam células que apontavam para outras, anteriores e posteriores. Vimos nos exercícios que o Java já tem tudo isso implementado por meio da Classe LinkedList.
+
+Neste momento, veremos uma outra estrutura de dados cuja principal diferença, em relação aos outros tipos de estruturas de dados, é guardar os diversos estados de uma aplicação para que no futuro, se necessário, seja possível voltar a estes estados. A essa estrutura damos o nome de Pilha.
+
+O Java também já possui uma Classe própria para pilhas, cujo nome é Stack. Substituindo os nomes de nossos métodos para os da Classe do Java, temos:
+insere -> push
+remove -> pop
+stack.push("Mauricio");
+stack.push("Marcelo");
+stack.pop();
+
+** Método peek
+Como vimos, o pop remove o último elemento da pilha. O método peek trabalha em cima desse elemento também, porém sem removê-lo, já que ele apenas o retorna.
+String nome = stack.peek();
+
+** Usabilidade das pilhas
+O conceito de pilhas é amplamente utilizado por compiladores e autômatos, portanto, podemos afirmar que essa estrutura de dados tem muita usabilidade em ciência da computação. O próprio, e muito conhecido, comando "Desfazer" dos editores de texto, de código, de imagens, etc. tem como base as pilhas.
+* Filas
+Agora vamos conhecer as Filas, que se estruturam de modo parecido com as pilhas. Porém, diferente das pilhas, na qual o primeiro elemento a entrar é o último a sair, em filas o primeiro a entrar é o primeiro a sair.
+* Queue
+Da mesma forma que a estrutura de Pilhas tinha o nome de Stack, à estrutura de Filas damos o nome de Queue:
+
+Queue<String> filaDoJava = new LinkedList<String>();
+Para as filas os métodos têm os seguintes nomes:
+
+adiciona: add
+remove: poll
+Implementamos da seguinte forma:
+
+Queue<String> filaDoJava = new LinkedList<String>();
+
+filaDoJava.add("Mauricio");
+String x2 = filaDoJava.poll();
+Se imprimirmos o x2, nos retorna Mauricio.

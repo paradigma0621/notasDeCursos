@@ -1,0 +1,62 @@
+* 01_O que é uma API?
+** API ( Application Programming Interface)
+Uma forma de fornecer acesso a um serviço
+ 
+** Padrões de API Web
+*** 1) RPC (Remote Procedure Call)
+*** 2) Soap (fornecia um protocolo para que fosse possível trabalhar com RPC (item de cima))
+*** 3) REST (usar HTTP)
+
+* 02_REST
+REST (Representational State Transfer)
+REST não é uma tecnologia, uma biblioteca, e nem tampouco uma arquitetura, mas sim um modelo a ser utilizado para se projetar arquiteturas de software distribuído, baseadas em comunicação via rede.
+
+REST foi adotado como o modelo a ser utilizado na evolução da arquitetura do protocolo HTTP.
+
+- princípio de aplicações distribuidas
+
+- funciona com: CLIENTES <-> SERVIDORES
+a comunicação REST acontece tanto entre:
+	cliente -> servidor
+como entre
+	servidor -> cliente
+
+REST tem que ser Stateless (sem estado) (em contrate de quando é salva sessão através de cookie, que não é REST)
+Para ser stateless pode-se fazer uso do JWT
+
+Considerações sobre o REST:
+- "Interface Uniforme": linguagem comum entre clientes e servidores. Consiste em vários outros pontos, por exemplo: os recursos devem ser identificáveis (ex: URL). 
+- a manipulação de recursos deve ser feita através de representações (exemplo: json, xml, texto, imagens, ....)
+- que a gente siga a semântica dos verbos HTTP (ex: GET)
+- hypermedia
+ ver imagem <link ....
+ referencia nome do arquivo
+ permite um desacoplamento maior entre cliente e servidor
+
+* 03_REST: Conceito e fundamentos (ARTIGO)
+é um modelo de arquitetura e não uma linguagem ou tecnologia de programação, que fornece diretrizes para que os sistemas distribuídos se comuniquem diretamente usando os princípios e protocolos existentes da Web
+
+* 04_Boas práticas na Modelagem de API's REST
+trabalha com recursos (e não com ações). Exemplos de como não usar no endpoint:
+/getAllCars
+/createNewCar
+/deleteNewCar
+
+usar:
+/cars (no plural)
+
+use aquele nome: HATEOAS
+a ideia é: facilite a interação com sua API
+fornece os links
+
+sua API deve ser flexível:
+GET /cars?color=red
+GET /cars?seats<=2
+GET /cars?sort=-manufactor,+model (- decrescente, + crescente)
+GET /cars?offset=10&limit=5
+
+Alteraçoes que demandam alterações no cliente DEVEM gerar uma nova versão de API
+/blog/api/v1/posts?name=Titulo1
+/blog/api/v2/posts?title=Titulo1
+
+erros 3xx (REDIRECTION): diz: "recebi, mas alguma ação deve ser tomada por você, cliente"

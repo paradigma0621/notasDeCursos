@@ -1,0 +1,367 @@
+DevOps é a disciplina responsável por cuidar de todo esse processo de entrega e monitoramento de softwares em ambientes de produção, sendo que existem dezenas de ferramentas para realizar tais tarefas
+
+DevOps: não é uma ferramenta, mas um processo que envolve que envolve muitas ferramentas, pessoas, uma cultura.
+* Aulas Gerais
+** Pergunta da Alura que fecha o curso
+O termo DevOps foi mencionado pela primeira vez em 2009, em uma palestra chamada de 10+ Deploys Per Day, por uma dupla que trabalhava no Flickr. O termo vem da junção das palavras Development e Operations, mas qual é a real definição desse termo?
+*** É um processo bem definido, que visa acelerar o "time to market" do software
+Alternativa errada! Acreditamos que não existe um único processo padronizado e sim boas e más práticas. Ou seja, não há um processo específico para cada empresa e ambiente, e sim melhoria e aprendizagem contínua.
+*** É uma ferramenta que permite criar pipelines de implantação
+Alternativa errada! O pipeline de implantação é um padrão importante da entrega contínua, mas o DevOps é sobre a cultura da empresa. É sobre "derrubar as paredes" para melhorar a colaboração e entregar software mais rápido, sem perder a qualidade
+*** É um cargo que mistura conhecimento de desenvolvimento e operações
+Alternativa errada! DevOps não é um cargo, nem uma ferramenta. Realmente não é!!!
+*** É um movimento cultural
+Alternativa correta! DevOps é sobre colaboração, sobre melhoria, feedback e aprendizagem contínua. Ou seja, é muito mais um mudança cultural do que o uso de uma nova ferramenta ou um processo específico.
+** 01_O que é DevOps?
+DevOps
+Dev: desenvolvimento
+Ops: operações
+
+ver imagem: 01_O que é DevOps.png
+ver imagem 02_O que é DevSecOps.png pra ver a que área (Dev ou Ops) pertence cada etapa do movimento
+** Artigo: Devops: o que é e principais práticas
+Entre as práticas do movimento DevOps podemos mencionar quatro principais, que são apoiadas por diversas ferramentas conhecidas:
+	- infraestrutura como código (IaC)
+	- a pipeline de construção do software (integração e entrega contínua)
+	- a virtualização e conteinerização
+	- o feedback constante da aplicação em produção através de monitoramento.
+** O que é DevSecOps?
+Sec: segurança (security) 
+
+Pilares DevOps
+	- Velocidade
+	- Entrega rápida e contínua (CI/CD)
+	- Confiabilidade
+
+Pilares DevSecOps (Segurança + Os pilares de DevOps):
+	- Segurança (é aceitável que se entre com menos velocidade, mas com mais segurança)
+	- Velocidade
+	- Entrega rápida e contínua (CI/CD)
+	- Confiabilidade
+** Engenharia de Confiabilidade de Site (SRE)
+Como você pode assegurar que seu software é confiável, que ele está pronto para produção, que todas as integrações vão funcionar sem que nenhum comportamento anômalo aconteça?
+
+Se você pensou em uma disciplina de engenharia, você está correto!. A Engenharia de Confiabilidade de Site ou Site Reliability Engineering em inglês (SRE) é uma disciplina criada pelo Google para garantir a confiabilidade de suas aplicações em produção.
+** O que são Containers?
+(ver imagem "./Outros/01_Containers.png")
+Imagem: podemos ter várias cópias do mesmo conteiner. Podemos criar uma imagem com as mínimas bibliotecas, ter 3 containers do tomcat (inclusive fazer balenceamento de carga entre eles).
+Container é como se fosse um sistema rodando. Entre si, containers se enxergam como isolados.
+imagem: é o que permite o sistema rodar (as configurações - o que é necessário para esse sistema)
+
+
+** (Testes funcionais)
+No curso de QA foi dito que os testes funcionais são os testes do QA.
+* Curso de Integração Contínua: mais qualidade e menos risco no desenvolvimento
+Integração contínua é mais focada no desenvolvedor, enquanto que a entrega contínua envolve pessoas/áreas totalemente diferentes.
+** O que é integração contínua? 
+Integração contínua, em outras palavras, nada mais é que integrar as atualizações frequentemente na base diária.
+"Continouous Integration (CI) is a development practice that requires developers to integrate code into a shared repository several times a day."
+
+Para usar Integração Contínua, é necessário usar um sistema de controle de versão (VCS), e no final integramos o código no repositório (usar Git não é obrigatório)
+Nas imagens 03_QualModeloDeRamificacao-01.png à 03_QualModeloDeRamificacao-04.png (da pasta "Curso_Integracao_continua")são mostrados modelos de estruturação do repositório, mas o professor salienta que dizem que nenhum deles são de integração contínua (Transcrição da aula: Essa não é uma prática da integração contínua, como é declarado em vários artigos sobre o assunto).
+** Estratégias de ramificação
+*** Recursos para não trabalhar com branchs de vida longa
+**** Feature Flag
+O que é o Feature Flag? Suponhamos uma nova funcionalidade em nosso projeto que terá um tempo longo de implementação. Contudo, não queremos criar uma nova ramificação para esse processo, queremos trabalhar diretamente com o master ainda que o código não esteja completo.
+
+Anteriormente, comentamos que cada commit deve ser releasable, isto é, pode ser publicado. Existe uma maneira de trabalhar sem branches: a feature flag.
+
+O código é inserido no master, mas ele não é visível para a equipe. O Feature flag server também para testar funcionalidades, por exemplo.
+
+**** Branch by Abstraction
+Apesar do nome, não envolve a criação de uma nova ramificação. Temos um módulo ligado, uma parte da aplicação utiliza uma biblioteca antiga e precisa ser substituída. Esse é um processo lento, e muitos elementos precisam ser alterados.
+
+O primeiro passo é introduzir uma abstração no código principal, isto é, uma camada intermediária para isolar o código que utiliza o módulo, portanto todas as chamadas deverão passar pela camada de abstração. Essa camada pode ser uma interface, várias ou mesmo uma classe que realiza delegações.
+
+Uma vez que é aplicada essa técnica de desacoplamento, podemos gradativamente fazer a re-implementação. Podemos utilizar um módulo legado para o que é de fato utilizava o módulo antigo.
+
+Com o tempo, o módulo antigo fica em desuso e pode ser suprimido completamente.
+
+No mundo ideal, todas as features tem uma granulidade suficiente para não precisar necessitar de um branch de vida longa, mas como nem sempre o ideal é possível, foram criadas essas técnicas.
+*** Merge x Rebase
+(ver imagens: "04-Merge_x_Rebase-0X-YZ" da pasta "Curso_Integracao_continua/04_Merge_x_Rebase")
+Mas quais são as diferenças entre merge e rebase? Temos um master e um feature branch, baseado no primeiro commit do master e as duas ramificações evoluiram ao mesmo tempo. Em algum momento, o desenvolvedor decide enviar as atualizações para o master, isto é, realizar a sincronização.
+
+O comando clássico para essa situação é o merge, e então ocorre o chamado "merge commit", cria-se um novo commit que representa esse momento de sincronização.
+
+Há desenvolvedores que não gostam desse processo, afinal trata-se de um commit que simplesmente representa um evento e que seu estado é baseado nas alterações realizadas na feature branch e na commit do master. Dessa maneira já não temos uma linha histórica muito interessante no desenvolvimento do projeto, o que pode gerar confusões.
+
+Outra maneira de sincronizar o branch é pelo uso do rebase. Neste caso, a ideia é que se mude a base do commit, e então as modificações são aplicadas nessa nova base.
+
+Dessa maneira, temos um histórico diferente de trabalho, e é por isso que o rebase deve ser aplicado apenas em máquina local.
+
+A mudança então pode ser enviada de fato ao master e novamente temos um histórico linear.
+
+Quando este processo estiver concluído, podemos inclusive excluir a feature branch.
+**** Pergunta da Alura: Sobre o comando rebase, do Git, quais das alternativas abaixo são verdadeiras?
+***** Elimina o merge commit na integração de duas branches
+Alternativa correta! O rebase sincroniza/pega os commits da outra branch e reaplica os novos commits da branch atual. Dessa forma, ele reescreve o histórico da branch atual.
+***** Pode ser usado a partir de qualquer branch
+Alternativa errada! Não podemos esquecer a regra de ouro (Golden rule). Não devemos usar o rebase em branches compartilhadas/públicas.
+***** Ajuda a manter o histórico de commits linear
+Alternativa correta! Esse é a grande vantagem do rebase. Os commits aparecem como eles fossem executados um após do outro.
+** Builds e testes automatizados
+*** Self testing
+Os testes em integração contínua são sobre feedback do software, como a maioria dos métodos ágeis.
+
+Existem diversas categorias e níveis de testes automatizados, aqui descaremos três: unit tests, integration tests e functional tests.
+**** Testes de unidade
+Os unit tests verificam unidades, como métodos e funções dentro do software. São os testes mais rápidos, baratos de escrever e sua manutenção é simples.
+**** Testes de integração
+Os testes de integração são de um nível mais alto, e testam a relação de elementos, como por exemplo um banco de dados e o software. A realização destes testes é mais lenta, afinal possuem um outro grau de complexidade.
+**** Testes funcionais
+Testes de um nível ainda maior, são os functional tests, que testam o sistema completo e garante a correção de funcionalidades no ponto de vista do cliente. Costumam ser mais demorados que os testes de integração.
+**** Smoke Tests
+Uma técnica comum é executar o que chamamos de smoke tests. Na prática, trata-se de uma seleção de testes que garantem que as funcionalidades mais importantes do sistema estejam operando corretamente. Esses testes avaliam um conjunto menor de elementos, por isso são mais rápidos, e dessa maneira teremos a garantia de que o software está operante em sua estrutura básica. Depois disso, podemos aplicar todos os testes e garantir uma varredura maior de erros.
+*** Build automatizado
+O build (AP: que por definção inclui rodar todos os testes) não deve ser superior a 10 minutos.
+É recomendado:
+- Build a cada commit (Além disso, devemos usar um build machine, afinal pode ser que na máquina local não seja possível executar todas as etapas do build)
+- Automatização
+- Build independente da IDE (Pro: exemplo: usando maven ou gradle)
+- Todo conteúdo necessário armazenado no repositório
+- Tente usar um "single command build" para executar o build
+
+Se o build for falhar, a ideia é que ele falhe o mais rápido possível. (AP: é mencionado no curso executar em ordem de demora os testes: primeiro os unitários, depois de integração, depois funcionais - e não necessáriamente todo de uma vez).
+** Mais feedback com builds contínuas
+*** Servidor de integração contínua
+Servidor "CI Daemon". Fornece um dashboard dos builds num lugar de fácil acesso. 
+
+Builda preferencialmente a cada commit.
+
+Servidor fornece, por exemplo, o Jenkins.
+
+O servidor de integração contínua monitora o repositório de código
+- Ao detectar uma alteração, deve iniciar o build do projeto
+- O build deve acontecer a cada novo commit
+- O resultado do build deve ser publicado
+- Os desenvolvedores devem ser notificados sobre o status do build
+
+*** Build quebrado
+Um build quebrado deve ser arrumado em no máximo 10 minutos, com prioridade máxima.
+É responsabilidade de todos da equipe arrumar um build quebrado.
+** Um pouco sobre a entrega contínua
+*** O que é entrega contínua
+Discutimos até aqui os processos da integração contínua: repositórios, servidor de integração, relatórios, notificações, artefato de build e assim por diante. Contudo, será que só essas práticas são o suficiente no desenvolvimento de softwares?
+
+Observemos o famoso manifesto ágil:
+	"Working software over comprehensive documentation"
+
+Um softawere funcional é mais importante do que uma documentação enorme. Mas o que significa um software funcional?
+
+Novamente observaremos outra citação do manifesto ágil:
+	"Our highest priority is to satisfy the customer through early and continuous delivery of valuable software."
+
+A prioridade mais alta é deixar o cliente satisfeito, e isso é feito por meio de *entrega contínua*. Isto é, um software funcional é aquele usado pelo cliente com suas novas features de maneira confiável. A integração contínua é uma parte fundamental para se chegar à entrega contínua.
+
+Ao revisitarmos a metáfora do botão de integração em que tudo é simples e automatizado, devemos ter um outro botão de "release", isto é, de deploy.
+
+Qual alteração que chega em nosso trunk principal e pode entrar em produção? Obviamente existem decisões de negócio sobre lançar novas features, como esperar datas comerciais importantes. Mas na visão técnica, devemos saber quais são as modificações aplicáveis.
+
+As equipes de desenvolvimento normalmente possuem divisões, como as pessoas do QA,deploy e operações. As tarefas são delegadas para os subgrupos durante o projeto. Equipes separadas que mal se comunicam dificultam o andamento do trabalho, aumentam a possibilidade de problemas e atrasam os deploys.
+
+A *entrega contínua* também exige uma mudança no comportamento e na cultura da empresa: as pessoas precisam trabalhar integradas.
+
+* Curso: Entrega Contínua: confiabilidade e qualidade na implantação de software
+** O que é Entrega Contínua?
+*** Diminuindo risco
+Pipeline de deploy:
+*Design (dev codando)* -> Build -> Teste -> Homologação -> Release / Operações
+
+DevsOps:
+ - feedback contínuo
+ - melhoria contínua
+ - aprendizagem contínua
+*** Realease Antipatterns
+**** Antipatterns (más práticas):
+
+***** Gerenciamento manual de ambientes
+Resultado: Deploy não confiável
+Regra: Todos os ambientes são tratados como código, versionados e criados de maneira automatizada.
+ 
+Há casos em que o deploy funcionou em ambiente de homologação, mas não de produção, e é importante mencionar que são ambientes muito similares.
+
+O mesmo pode ocorrer dentro do ambiente de produção, por exemplo o cluster, que possui várias máquinas envolvidas. Se as máquinas não forem idênticas a medida que o software se expande complexifica, teremos problemas. Isso ocorreu porque algo foi aplicado manualmente.
+***** Deploy manual
+Resultado: deploy lento, propício ao erro, não confiável
+Regra: apenas duas tarefas devem ser executadas manualmente: escolher a versão do release e o clique em "deploy buttom.
+
+Geralmente temos um manual que define as etapas de um deploy, mas geralmente a aplicação evolui e a documentação não é mais precisa e real. Há desenvolvedores que não sabem como o deploy é de fato realizado, afinal é um fazer delegado a poucas pessoas dentro da empresa em algumas configurações de equipe. Os deploys podem ser lentos e durarem horas ou dias. Nessa configuração teremos um deploy vagaroso, sujeito a erros e não confiável.
+
+Dessa maneira qualquer pessoa da equipe pode realizar o deploy, o resto é automatizado, encapsulado e seguro.
+
+***** Deploy apenas no fim do ciclo
+Resultado: pouca colaboração. Problemas só aparecem no dia da publicação, não confiável nem rápido, achismo
+Regra: deployment faz parte do desenvolvimento desde a primeira interação, todos definem um delivery team.
+
+Por exemplo, os desenvolveremos em aplicações estáveis e grandes focam em testes de criação de novas features e não interagem com a equipe de produção. Dessa maneira não sabemos se as novas features serão de fato funcionais e estáveis em produção.
+
+Desse modo, teremos como resultado uma equipe pouco integrada, os problemas serão avistados apenas no dia da publicação, e isso torna o processo mais lento.
+*** Entrega contínua vs Deploy contínuo
+A diferença entre a entrega contínua e o deploy contínuo é, que no deploy contínuo todas as alterações realmente entra em produção, o tempo todo.
+**** Pergunta da Alura importante: Qual é a diferença entre entrega contínua e deploy contínuo?
+***** A entrega contínua é totalmente automatizada, sem nenhuma aprovação humana, e o deploy contínuo depende de uma aprovação humana
+Alternativa errada! É justamente contrário: na entrega contínua, o software será publicado apenas diante da liberação humana. No deploy contínuo, todas alterações entram automaticamente em produção.
+***** No deploy contínuo, todas alterações entram em produção, sem nenhuma aprovação humana. A entrega contínua depende de uma aprovação humana
+Alternativa correta! O importante é que, na entrega contínua, as alterações não entrem em produção automaticamente, pois existe um motivo de negócio (marketing, por exemplo). Tecnicamente, não existe nenhuma razão para reter alterações.
+***** Nenhuma, ambos são especializações da integração contínua
+Alternativa errada! Ambos têm a integração contínua como base, mas a diferença é que na entrega contínua, o software será publicado apenas diante da liberação humana. No deploy contínuo, todas alterações entram automaticamente em produção.
+** Fundamentos
+*** Princípios
+*A ideia da entrega contínua é colocar as coisas em produção.*
+
+Podemos definir a entrega contínua como o ato de: "Entregar software com alta qualidade e grande valor, de maneira eficiente, rápida e confiável"
+
+**** Princípios básicos da entrega contínua
+***** I. Automatize
+Automatizar também faz parte da integração contínua, como ja frisamos diversas vezes
+***** II. Versione
+Versionar é importante não só para o código, mas versionar tudo.
+***** III. Repita
+não deixe o deploy para o fim de semana
+***** IV. Garanta qualidade
+Testes no primeiro lugar
+***** V. Defina "done"
+Não basta ter algo comitado e testado, "done" significa "em produção". 
+***** VI. Crie delivery team
+Devemos, ainda, criar uma equipe de entrega com desenvolvedores, analistas, operation e assim por diante. Uma equipe multifuncional garantirá o sucesso do projeto.
+***** VII. Use melhoria contínua
+Devemos utilizar a melhoria contínua, isto é, que cada etapa do pipeline tenha feedbacks rápidos sobre o estaus do software.
+*** Elementos principais
+Discutiremos os elementos que compõe a entrega contínua, e temos três itens principais:
+**** 1. Cultura DevOps 
+Ela envolve: feedback, colaboração, confiança, melhoria e aprendizagem contínua.
+
+**** 2. Patterns 
+São os padrões de deploy, ou releases de baixo risco. Nós ainda discutiremos esse assunto ao longo do curso, alguns padrões são blue/green, canary, feature toggle e outros.
+
+**** 3. Arquitetura
+A arquitetura é uma fase importante, pois quando falamos sobre arquitetura estamos mencionando a estrutura do sistema. As decisões estruturais são as mais difíceis dentro de um projeto, é necessário que ela seja estipulada no começo do trabalho. Quando pensamos na arquitetura queremos definir testabilidade, estabilidade, desempenho e outras propriedades como deployability.
+
+Quanto melhor for a arquitetura do sistema, mais fácil será praticarmos entrega contínua. Se existem dificuldades em recriar o ambiente de produção isso influencia a testabilidade, afinal devemos criar um clone da produção para que o teste seja possível.
+
+O mesmo se dá com o deployability. Se a base de código é muito grande, sentiremos dificuldade em inserir elementos na fase de produção. Nesta fase entram as boas práticas e os serviços e uma melhor base de dados.
+** Deployment pipeline
+*** Etapas do pipeline
+Conheceremos as etapas clássicas do deploy:
+**** 1. Build
+**** 2. Testes de aceitação automatizados (Automated Acceptance Testing Stage (Testes de aceitação))
+Depois da construção do software são executados os testes necessários. Por meio dos testes criamos relatórios sobre a qualidade do sistema. Se alguma etapa falhar ela é congelada por aqui e o artefato não é promovido.
+**** 3 Homologação UAT 
+As etapas build e AAT são totalmente automatizadas. UAT é manual.
+A próxima etapa - caso tudo ocorra como o esperado - é a promoção do artefato. Este é o ambiente classico de User Acceptance Testing, ou simplesmente homologação. Nesta fase executamos os testes mais complexos e que não podem ser automatizados.
+**** 4. Produção
+Depois da aprovação manual, iremos para o ambiente de produção, em que o artefato será de fato produzido de maneira segura.
+**** Pergunta da Alura: Quais são as vantagens de usar deployment pipeline?
+***** Entrega otimizada através de ferramentas típicas do mundo DevOps
+Alternativa errada! As ferramentas que você usa não importam muito.
+***** Entrega versionada
+Alternativa errada! Se é versionado ou não, depende de outros fatores.
+***** Entrega confiável
+Alternativa correta! As etapas são testes do nosso sistema, começando com testes simples e rápidos, até chegar aos testes mais sofisticado.
+***** Feedback rápido
+Alternativa correta! Cada etapa dá feedback para a equipe sobre a qualidade do software.
+**** Pergunta da Alura 2: Em que momento o pipeline começa a trabalhar?
+A cada commit
+Alternativa correta! Para cada commit novo devemos construir e testar o software!
+** Stage de commit e testes de aceitação
+*** Commit Stage
+Agora, focaremos em cada uma das etapas mais detalhadamente, começando pelo build, unit test e commit stage. Tudo que aprendemos sobre integração contínua aplica-se nesse ponto.
+
+Nosso objetivo é garantir que não introduzimos um bug e tudo continua funcionando. É nesta etapa em que rodamos os testes de unidade (ou commit test), buildamos e disponibilizamos o artefato, e geramos relatórios de qualidade.
+
+É ideal que esta etapa não demore mais do que 10 minutos. Quando uma pessoa altera o código-fonte e faz o commit, ela deve aguardar o resultado dessa etapa antes de seguir para outra tarefa. Não é obrigatório esperar as demais etapas do pipeline, mas é essencial aguardar o build. Por isso, é importante que ele seja executado em até 10 minutos. Portanto, o build é executado por commit na área de builds agendados.
+
+Se esse processo estiver demorando mais que 10 minutos, é interessante otimizá-lo. Podemos executá-lo em paralelo, por exemplo. Como comentamos, vamos executar os testes de unidade, buildar e disponibilizar o artefato em um repositório na nuvem, e gerar os relatórios de qualidade. Os testes e a análise de código estático podem ser realizados paralelamente.
+
+Idealmente, não devemos criar novas etapas. A pipeline deve ser curta e não ter muitas etapas. Logo, é melhor aumentá-la verticalmente, executando etapas intermediárias em paralelo.
+
+Vale lembrar que tudo estará no repositório! É importante que todos da equipe de entrega tenham acesso aos artefatos — não somente o binário (o produto), mas também os relatórios.
+
+Resumidamente, os passos clássicos dessa etapa são:
+   - testes de unidade
+   - build
+   - análise estática
+
+*(Obs importante: Os testes de integração, por serem mais demorados, normalmente ficam para a próxima etapa)*
+
+É importante que essa etapa seja rápida, pois a pessoa desenvolvedora deve aguardá-la para continuar seu trabalho. Como boas práticas, é interessante não testar a interface, evitar acessos ao banco de dados e async.
+
+O objetivo é assegurar que nenhum bug foi introduzido e as demais funcionalidades continuam funcionando. Uma boa cobertura de testes é uma boa garantia de que o projeto continua funcionando, mas não é o suficiente.
+
+Todos os scripts devem ser mantidos dentro do controle de versão, incluindo ambientes, configurações, migração, schemas, testes, entre outros. Eles devem evoluir junto do projeto para chegarmos à entrega contínua.
+
+*O stage de commit foca nos testes de unidade e integração.*
+*** Stage de testes de aceitação automatizados (AAT)
+Diferente dos testes de unidade, esse tipo de teste garante que as funcionalidades em conjunto estejam plenamente operantes e atenderão o requisito do cliente. Tais testes são caros e trabalhosos, portanto é fácil de pular esta etapa devido ao seu custo e dificuldade.
+
+Os testes de aceitação acessam a interface do software, como seria a experiência de usuário, e a ferramenta clássica para esta etapa é o Selenium. O teste de aceitação fornece uma garantia maior do ponto de vista do usuário.
+
+Neste teste, a primeira fase é nosso artefato estar disponibilizado em um repositório, e caso tudo tenha ocorrido certo, o pipeline é notificado e sistemas como Jenkins fazem o papel necessário nesta fase.
+
+
+Nessa etapa é testado o sistema todo. São testes baseados em requisitos, de alto nível (black box tests) e por isso muito valiosos.
+
+AP: Fiquei em dúvida, pois eu havia entendido das notas acima que os testes automatizados eram executados na Commit Stage, mas nessa aula foi mostrado os mesmo vindo depois dessa última. Conforme pergunta da Alura após a aula, essa alternativa é correta: *Essa etapa é iniciado quando o commit stage foi executado com sucesso.* Porém essa é errada:
+"Precisa de aprovação humana, normalmente alguém da equipe QA", pois: "Aqui é tudo automatizado, sem aprovação."
+
+*O stage AAT foca nos testes funcionais, que testam o sistema todo, baseado em um requisito*
+** Stage de Homologação 
+*** Stage de Homologação
+Nesta fase os testes são executados pelo cliente, isto é, um usuário real do produto utiliza a interface do software, por isso essa etapa também é conhecida como "teste de aceitação".
+
+Devemos lembrar que:
+
+"Our highest priority is to satisfy the customer through early and continuous delivery of valuable software". (Manifesto ágil)
+*** Stage de teste de carga (paralelo à Stage de Homologação acima)
+Em paralelo a homologação, podemos executar o "Capacity Testing Stage". A pergunta que queremos responder é: como garantir que o software realmente suporta a quantidade de requisições, transações e acessos de usuários?
+
+Os testes de carga buscam descobrir qual é a real capacidade do nosso sistema, ou seja, seu baseline. Conhecendo nosso sistema, devemos estabelecer metas claras e utilizar ferramentas de monitoração para descobrir as modificações arquiteturais que são necessárias.
+
+Algumas ferramentas que podemos utilizar para isto são JMeter, Getling, Webbload, Apache Bench, LoadNinja.
+
+** Estratégias de releases
+*** Releases de baixo risco
+A entrega contínua faz a diferença entre o deploy e o release, e até agora utlizamos essas duas palavras como se fossem a mesma coisa, e na verdade não o são.
+
+Deploy é criar um ambiente, garantir que ele exista de maneira correta, instalar o software e configurá-lo. Já o release é a publicação de fato, o momento em que o cliente utiliza o produto.
+
+Devemos desacoplar o deploy do release, e para isso existem estratégias como:
+- Blue/Green Deployment
+- Canary Releases
+- Feature Toggles (Feature Flags)
+
+(Obs: Maturidade do software: começa com alpha, depois beta (pensar na ordem do alfabeto, de uma flecha indo em ordem crescente da ordem das letras a->b->...))
+*** Blue-Green Deployment
+(ver arquivo: "./Curso_entrega_continua/01_Blue-Green_Deployment.png")
+
+Anteriormente, mencionamos alguns princípios para deploys de baixo risco. Para garantir a segurança do nosso deploy, devemos aplicar algumas estratégias de release.
+
+Temos duas questões principais:
+
+Como evitar que a aplicação fique offline durante o deploy (zero downtime)?
+
+Como voltar para a versão anterior (rollback) em caso de erro?
+
+Começaremos por conhecer o Blue/Green Deployment. Tecnicamente, o deploy já foi realizado, mas temos duas versões: uma antiga(azul) e a nova(verde) que já está em ambiente de produção.
+
+Entre as versões há um roteador, então em algum momento podemos modificar o fluxo para o novo ambiente, a nova versão. O ambiente velho (blue) fica no ar ainda um bom tempo caso algum problema surja. As conexões que existiam para o azul ficarão disponíveis até que realmente apenas a versão verde esteja totalmente funcional.
+(Pro: as conexões com o servidor blue continuam após a comutação até que tenham sido finalizadas).
+*** Canary Releases
+(ver arquivo: "./Curso_entrega_continua/02_Canary_Release.png")
+Aprendemos anteriormente sobre o Blue/Green Deployment, que oscila entre duas versões da aplicação: uma mais nova e outra mais antiga. Já o Canary Release executa ações parecidas, na verdade, podemos pensar que se trata de uma evolução.
+
+Neste caso, as duas versões são utilizadas ao mesmo tempo, tanto azul quanto a verde, mas a nova versão não é acessada por todos os usuários. Uma parcela dos usuários que têm acesso a nova versão serão agentes de um teste.
+
+O critério de direcionamento da nova versão em teste para alguns usuários varia, podemos usar 5% do nosso tráfego para a nova versão e monitorar o comportamento do sistema. Outro critério possível é o geográfico ou em estratégias de mercado, idade e assim por diante, isso vai variar de acordo com as necessidades do negócio e dados disponíveis sobre os usuários.
+
+Uma vez que o teste for concluído, os usuários integralmente são direcionados para a nova versão. Esse metodologia também é utilizada para A/B Test.
+
+O Canary Release é muito utilizado, e também é conhecido como "dark lauching" em tradução livre "lançamento no escuro", afinal nem todos os usuários sabem que existe um novo feature.
+*** Feature Toggles
+(ver arquivo: "./Curso_entrega_continua/03_Feature_Toggles.png")
+Outra estratégia com o mesmo objetivo é o Feature Toggles, também um dark lauching, mas neste caso trata-se de uma configuração *no código* (um if, por exemplo) que disponibiliza um switch de versões.
+
+Um exemplo é quando é oferecida a consdição de "beta tester" para o usuário de alguma aplicação, caso a resposta seja positiva, alguma configuração no cadastro possibilitará o acesso à nova feature. Mas temos a mesma base de código, não são duas versões blue ou green.
+
+Esta estratégia pode ser combinada ao Canary Release: uma parcela dos usuários que será direcionado para a versão nova utilizará o Feature Toggles habilitado. Há pessoas que defendem que toda a nova funcionalidade deve ser um Feature Toggles, mas para isso ser implementado de maneira correta deve-se elaborar uma estratégia para lidar com essa proposta.
