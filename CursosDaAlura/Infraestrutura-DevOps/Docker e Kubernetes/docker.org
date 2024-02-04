@@ -1,0 +1,1397 @@
+* Artigo: Começando com Docker
+https://www.alura.com.br/artigos/comecando-com-docker
+
+** Instalando o Docker
+Atualmente Docker está disponível em duas versões Docker Community Edition(CE) e Docker Enterprise Edition(EE).
+
+Em ambas as versões temos acesso a toda a API, basicamente a diferença entre as duas versões é o perfil desejado de aplicações. No EE temos um ambiente homologado pela Docker com toda infraestrutura certificada, segura pensada para o mundo enterprise. Já na versão CE podemos chegar ao mesmo nível que EE porém de uma forma manual.
+** Imagens
+O Docker trabalha com o conceito de images, ou seja, para colocar um container em funcionamento o Docker precisa ter a imagem no host.
+
+Essas imagens podem ser baixadas de um repositório (a nomenclatura para esse repositório é registry) ou criadas localmentes e compiladas. Esse é o link (https://hub.docker.com/) para o registry do Docker.
+
+Nesse registry podemos ter imagens oficiais e não oficiais. Além de podermos criar nossas próprias imagens, também é possível fazer upload dela em um registry.
+*** Baixando Imagens
+Para baixar uma imagem podemos usar o comando "docker pull" e o nome da imagem que queremos baixar. Vamos baixar a imagem do Ubuntu, para isso execute o seguinte comando no terminal: 
+	docker pull ubuntu.
+*** Listando imagens baixadas
+Para listar todas as imagens podemos usar o comando:
+	 docker images
+O nome da imagem é exibido na coluna REPOSITORY.
+** Containers
+*** Executando Containers
+A partir da imagem podemos iniciar quantos containers quisermos através do comando 
+	docker run
+
+Para acessarmos um terminal do Ubuntu podemos usar o comando 
+	docker run -i -t ubuntu 
+ou 
+	docker run -it ubuntu. 
+O parâmetro -i indica que queremos um container interativo, o -t indica que queremos anexar o terminal virtual tty do container ao nosso host.
+*** Listando containers em execução
+Para ver os containers em execução podemos usar o comando 
+	docker ps 
+(em outro terminal ou aba).
+Aqui temos informações sobre os containers em execução, como id, imagem base, comando inicial, há quanto tempo foi criado, status, quais portas estão disponíveis e/ou mapeadas para acesso e o nome do mesmo. Quando não especificamos um nome ao iniciá-lo, será gerado um nome aleatóriamente.
+
+Quando encerramos um container ele não será mais exibido na saida do comando 
+	docker ps
+, porém isso não significa que o container não existe mais. Para verificar os containers existentes que foram encerrados podemos usar o comando 
+	docker ps -a 
+e teremos uma saída.
+Como o próprio status do container informa numa possível situação dizendo em STATUS: "Exited (0)", o mesmo já saiu de execução e no nosso caso saiu com status 0 (ou seja saiu normalmente).
+*** Removendo containers
+Para remover o container podemos usar o comando 
+	docker rm 
+e informar o id do container ou o nome dele. Para nosso caso poderíamos executar o comando 
+	docker rm 43aac92b4c99 
+ou 
+	docker rm dreamy_bassi 
+para remover o container por completo.
+
+Caso tenhamos a necessidade de remover todos os container (em execução ou encerrados) podemos usar o comando 
+	docker rm $(docker ps -qa)
+ A opção -q do comando docker ps tem como saída somente os ids dos containers, essa lista de ids é passado para o "docker rm" e com isso será removido todos os containers.
+
+Só será possível remover um container caso o mesmo não esteja em execução, do contrário temos que encerrar o container para removê-lo.
+** Como são feitas as imagens?
+Nesse momento podemos pensar que o Docker é meio mágico (e é...kkk). Dado uma imagem ele pode rodar um ou mais containers com pouco esforço, mas como são feitas as images?
+
+Uma imagem pode ser criada a partir de um arquivo de definição chamado de Dockerfile, nesse arquivo usamos algumas diretivas para declarar o que teremos na nossa imagem. Por exemplo se olharmos a definição da imagem do Ubuntu podemos ver algo semelhante a isso:
+
+FROM scratch ADD ubuntu-xenial-core-cloudimg-amd64-root.tar.gz / . . . RUN mkdir -p /run/systemd && echo 'docker' > /run/systemd/container
+
+CMD \["/bin/bash"\]
+
+Com um arquivo Dockerfile podemos compilá-lo com o comando 
+	docker build
+Ao compilar um arquivo Dockerfile temos uma imagem. Para ver um exemplo de de arquivo Dockerfile ver: https://github.com/tianon/docker-brew-ubuntu-core/blob/1a5cb40f41ac4829d8c301ccd2cf3b7a13687a8b/xenial/Dockerfile
+* Curso de Docker: criando e gerenciando containers
+** Conhecendo o docker
+*** Conhecendo o problema
+**** Conhecendo o problema
+Temos uma aplicação Nginx que vai servir como um load balancer (balanceador de carga) do nosso sistema. Além disso, temos uma aplicação Java e uma aplicação C# rodando com o .NET.
+
+Nessa situação, queremos que todas essas aplicações estejam em execução para que o sistema como um todo esteja operacional. Para isso, precisamos de uma máquina para que essas aplicações rodem e o sistema funcione.
+
+A nossa aplicação C# roda na porta 80, isto é, precisa da porta 80 para executar. Da mesma forma, a aplicação Java roda na porta 80, assim como a Nginx. Nesse caso, o C# que utilizamos está na versão 9, o Java na versão 17, e o Nginx na versão 1.17.0.
+
+Quais problemas podem ocorrer nessa situação?
+Se observarmos cada uma dessas aplicações e ferramentas, podemos acabar tendo um conflito de portas, porque as 3 aplicações nesse cenário dependem da porta 80 para executar o fluxo necessário.
+
+Além disso, como podemos alterar as versões de maneira prática? Se simplesmente fizéssemos o downgrade ou o upgrade da versão do C#, atualizando o .NET, quebraríamos algo? Precisamos desinstalar para instalar uma nova? O mesmo se aplica ao Java e ao Nginx: conseguiríamos atualizar de maneira prática?
+
+Outra questão é a seguinte: como vamos ter um controle de recursos de memória e de CPU para essas aplicações? Por exemplo: a aplicação C# precisa de 100 millicores de CPU e 200 megabytes de memória para funcionar. Como podemos definir isso de maneira fácil?
+
+O mesmo é válido para as outras aplicações: como podemos fazer essa definição de consumo de recursos do sistema de maneira prática? É uma questão que precisamos levantar.
+
+Por fim, considerando todos esses problemas de uma vez só, como podemos fazer o processo de manutenção dessas aplicações? Como vamos conseguir mudar a versão? Como vamos ter esse controle sobre as portas das aplicações? Como vamos gerenciar os recursos e manter isso a longo prazo?
+**** Solução 1 - uma máquina para cada aplicação
+Uma solução que poderíamos pensar inicialmente que seria bem simples, mas ao mesmo tempo problemática, seria simplesmente comprar uma máquina para cada aplicação. Dessa forma, teríamos uma máquina para a aplicação .NET, outra máquina para a aplicação Java, e outra para a aplicação Nginx.
+
+Assim, resolveríamos o problema de conflito de portas, já que cada máquina teria a sua respectiva porta 80; conseguiríamos controlar os recursos de maneira mais fácil, pois não teríamos essa dependência das aplicações entre si; e o controle de versionamento também ficaria mais fácil, pois não teríamos diversas aplicações no mesmo sistema.
+
+Porém, qual o problema disso? O nosso dinheiro vai embora, porque se tivéssemos uma máquina para cada aplicação, pensando em sistemas que têm milhares ou milhões de aplicações em execução simultaneamente, precisaríamos de milhares ou milhões de máquinas para que o sistema esteja operante.
+
+**** Solução 2 - Máquinas virtuais (ver ./Imagens/01_Usando_VM.png)
+Existe uma solução já bem difundida, que não é recente e ajuda a resolver esses problemas: as máquinas virtuais, onde teríamos o hardware bem definido; o sistema operacional, seja ele Windows, Linux, Mac ou outro; e uma camada de hypervisor, que fará um meio de campo para virtualizar um novo sistema operacional.
+
+Esse sistema pode ser um Windows, um Linux, um Mac, rodando dentro de outro sistema, mas graças a essa camada de hypervisor, teríamos uma camada de isolamento desse sistema operacional original. Assim, conseguiríamos instalar as nossas dependências e aplicações de maneira isolada, porque cada uma delas tem o seu respectivo sistema operacional.
+
+Essa solução resolve esses problemas iniciais, mas a pergunta que fica nesse momento é a seguinte: é realmente necessário fazer isso?
+
+Queremos executar as nossas aplicações, como vimos, de maneira isolada, ter um controle de recursos, e ter um controle de versionamento bem definido. Então, essa camada de hypervisor é realmente necessária? Nessas situações, precisamos sempre virtualizar um sistema operacional? Pode ser que sim, pode ser que não, mas no caso que vamos abordar durante este curso, é a utilização de containers.
+**** Solução 3 - Containers (ver ./Imagens/02_Usando_Containers.png)
+No caso do uso de containers, não temos a camada de sistema operacional virtualizado, nem a de hypervisor, mas sim a camada diretamente do container rodando o sistema operacional, e mesmo assim, de forma isolada. Cada aplicação está isolada entre si e também isolada do sistema operacional original.
+
+É isso que vamos entender a partir de agora: por que os containers são mais leves? Como eles vão garantir esse isolamento? E como eles vão funcionar sem instalar um sistema operacional?
+
+No caso da máquina virtual, a aplicação C# terá um sistema operacional para ela, bem como a aplicação Java. Já no ambiente de containers, a aplicação C# está diretamente dentro do container. Nesse caso, qual sistema operacional ela vai usar? Windows? Linux? Precisamos instalar um sistema?
+
+Precisamos responder essas perguntas. De onde vêm essas informações? Por último, temos a seguinte pergunta: como ficará a divisão de recursos entre as aplicações que estarão, a partir de agora, containerizadas?
+
+**** Conclusão
+No próximo vídeo, vamos entender como essas situações ocorrem. Como o container vai garantir ser mais leve em questão de consumo de recursos? Como vai garantir isolamento? Como funciona sem instalar um sistema operacional?
+
+Agora que já sabemos como os containers nos ajudam e o que eles fazem, vamos entender os diferenciais de como o container opera dentro do nosso sistema. Abordaremos isso na sequência. Até mais!
+*** Como containers funcionam?
+Neste vídeo, vamos responder às seguintes perguntas:
+
+Por que os containers são mais leves em relação a uma máquina virtual?
+Como eles garantem o isolamento?
+Como funcionam sem instalar um sistema operacional?
+Como fica a divisão de recursos do sistema?
+
+**** Como containers funcionam?
+
+O container funciona da seguinte maneira: dentro de um sistema operacional, temos vários containers, isto é, diversas aplicações sendo executadas. No entanto, eles funcionarão diretamente como processos dentro do nosso sistema.
+
+Enquanto uma máquina virtual terá toda aquela etapa de virtualização dos sistemas operacionais dentro do sistema original, os containers funcionarão diretamente como processos dentro do sistema.
+
+Portanto, no que diz respeito ao consumo, podemos visualizar que ele será um pouco menor. O consumo de recursos, a carga para que ele possa ser executado, é um pouco menor, porque eles serão processos, e não uma virtualização completa.
+
+As próximas perguntas são as seguintes:
+
+Como um processo garantirá o isolamento?
+Como ele funcionará sem instalar um sistema operacional?
+Como vamos conseguir resolver e responder essas perguntas?
+A questão é que, quando containers estiverem em execução no nosso sistema operacional, para garantir o isolamento entre cada um deles e o sistema operacional original, existe um conceito chamado namespaces, que garantirá que cada um desses containers tenha capacidade de se isolar em determinados níveis.
+
+**** O que são namespaces?
+Teremos os principais namespaces: 
+- PID, que garante o isolamento a nível de processo dentro de cada um dos containers. Portanto, um processo dentro de um container, que, consequentemente, é um processo dentro do sistema operacional, estará isolado de todos os outros do nosso host, isto é, da nossa máquina original.
+- NET, o namespace de rede, que garantirá o isolamento entre uma interface de rede de cada um dos containers e também do nosso sistema operacional original.
+- IPC será de intercomunicação entre cada um dos processos da nossa máquina. 
+- MNT, que é a parte de file system (sistema de arquivos), montagem, volumes e afins, também estará devidamente isolado.
+- UTS faz um compartilhamento e um isolamento ao mesmo tempo do host, isto é, do kernel, da máquina que executa o container.
+
+Este último namespace específico, UTS, ajuda a responder à próxima pergunta:
+
+Como o container dentro do sistema operacional funcionará sem um sistema operacional?
+Na verdade, graças ao namespace UTS, se executarmos nossos containers em uma máquina com kernel Linux, cada um dos containers, a princípio, também terá um pedaço desse kernel, mas devidamente isolado.
+
+Assim, conseguimos responder à pergunta: não precisamos necessariamente instalar um sistema operacional dentro de um container, porque ele já terá, graças ao namespace UTS, acesso ao kernel do sistema original, mas isoladamente.
+
+**** Cgroups
+Por fim, na parte de gerenciamento de recursos, suponha que queiramos definir, conforme levantado em um problema anteriormente, o consumo máximo de memória, de CPU e afins para cada um dos containers.
+
+Existe outro conceito chamado Cgroups, que garantirá que podemos definir, tanto de maneira automática, quanto de maneira manual, como os consumos serão feitos para cada um desses processos, isto é, para cada um desses containers dentro do sistema operacional.
+
+De volta às perguntas originais, graças aos namespaces e aos Cgroups, conseguimos garantir o isolamento, garantir que o nosso container funciona sem instalar um sistema operacional dentro dele, e também conseguir ter um controle de gerenciamento de recursos como memória e CPU.
+
+Quanto à questão de por que eles são mais leves, entendemos que eles funcionarão como processos diretamente do sistema operacional, mas ao longo deste curso, entenderemos ainda mais por que eles conseguem ser tão mais práticos em relação a uma máquina virtual em termos de consumo de recursos e de tamanho de armazenamento também no nosso sistema operacional.
+*** Outras infos
+**** Versionamento de Aplicações
+No docker as aplicações são encapsuladas em imagens, que são versões imutáveis e autossuficientes. Uma imagem docker é composta por camadas, permitindo versionamento eficiente e a reutilização de partes comuns entre diferentes aplicações. Utilizando um arquivo conhecido como Dockerfile, o versionamento é facilitado , um arquivo de configuração que descreve os passos para criar uma imagem. As alterações no Dockerfile resultam em novas versões da imagem, garantindo consistência na implantação.
+** Os primeiros comandos
+*** docker run nomeDeImagem
+Retornando ao terminal, repetiremos o comando docker run hello-world do início para observar os resultados.
+
+docker run hello-world
+
+Neste ponto, é comunicado que a imagem não está presente localmente, desencadeando o download. Ao término, o processo é concluído com a validação de sha256, cuja interpretação será abordada.
+
+Unable to find image 'hello world:latest' locally
+Latest: Pulling from library/hello-world
+2db29710123e: Pull complete Digest:sha256:2498fce14358aa50ead0cc6c19990fc6ff866ce72aeb5546e1d59caac3d0d60f
+Status: Downloaded newer image for hello-world: latest
+
+A saída do container associado ao hello world é exibida (desde Hello from Docker até o final do retorno). Limparemos o terminal para prosseguir com um novo docker run. 
+
+Se for pedido:
+	docker run umaStringAleatoriaQueNaoEhImagemContidaNoDockerHub
+
+Não fará download e mostrará uma imagem de erro.
+
+É importante compreender que, para o funcionamento do nosso docker run, é necessário localizar essa entidade denominada imagem, a fim de que o container seja efetivo. Quando inserimos um nome sem sentido, como no caso anterior, o Docker não o localiza. 
+
+Como o Docker identifica os locais para procurar e encontrar esses nomes, resolvendo e executando nosso container?
+
+Um vasto repositório, conhecido como Docker Hub (https://hub.docker.com/), abriga uma variedade dessas imagens, correspondendo aos parâmetros que estamos especificando. 
+
+Agora, que outras ações podemos realizar para começar a levantar algumas perguntas? Quais imagens adicionais são interessantes para explorar na parte do docker run e compreender seu funcionamento? Há uma variedade de imagens que replicam, por exemplo, o conteúdo de um sistema operacional.
+
+Portanto, embora um container não seja obrigado a ter um sistema operacional instalado, ele tem a capacidade de incluir um sistema operacional, como o Ubuntu, por exemplo. Se pesquisarmos no Docker Hub por Ubuntu no campo de busca na parte superior, encontramos uma imagem oficial, criada e mantida por um grupo confiável de pessoas. Essa imagem, quando executada, gera um container baseado no Ubuntu.
+
+A questão em foco é: ao executarmos o comando docker run ubuntu, ele realizará exatamente isso.
+	docker run ubuntu
+(obs: com esse comando "nada acontece". ver seção **** docker ps abaixo
+
+**** -it
+
+Para concluir, mais um comando interessante é o seguinte: em vez de termos que executar um docker exec toda vez após um sleep, seria mais prático começarmos a executar nosso container e mantê-lo em execução, sem a necessidade de um sleep. Como podemos fazer?
+
+Simplesmente executamos um docker run ubuntu e indicamos que queremos executar o bash. Indo um pouco além, podemos especificar que queremos executá-lo em modo interativo, semelhante ao nosso exec. Assim, docker run -it ubuntu bash.
+
+	docker run -it ubuntu bash
+
+Com isso, criamos um novo container diretamente no terminal.
+
+Ao abrir mais um terminal e executar um docker ps, encontramos o container criado com o sleep de um dia há pouco e o bash criado há 10 segundos.
+
+CONTAINER ID	IMAGE	COMMAND		CREATED				STATUS				PORTS	NAMES
+81a143d70802	ubuntu	"bash"		10 seconds ago		Up 9 seconds		#		intelligent_allen
+48aac971d7fb	ubuntu	"sleep id"	About a minute ago	Up about a minute	#		busy_ritchie
+
+Se realizarmos alguma operação dentro dele, como ls ou criar um arquivo na home usando o comando cd pra ir para a home e logo após criamos um-arquivo.txt com o comando touch um-arquivo.txt.
+
+cd
+touch um-arquivo.txt
+
+No entanto, ao sairmos desse terminal, o container será encerrado. Podemos verificar isso rodando docker ps novamente no outro terminal.
+
+CONTAINER ID	IMAGE	COMMAND	    CREATED			STATUS			PORTS	NAMES
+48aac971d7fb	ubuntu	"sleep id"	2 minute ago	Up 2 minutes	#		busy_ritchie
+Por quê? Explicamos que, agora, não há mais nenhum processo; antes, tínhamos o bash, mas agora o terminal que mantinha a execução do processo para manter o container ativo não está mais presente. Portanto, no momento em que encerramos a execução do nosso único processo, o container é encerrado.
+
+**** -d
+	docker run dockersamples/static-site
+
+No entanto, ao executarmos o Ubuntu anteriormente, observamos que, ao realizar um simples docker run e manter nosso container em execução, como fizemos com o sleep, ele trava nosso terminal.
+
+Para executarmos esse comando e mantermos o container em segundo plano no terminal sem travamentos, podemos adicionar a flag -d, indicando "detached" (desanexado).
+
+docker run -d dockersamples/static-site 
+
+*** docker pull
+Ele acessa o Docker Hub, adquire a imagem e inicia o container. Ou, se optarmos por uma abordagem passo a passo, retornando ao Docker Hub, primeiramente podemos baixar a imagem para posterior execução. Portanto, voltando ao terminal, em vez de docker run ubuntu, podemos utilizar docker pull ubuntu.
+
+docker pull ubuntu
+
+Obtemos como retorno:
+
+Using default tag: latest
+latest: Pulling from library/ubuntu 1
+7b1a6ab2e44d: Pull complete
+Digest: sha256:626ffe58f6e7566e00254b638eb7e0f3b11d4da9675088f4781a50ae288f3322
+Status: Downloaded newer image for ubuntu: latest
+docker.io/library/ubuntu: latest
+
+O processo envolve o download, com uma saída inicial semelhante, não indicando localização local, pois estamos solicitando o download. Ele realiza a operação, extrai e, por fim, verifica. No entanto, não executa, pois apenas solicitamos o download da imagem.
+
+*** docker ps
+	docker run ubuntu
+Porém com o comando acima "nada aconteceu".
+Compreenderemos e exploraremos outros comandos do Docker que nos auxiliarão a verificar se o container de fato foi executado e por que não exibe nada.
+ 
+Um comando extremamente útil que utilizamos com frequência é o docker ps, que mostra quais containers estão em execução no momento. Limpamos a tela e executaremos docker ps.
+
+	docker ps
+
+Obtemos como retorno:
+CONTAINER ID IMAGE COMMAND CREATED STATUS PORTS NAMES
+
+Exibiu apenas o cabeçalho. Isso indica que a tabela de containers em execução está vazia. Não há nenhum container de fato em execução. Outra maneira, por mera curiosidade, de utilizar o docker ps, um tanto mais semântica, é através do comando 
+	docker container ls.
+
+É essencialmente o mesmo comando, um pouco mais longo, porém ao mesmo tempo mais semântico.
+
+Como percebemos agora, temos ciência de que nosso container não está em execução. Como visualizamos todos os containers, inclusive os que já não estão mais em execução, para determinar se nosso comando docker run teve algum efeito efetivo?
+
+Esse comando pode ser simplesmente o 
+	docker ps -a 
+ou 
+	docker container ls -a
+sendo essencialmente o mesmo.
+
+CONTAINER ID	IMAGE	    COMMAND	    CREATED	            STATUS	                      PORTS 	NAMES
+647c30aaa91a	ubuntu	    "bash"   	About a minute ago	Exited (0) About a minute ago	#  	upbeat_black
+612083bad906	ubuntu	    "bash"	    4 minute ago    	Exited (0) 4 minutes ag    o	# 	condescending_panini
+aecbfb856a76	hello-world	"/hello"	9 minutes ago   	Exited (0) 9 minutes ago	    #	relaxed_beaver
+
+Entendemos cada uma dessas colunas. A primeira é o container id, um identificador. A imagem usada como base para criar esse container, então docker run ubuntu, docker run ubuntu, docker run hello-world. O comando executado ao criar esse container, então aqui foi um bash, aqui foi um /hello, também foi um bash.
+
+Criados há um minuto, quatro minutos e nove minutos, respectivamente. Todos eles têm status exited, razão pela qual não foram exibidos no docker ps ou docker container ls, somente quando usamos a flag -a.
+
+Vamos compreender em breve a questão das portas, e name é simplesmente um nome atribuído automaticamente pelo Docker ao container quando não especificamos um nome. Não estamos preocupados com isso por enquanto; é apenas um detalhe. O Docker cria um nome aleatório para os containers.
+
+Agora, voltando para responder à pergunta: por que o container não está em execução? A resposta está nesta linha de comando. Ao executar o container a partir da imagem, como no caso da imagem do Ubuntu, é configurado para iniciar e executar o comando bash. No caso da imagem do hello world, ele executa /hello.
+
+*O que ocorre quando executamos novamente docker run ubuntu? O Docker inicia o container, executa o comando bash e conclui. Ao executar o comando bash, o Docker atinge seu objetivo. Neste momento, o container foi executado, subiu, realizou o bash, desempenhou sua função de execução, e a partir desse ponto não havia mais nenhum processo sustentando a existência do container. Por isso, ele foi encerrado.*
+
+*Para que um container permaneça em execução, é necessário ter pelo menos um processo em seu interior. Se não houver nenhum processo em execução, o container não permanecerá ativo. Como solicitamos apenas a execução do bash, o container iniciou, cumpriu sua função e encerrou.*
+
+Essa é a primeira consideração. Ao executarmos o comando run, ele executou essa instrução e encerrou imediatamente, pois não mantivemos nenhum processo em execução naquele momento.
+
+Ao mesmo tempo, se chegarmos agora, limpamos o terminal e executamos o comando docker run ubuntu mais uma vez. O que faremos? Ao executarmos o comando docker run --help, observamos que ao especificar a imagem, podemos enviar um comando para que esse container execute.
+
+Usage: docker run [OPTIONS] IMAGE [COMMAND] [ARG...]
+
+Podemos sair do comando e limpar o terminal.
+
+O que faremos? Sabemos que, dentro do Ubuntu como um todo, temos a linha de comando que podemos usar. Então, desejamos que esse container, por exemplo, execute o comando sleep e passaremos 1d.
+
+	docker run ubuntu sleep 1d
+
+Desejamos que o comando que o container execute, quando o Ubuntu subir, seja um sleep de um dia. Tecnicamente, quando o container subir, terá um processo de sleep, mantendo-o inativo por um dia. Isso funcionará? Veremos agora. Teclamos "Enter". Ele aparentemente travou nosso terminal.
+
+Agora, se executarmos o docker ps, veremos o que acontecerá.
+
+	docker ps
+
+Como retorno, temos:
+CONTAINER ID	IMAGE	COMMAND 	CREATED	        STATUS	      PORTS	NAMES
+9159610d06ec	ubuntu	"sleep 1d"	27 seconds ago	Up 27 seconds	#	funny_pike
+
+O docker ps mostra um container id com a imagem Ubuntu e um comando sleep de um dia. Como esse comando levará um dia para ser concluído, nosso container terá uma vida útil de um dia e está em execução, com um status up há 27 segundos. Quanto às portas, por enquanto, ignoraremos a questão, o nome é funny_pike.
+
+Agora compreendemos como manter um container em execução e por que ele para quando não especificamos um comando a ser executado. Antes, não havia nada impedindo sua execução; agora temos o sleep de um dia que fornecemos para o container executar.
+
+*Ao realizar o docker run, se não a tivermos localmente, buscamos no Docker Hub, validamos através de um hash e executamos nosso container. Este geralmente possui, como visto no caso do Ubuntu, um comando padrão a ser executado, que, ao compararmos com o menu rodando o comando docker ps -a no terminal, seria o "bash".*
+
+*** docker start/stop
+Interrompendo e reiniciando os containers:
+
+Contudo, o que mais é essencial compreender? Ainda precisamos abordar o seguinte ponto: ao executarmos novamente o comando docker ps, veremos que nosso container está em execução com o sleep de um dia. No entanto, a execução está vinculada a um terminal bloqueado, o que pode ser inconveniente.
+
+Por exemplo, para tornar o fluxo mais prático, fecharemos o terminal que estava bloqueando o nosso. O que ocorrerá nesse momento? Se executarmos agora o comando docker ps, o container continuará em execução. Entretanto, se desejarmos interromper a execução desse container, o que faremos? Utilizaremos o comando docker stop, fornecendo a ele o ID ou o nome do container.
+
+	docker stop 9159610d06ec
+
+Ele demorará um pouco e interromperá a execução desse container. No instante em que executarmos novamente docker ps, não haverá mais nenhum output. Executando docker ps, não há mais nenhum container em execução.
+
+Se, por algum motivo, desejarmos reiniciar o container que foi previamente interrompido, consultaremos nosso docker ps -a, obteremos o ID do container e simplesmente executaremos docker start, passando novamente o ID. Nesse momento, o container retomará a execução.
+
+	docker start 9159610d06ec
+
+Ao executarmos docker ps novamente, veremos que ele está em execução, criado há 11 minutos, mas seu status indica que está em execução apenas há 4 segundos.
+
+CONTAINER ID	IMAGE	COMMAND	    CREATED	        STATUS	      PORTS	NAMES
+9159610d06ec	ubuntu	"sleep 1d"	11 minutes ago	Up 4 seconds	#	funny_pike
+
+Conseguimos interromper e reiniciar nossos containers utilizando esses dois comandos, docker start e docker stop.
+
+Para que consigamos fazer a inicialização a partir de um start, precisamos que o nosso container esteja no estado de parada e vice-versa, se quisermos pará-lo, ele precisa estar no estado de execução.
+
+*Obs IMPORTANTE Pro/AP: quando subimos um container com docker start são executados todos os comandos da árvore de processos dele que foram chamados previamente (ou apenas o da guia COMMAND do docker ps???)*
+
+Agora, um último detalhe para entender. Vamos executar um docker ps, mas desta vez, pegaremos o ID do nosso container e executaremos um docker stop nele novamente.
+
+	docker stop 9159610d06ec
+
+Se desejarmos evitar que ele leve 10 segundos para executar, podemos usar a flag -t = 0, colocando-a antes do nome do nosso container, para que não haja tempo de espera ao parar.
+
+docker stop -t=0 9159610d06ec 
+COPIAR CÓDIGO
+Por padrão, o container espera 10 segundos para encerrar de maneira adequada. Se quisermos ser rápidos, simplesmente usamos -t = 0 para uma parada instantânea.
+
+*** docker exec
+Como interagir com um container em execução
+	
+	docker exec
+	
+Podemos afirmar que é possível executar um comando dentro do nosso container de maneira interativa. Para torná-lo interativo, usaremos o -it, com o i indicando interatividade e o t referindo-se ao terminal padrão do container. Realizaremos essa ação no container com o ID mencionado.
+
+	docker exec -it 9159610d06ec
+
+E o que queremos é simplesmente executar um comando. Qual comando podemos empregar para navegar no interior do nosso Ubuntu? Podemos optar por um simples bash.
+
+	docker exec -it 9159610d06ec bash
+
+Executaremos isso agora, e observe o que ocorreu: o terminal foi modificado, e agora estamos logados como usuário root nessa máquina.
+
+root@9159610d06ec:/#
+
+Comparando, é exatamente o ID do nosso container. Atualmente, estamos dentro do terminal do container, e todas as ações que empreendermos aqui serão devidamente isoladas.
+
+Executaremos um "Ctrl + D" para sair do container.
+
+Poderíamos constatar que tudo está devidamente isolado devido aos namespaces. No terminal, acessamos a home desse container com o comando cd agora e criarmos um arquivo, como touch eu-sou-um-arquivo.txt, o que ocorrerá?
+
+	cd
+	touch eu-sou-um-arquivo.txt
+
+Ao executarmos ls, temos o nosso arquivo.
+
+	top
+
+Esse comando mostrará os processos em execução do usuário root, incluindo nosso sleep que mantinha o container ativo e o bash que estamos utilizando agora.
+
+O retorno abaixo foi parcialmente transcrito. Para conferi-lo na íntegra, execute o código na sua máquina
+
+PID	USER	PR	NI	VIRT	RES	SHR	S	%CPU	%MEM	TIME+	COMMAND
+1	root	20	0	2516	592	528	S	0.0	0.0	0:00.01	sleep
+7	root	20	0	4116	3632	3084	S	0.0	0.0	0:00.02	bash
+Assim, nosso container possui dois processos neste momento, ambos pertencentes a nós, usuários root.
+
+Se pararmos agora, realizaremos um "Ctrl + L" mais uma vez para sair desse container. O que ocorrerá? para sair do container, e ao executar docker ps novamente, ele ainda estará em execução, pois nosso sleep permanece ativo.
+
+CONTAINER ID	IMAGE	COMMAND	CREATED	STATUS	PORTS	NAMES
+9159610d06ec	ubuntu	"sleep id	15 minutes ago	Up 4 minutes	#	funny_pike
+É necessário compreender o seguinte: se executarmos um docker stop neste container e, em seguida, o reexecutarmos, faremos o seguinte: docker stop, aguardaremos o término, e depois executaremos um docker start para verificar o resultado.
+
+docker stop 9159610d06ec
+COPIAR CÓDIGO
+Ao realizar o docker stop, aguardamos um período padrão (Pro: foi dito que ele espera por padrão 10 segundos antes de encerrear os processamentos) e, em seguida, executaremos o docker start.
+
+docker start 9159610d06ec
+
+Novamente, executaremos o comando para acessar o terminal em modo interativo.
+
+docker exec -it 9159610d06ec bash
+COPIAR CÓDIGO
+Nesse ponto, ao retornarmos à nossa home com o comando cd e executarmos um ls, nosso arquivo estará presente.
+
+eu-sou-um-arquivo.txt
+
+Mas se executarmos um top agora, o que acontece?
+
+top
+COPIAR CÓDIGO
+Ele simplesmente resetou toda a nossa árvore de processos. Ele deu um sinal de kill, sigkill por assim dizer, em toda a árvore de processos, porque paramos todos os processos e recomeçamos eles. Então o tempo de execução deles na coluna "time" foi zerado, toda a contagem do processo foi reiniciada. Essa é uma questão que acontece quando executamos o top.
+
+PID	USER	PR	NI	VIRT	RES 	SHR 	S	%CPU	%MEM	TIME+	COMMAND
+1	root	20	0	2516	592 	464 	S	0.0 	 0.0	0:00.02	sleep
+9	root	20	0	4116	3632	3008	S	0.0	     0.0	0:00.01	bash
+18	root	20	0	6092	3300	2804	R	0.0      0.0	0:00.00	top
+
+*** docker pause/unpause
+Se simplesmente sairmos do terminal mais uma vez e executarmos outro comando, como por exemplo docker pause passando o id do container; nós pausamos o container.
+
+	docker pause 9159610d06ec
+
+Tentar acessar esse container agora é impossível, pois está pausado. Podemos tentar com o seguinte comando:
+
+	docker exec -it 9159610d06ec bash
+
+Obtemos como retorno:
+
+Error response from daemon: Container 9159610d06ec is paused, unpause the container before exec
+
+Podemos simplesmente despausar o container com o comando docker unpause.
+
+	docker unpause 9159610d06ec
+
+*Ao tentar acessá-lo novamente com docker exec -it 9159610d06ec bash, conseguimos; e ao executar top, percebemos que a árvore de processos foi mantida, pois preserva o fluxo de execução e os arquivos. (AP: contrastar com o docker stop, que quando roda docker start ele reexecuta toda árvore de execução anterior)*
+
+PID	USER	PR	NI	VIRT	RES	    SHR	    S	%CPU	%MEM	TIME+	COMMAND
+1	    root	20	0	2516	592  	464	    S	0.0	     0.0	0:00.02	sleep
+19	root	20	0	4116	3448	2996	S	0.0	     0.0	0:00.02	bash
+27	root	20	0	6124	3376	2900	R	0.0	     0.0	0:00.00	top
+
+Mas numa situação menos agressiva em relação ao comando stop que podemos realizar. O que ainda precisamos saber? Na verdade, agora aprendemos como podemos interromper a execução de um container, reiniciá-lo e retomar a execução.
+
+Observamos como podemos pausar e despausar, entendendo a diferença entre cada tipo de operação. Vale destacar que os containers estão devidamente isolados do nosso host original, graças ao arquivo, como o namespace de utilização do mnt, que criamos.
+
+*** docker rm
+Excluindo o container
+Agora, podemos excluir nosso container com o comando docker rm, passando o ID correspondente.
+
+	docker rm 9159610d06ec
+
+Ao executar docker rm para nosso container, ele será removido instantaneamente.
+
+Ao criar mais uma vez com o comando docker run ubuntu e manter um sleep de um dia, ele bloqueará o terminal.
+
+	docker run ubuntu sleep 1d
+
+Por fim, ao abrir um novo terminal e executar docker exec -it neste terminal criado, e depois rodamos usar docker ps para obter o ID 48aac971d7fb.
+
+    docker exec -it
+    docker ps
+
+Copiamos o id e rodamos:
+
+	  docker exec -it 48aac971d7fb bash
+
+Acessmos o terminal.
+
+*(AP/Pro: Obs para entender o parágrafo abaixo: no container da imagem ubuntu que havia sido removido com o comando acima havíamos criado um "touch" para criar um arquivo na pasta home, ao criarmos um novo container com essa mesma imagem foi observado que o arquivo não estava lá - ou seja: os dados salvos nos containers são exclusivamente deles):
+Ao navegar até a home com cd e executar ls, notamos que o arquivo desapareceu. Como o container deixou de existir, ficando completamente isolado dos outros containers e do nosso host, todo o conteúdo foi perdido.*
+
+Assim, o container possui essa característica efêmera; deve estar sempre pronto para ser encerrado, e devemos estar preparados para perder os dados, a menos que configuremos alguma medida para evitar isso.
+
+É uma questão que também exploraremos mais adiante: como lidamos com a persistência de arquivos em containers.
+
+Conclusão
+Exploramos alguns pontos importantes no ciclo de vida dos containers e compreendemos que, devido ao seu isolamento, não conseguimos reter as informações de maneira persistente. (AP: Obs: uma vez dado "docker stop", ou "exit" (quando logado), ou CTRL+D - os arquivos que eu crio dentro do sistema continuam lá ainda).
+**** --force
+Vamos interromper e remover o container de uma vez. Podemos adotar uma abordagem mais direta, em vez de executar docker stop seguido de docker rm. Ao copiarmos o ID (1b6d75073457) e utilizarmos docker rm diretamente com o ID, acrescentando --force ao final, o container será interrompido e removido simultaneamente.
+
+docker rm 1b6d75073457 --force
+
+Dessa forma, docker ps não exibe mais nenhum container em execução.
+
+**** removendo todos containers de uma vez, num único comando
+Digitamos docker container rm, usando como entrada a saída do nosso comando docker container ls -aq:
+
+	docker container rm $(docker container ls -aq)
+
+Por que o -aq? Queremos pegar apenas os IDs com o q, e o -a serve para pegar todos os nossos containers, inclusive os que estão parados. Se pressionarmos "Enter", os containers serão removidos, sendo exibidos seus IDs no retorno.
+
+*** docker port
+Em vez de repetir a execução do docker run ubuntu com o hello-world no terminal, iremos além. Executaremos um exemplo prático de uma aplicação web que permitirá visualizar sua saída através do navegador.
+
+Qual aplicação é essa? Se voltarmos ao docker hub , encontramos uma aplicação, na verdade, um grupo de pessoas usuárias, uma organização chamada docker samples que oferece diversos tipos de aplicação para exemplificar o uso do docker. 
+
+Iremos copiar mais uma vez o nome da imagem (dockersamples/static-site) e realizar um docker run, passando o dockersamples/static-site.
+
+	docker run dockersamples/static-site
+
+ou, para não travar o container:
+
+	docker run -d dockersamples/static-site 
+
+Observemos o que ocorrerá. O processo envolverá o download de todas as camadas necessárias para a execução do container, o qual é baseado na imagem dockersamples/static-site.
+
+
+	docker ps
+
+Como retorno, temos:
+
+CONTAINER ID	IMAGE						COMMAND				CREATED			STATUS			PORTS			NAMES
+1b6d75073457	dockersamples/static-site	"/bin.sh -c /usr…"	13 seconds ago	Up 11 seconds	80/tcp, 443/tcp	friendly_lamarr
+
+O comando revela que o container está em execução, foi baseado na imagem, foi criado há poucos segundos e permanece em execução. 
+
+Este comando, /bin.sh -c, não exibe o comando completo, mas mantém um processo ativo dentro do terminal do nosso container. Como resultado, o próprio container continua em execução.
+
+A coluna de portas mostra que a aplicação está operando nas portas 80 e 443, e o nome registrado é "frangley lamar". Se a aplicação está na porta 80, vamos abrir o navegador e acessar localhost nessa porta.
+
+*No entanto, não há acesso direto devido ao isolamento das interfaces de rede proporcionado pelo namespace, principalmente pelo NET. Portanto, a porta 80 do container não está automaticamente mapeada para a máquina host, tornando o acesso direto inviável.*
+
+Se voltarmos ao terminal e compreendendo o que está ocorrendo, precisamos observar o seguinte. A porta 80 pertence ao container, sendo a porta 80 interna à interface de rede do container. Se desejarmos acessá-la de outras maneiras, é necessário expor essa porta. Antes disso, contudo, precisamos realizar o seguinte. O container já está em execução.
+
+Vamos interromper e remover o container de uma vez. 
+
+	docker rm 1b6d75073457 --force
+
+Ao executarmos mais uma vez, adicionamos o -d docker samples. Contudo, em vez de repetirmos apenas esse comando, o que faremos é incluir a flag -P em maiúsculo. Vamos descobrir o que essa flag faz agora.
+
+	docker run -d -P dockersamples/static-site 
+
+Obtemos como retorno:
+
+b0e93e405db66a44d8976fbd9f7eb72deb5690125f71e70c356698c6c31d08e7
+
+O container é executado novamente sem travamentos devido ao -d, e não ocorre o download porque já temos o conteúdo em nossa máquina. Ao usar docker ps, observamos um mapeamento na coluna de portas, um tanto complexo de entender, mas o restante permanece inalterado.
+
+CONTAINER ID	IMAGE						COMMAND					CREATED			STATUS			
+b0e93e405db6	dockersamples/static-site	"/bin.sh -c 'cd /usr…"	14 seconds ago	Up 13 seconds 
+
+PORTS																NAMES
+0.0.0.0:49154->80/tcp, 0.0.0.0:49153->443/tcp, :::49153->443/tcp	happy_jang
+
+Vamos agora executar um comando, no qual pegaremos apenas o ID, que é este, o b0e93e405db6, e em seguida, usaremos docker port, um comando que revela como está o mapeamento de portas do container em relação ao host.
+
+	docker port b0e93e405db6
+
+Vamos transferir o container, e agora constatamos que a porta 80 do nosso container foi mapeada para a porta 49154 do nosso host:
+
+443/tcp -> 0.0.0.0:49153
+443/tcp -> :::49153
+80/tcp -> 0.0.0.0:49154
+80/tcp -> :::49154
+
+Isso implica que se eu executar localhost na porta 49154 em nosso host no navegador, o que ocorrerá? Utilizaremos http://, e conseguimos acessar nosso container.
+
+http://localhost:49154
+
+O conteúdo do container foi acessado devido ao mapeamento de uma porta interna do container para uma porta do nosso host. No navegador, obtemos a mensagem:
+
+Hello Docker!
+
+Poderíamos ter realizado isso de maneira mais precisa. Ao retornarmos, executaremos o comando docker rm, passando o nome e o ID do nosso container com --force. Em seguida, iniciaremos um novo container.
+
+	docker rm b0e93e405db6 --force
+
+Ao executarmos novamente o comando docker run, mas desta vez com a flag -p em minúsculo, conseguimos realizar um mapeamento específico da porta do host, como, por exemplo, a porta 8080 do host refletindo em uma porta específica do container.
+
+Observamos que, por padrão, ele expôs nas colunas de porta as portas 80 e 443. Desejamos que a porta 8080 da nossa máquina reflita na porta 80 do container. Para isso, após o -p inserimos 8080:80.
+
+	docker run -d -p 8080:80 dockersamples/static-site 
+
+Executamos o comando. Agora, ao acessar localhost na porta 8080, conseguimos realizar esse mapeamento de uma porta específica do nosso host para o container.
+
+localhost:8080
+
+Temos como retorno no navegador:
+
+Hello Docker!
+
+Temos o isolamento de rede, mas conseguimos realizar um mapeamento para acessar o conteúdo do container, validando o que está acontecendo, evitando não sabermos o que ocorre dentro do container. No final, conseguimos expor nossa aplicação para que as pessoas usuárias possam acessar.
+
+** Criando e compreendendo imagens
+*** Entendendo imagens
+**** O que são imagens?
+Até agora, temos aceitado que as imagens são uma receita para criar um container, mas efetivamente como elas funcionam?
+
+Uma imagem nada mais é que um conjunto de camadas, que ao serem unidas formam imagens. E essas camadas são independentes, cada uma tem o seu respectivo ID (identificador).
+
+Vamos voltar para o terminal no caso do dockersamples para visualizar esse exemplo (AP: imagem de exemplo do Docker Hub).
+
+Após executar um docker pull do dockersamples e um docker run na nossa imagem, podemos visualizar as imagens que temos baixadas no nosso sistema, através do comando 
+	docker images 
+ou 
+	docker image ls
+
+REPOSITORY				TAG		IMAGE ID		CREATED		SIZE
+dockersamples/static-site	latest	f589ccde7957	5 years ago	191MB
+
+Temos baixada a nossa imagem, que é o dockersamples/static-site, com essa tag latest, com seu respectivo ID. E ela foi criada há cinco anos pelo grupo do dockersamples e o tamanho dela é 191 megabytes.
+
+Podemos ir um pouco mais além, podemos dar o comando docker inspect em uma imagem passando o identificador do que queremos inspecionar.
+
+	docker inspect f589ccde7957
+
+Dessa maneira, teremos diversas informações.
+
+Retorno parcialmente transcrito:
+
+[
+    {
+        "Id": "sha256:f589ccde7957fa3ddf76a2eeee4d2f5d687b32176f559b703b6b8cacf6d36
+        bc4",
+        "RepoTags": [
+            "dockersamples/static-site:latest"
+        ],
+        "RepoDigests": [
+            "dockersamples/static-site@sha256:daa686c61d7d239b7977e72157997489db49f316b9b9af3909d9f10fd28b2dec"
+        ],
+        "Parent": "",
+        "Comment": "",
+        "Created": "2016-03-18T10:59:54.367126Z",
+    }
+]
+
+Temos um conjunto muito grande de informação que podemos ter detalhadamente sobre determinado recurso dentro do nosso Docker.
+
+Por exemplo, o ID, a tag do repositório, o digest que foi utilizado para validação da imagem, se tem alguma imagem que é um parent, uma imagem pai ou mãe, a data de criação, o container e sua configuração. Inclusive, no final, temos mais informações sobre a parte de layers, ou seja, das camadas.
+
+Existe um comando específico para verificar quais são as camadas de uma imagem. Basta usar o comando docker history, passando o ID da imagem.
+
+	docker history f589ccde7957
+
+IMAGE			CREATED		CREATED BY										SIZE	COMMENT
+f589ccde7957	5 years ago	/bin/sh -c #(nop) CMD ["/bin/sh" "-c" "cd /u…	0B		-
+<missing>		5 years ago	/bin/sh -c #(nop) WORKDIR /usr/share/nginx/h…	0B		-
+<missing>		5 years ago	/bin/sh -c #(nop) COPY file:c8203f6bfe2ff6ba…	8.75kB	-
+…	…	…	…	…
+Repare que temos a nossa imagem f589ccde7957 na primeira linha. Ela tem 13 camadas, as quais quando são aglutinadas, ou seja, quando são empilhadas umas nas outras formam essa imagem final do dockersamples/static-site. E caso alguma outra imagem venha a depender dessas camadas, conseguimos reutilizá-las.
+
+Ele mostra detalhadamente qual é o tamanho de cada uma dessas camadas, a data de criação e a ordem de cada uma delas, como CMD, WORKDIR, COPY. Assim, conseguimos verificar todas essas informações e entender o que está acontecendo.
+
+Em resumo, uma imagem é um conjunto de camadas empilhadas para formar determinada regra de execução de um container.
+
+**** Como imagens viram containers?
+Quando fizemos o comando docker run pela primeira vez, ou simplesmente um docker pull, não para executar o container, mas só baixar a imagem, o que pode acontecer? Vamos fazer o download das nossas imagens, das nossas camadas.
+
+Mas é possível que, por exemplo, já tenhamos algumas das camadas que queremos no nosso host. Por isso, no momento em que fazemos um pull ou um run, que vai fazer um pull consequentemente, faremos os downloads simplesmente das camadas que necessitamos.
+
+*O Docker é inteligente o suficiente para reutilizar essas camadas para compor novas imagens, conseguindo assim uma performance muito boa, já que não precisaremos ter informação duplicada ou triplicada, porque conseguimos reutilizar as camadas em outras imagens.*
+
+*O que mais podemos explorar na parte de criação de imagens? No fim das contas, quando temos a nossa imagem, ela é read-only (somente leitura), isso significa que não conseguimos modificar as camadas dessa imagem, depois que ela foi criada.*
+
+Voltando ao exemplo no terminal, no momento em que temos a imagem do dockersamples/static-site, ela é imutável - assim como a imagem que temos do Ubuntu.
+
+Mais uma vez, se fazemos docker run -it ubuntu bash para executar o bash em modo iterativo, vamos baixar a camada necessária para ter a nossa imagem de execução para que consigamos executar nosso container do Ubuntu.
+
+docker run -it ubuntu bash
+
+*Contudo, havíamos criado na home um arquivo qualquer de exemplo com o comando touch um-arquivo-qualquer.txt. Isso significa que estaríamos escrevendo dentro do container. Mas como estamos conseguindo fazer isso se a imagem que gera o nosso container é apenas para leitura (read only)?*
+
+*Se ela é bloqueada para escrita, como é que o container consegue escrever informação dentro dela? Porque um container nada mais é do que uma imagem com uma camada adicional de read-write (leitura e escrita).* (Ver arquivo: "./Imagens/03_Camadas_Container=CamadasImagem+RW.png")
+
+Quando criamos um container, criamos uma camada temporária em cima da imagem, onde conseguimos escrever informações. E, no momento em que esse container é deletado, essa camada extra também é deletada.
+
+Por isso que quando fizemos aquele experimento anteriormente, a nossa informação dentro do container era perdida quando nosso container era apagado. Porque essa camada é temporária, bem fina e leve para que o container tenha um ambiente de execução muito leve e fácil de ser executado.
+
+**** Por que os containers são tão leves?
+Agora voltamos àquela primeira pergunta, onde questionávamos por que os containers são tão leves.
+
+Além de serem simplesmente processos dentro do nosso sistema, podemos dizer que, quando um container entra em execução, estamos sempre reaproveitando a mesma imagem.
+
+Como a imagem é apenas de leitura, podemos ter vários containers baseados na mesma imagem. A diferença é que cada um desses containers terá apenas uma camada diferente de read-write, e como essa camada é extremamente leve, a fim de manter essa performance, temos uma reutilização da imagem para múltiplos containers.  (Ver arquivo: "./Imagens/04_Reaproveitamento_da_Imagem_Nos_Containers.png")
+
+*No fim das contas, o que acontece é que quando definimos um container ou outro container baseado na mesma imagem, o tamanho desse container será apenas o tamanho da camada de escrita que estamos gerando para ele, porque a imagem será reutilizada para cada um deles.*
+
+Em breve, faremos um experimento prático, conforme formos avançando na criação e no fluxo das nossas imagens.
+
+O container é leve e otimizado, porque consegue reaproveitar as camadas das imagens prévias que já temos. E, quando criamos novos containers, ele simplesmente reutiliza as mesmas imagens e, consequentemente, as camadas.
+
+Além disso, utiliza a camada de read-write para utilizar de maneira mais performática o que ele já tem no ecossistema do Docker.
+
+Próximos passos
+A partir de agora, vamos entender como definir um arquivo chamado Dockerfile, que vai nos ajudar a criar as nossas próprias imagens, e como vamos gerar os nossos containers através dessas imagens que vamos criar.
+
+Nesse vídeo, desmistificamos efetivamente o que é uma imagem, como transformar uma imagem num container, porque o container é tão leve. Isso vai ficar ainda mais fácil entender, conforme formos avançando e criando a nossa própria imagem.
+*** Criando a primeira imagem
+Agora, precisamos entender como criaremos nossa imagem efetivamente para não depender totalmente de imagens de outras pessoas.
+
+Para isso, precisamos seguir um fluxo. Primeiro, definimos um arquivo Dockerfile e a partir dele criamos nossa imagem. Uma vez em posse da imagem, basta executar o comando run para gerar um container a partir da imagem.
+
+**** Definindo arquivo Dockerfile
+Para esse projeto, vamos usar uma aplicação Node. Ressaltamos que não vamos entrar em nenhum detalhe específico de Node ou qualquer linguagem de programação, apenas usamos como exemplo para ter uma aplicação efetiva para empacotar, transformar em uma imagem e depois em um container.
+
+O que queremos é que, ao executar nosso container e acessá-lo via nosso host, por exemplo, mapeando as portas, tenhamos a visualização, da aplicação em execução. Nesse caso, será uma tela azul com a frase "Eu amo Docker!".
+
+Portanto, de alguma maneira, precisamos colocar todo o conteúdo da aplicação (AP: código do projeto de Node) dentro de uma imagem, instalar o Node, que será responsável por executar o servidor e, finalmente, quando nosso container executar, queremos que ele execute algum comando que mantenha esse servidor em execução.
+
+Dentro da pasta do projeto Node, vamos criar um arquivo chamado Dockerfile.
+
+Dentro deste arquivo, vamos definir como será a criação da nossa imagem. O que queremos fazer? Nós queremos que dentro do nosso projeto como um todo nós tenhamos o Node para que consigamos rodar um servidor.
+
+Então, se queremos usar o Node como base para nossa aplicação, podemos pegar emprestado o que já desenvolveram. Assim, poderíamos fazer o pull dessa imagem já existente para poder usar em nosso projeto, e a partir daí, fazer modificações para customizar o projeto da nossa maneira.
+
+No fim das contas, precisamos do Node. Mas como colocamos o Node dentro da nossa imagem por padrão? A princípio, poderíamos colocar um Ubuntu e dentro desse Ubuntu, instalar o Node e fazer toda a configuração necessária.
+
+Porém, não precisamos ter necessariamente um sistema operacional dentro do nosso container. Podemos simplesmente usar uma imagem que já disponibilize o Node para nós, como a própria imagem do Node no Docker Hub, que é uma imagem oficial.
+
+A descrição, nessa página, contém todas as versões que podemos definir, desde a versão 17 até a 12. Então, o que podemos fazer neste cenário? Podemos simplesmente dizer que queremos pegar uma dessas versões do Node para executar nosso projeto e usar essa imagem como base para a nossa. A partir da imagem que vamos definir, começamos a usar a nossa.
+
+Como pegamos uma imagem emprestada? Por exemplo, se queremos usar o Node na versão 14, devemos definir isso dentro do arquivo Dockerfile.
+
+Para definir que queremos pegar a partir do Node, digitamos FROM node. Mas como explicitar a versão? Utilizando dois pontos e a versão que queremos:
+
+FROM node:14
+
+Como sabemos que é preciso escrever 14? Porque na documentação da imagem do Node (no Docker Hub), ele mostra quais são as tags suportadas, inclusive a 14.
+
+A partir do Node na versão 14, o que queremos fazer? Queremos colocar todo o nosso projeto, que são esses arquivos do diretório exemplo-node, exceto o próprio Dockerfile, dentro dessa imagem.
+
+Portanto, queremos copiar o conteúdo do nosso host para nossa imagem. Mas como fazemos isso? Podemos simplesmente colocar o COPY. Queremos copiar o quê? Todo o conteúdo do nosso diretório atual. Em que diretório está o nosso Dockerfile? No "exemplo-node".
+
+Então, todo o conteúdo do nosso diretório atual, queremos copiar para algum diretório dentro do nosso container, por exemplo, para uma pasta chamada /app-node.
+
+	COPY . /app-node
+
+(Pro/AP: o "." acima se refere à pasta da máquina host (nossa máquina "real") da qual copiaremos para dentro da pasta "app-node" que será criada dentro da imagem. Nesse caso, como foi passado ".", se refere à pasta que estaremos no terminal processando o comando de "docker run" na hora da criação da nova imagem).
+
+E o que precisamos fazer? Queremos executar o comando npm install, mas esse comando deve ser executado dentro do nosso diretório /app-node, para que possamos instalar as dependências da nossa aplicação.
+
+	RUN npm install
+(Pro/AP: esse comando será processado só uma vez: na hora da criação da imagem. Depois a imagem vai ter todas as dependências que o npm install baixou)
+Caso você não conheça Node, esse comando basicamente é responsável apenas por instalar as dependências que nosso projeto precisa em um projeto Node. Basicamente, estamos instalando as dependências e o Node está resolvendo isso automaticamente.
+
+Por fim, queremos que o ponto de entrada (ENTRYPOINT) do nosso container ao executar essa imagem *e começar a ter seu container devidamente em execução, seja iniciar a aplicação*. Para isso, usamos npm start.
+
+ENTRYPOINT npm start
+
+Esse comando também tem que ser executado dentro desse diretório /app-node. Mas teríamos que colocar /app-node em todos os lugares. Será que poderíamos resolver isso de uma maneira mais simples?
+
+Por exemplo, queremos que todos esses comandos sejam executados no diretório que estamos atualmente por padrão. E como definimos qual é o diretório que a imagem vai tratar como padrão? Qual será o meu diretório de trabalho, por assim dizer?
+
+*Para isso, existe a instrução WORKDIR, e com ela podemos definir o nosso diretório padrão /app-node.*
+
+Com isso, podemos modificar o COPY inclusive. Podemos fazer um COPY de ponto, ou seja, esse ponto é o diretório atual dentro do nosso host, para ponto também, que será o nosso diretório atual dentro da nossa imagem.
+
+Qual será o nosso diretório atual? Nosso /app-node, que foi definido através do nosso WORKDIR.
+
+FROM node:14
+WORKDIR /app-node
+COPY . .
+RUN npm install
+ENTRYPOINT npm start
+
+O que estamos fazendo? Estamos definindo que vamos utilizar a imagem do node na versão 14 como base para a nossa imagem. Também vamos definir o nosso diretório de trabalho padrão como o /app-node.
+
+Depois, vamos copiar do diretório atual, onde está o Dockerfile do nosso host, que é esta pasta "exemplo-node", para a pasta atual dentro da nossa imagem, que é o /app-node, que foi definida dentro do nosso WORKDIR.
+
+Finalmente, vamos executar esse comando npm install, enquanto a imagem estiver sendo criada. Este comando npm install será executado na etapa de criação da imagem. E quando o container for executado a partir dessa imagem, o comando executado será o npm start.
+
+**** Criando a imagem
+Após salvar o arquivo, vamos ao terminal e acessar o diretório exemplo-node que está na área de trabalho.
+
+cd Desktop/exemplo-node/
+
+Como podemos gerar uma imagem a partir do arquivo Dockerfile? Através do comando docker build, passamos o -t, para criar um nome, ou seja, etiquetar a nossa imagem. Nesse caso, vamos colocar danielartini/app-node, por exemplo, na versão 1.0 - Com os dois pontos (:), podemos explicitar qual é a versão que estamos criando.
+
+Em qual contexto tudo isso terá que ser executado? No contexto do diretório atual, ou seja, ponto (.) que é a referência ao diretório atual.
+
+	docker build -t danielartine/app-node:1.0 .
+
+Ao executar esse comando, o Docker vai ao Docker Hub buscar a imagem do node, na versão 14, para baixá-la. Em outras palavras, ele pega todo esse conteúdo para a nossa máquina e vai construir uma nova imagem, utilizando essa como base.
+
+No momento em que todos os 5 passos terminarem, vamos executar o comando docker history para verificar o que ele vai fazer e entender como essa imagem vai se comportar dentro do nosso sistema.
+
+É importante mencionar que todas as instruções podem ser deduzidas a partir da própria documentação do Docker. É uma documentação muito completa, na qual podemos e devemos nos basear para seguir nossos projetos de criação de imagens.
+
+Nesta documentação, temos as principais instruções para a criação de uma imagem - desde como as sintaxes funcionam até como escapar caracteres.
+
+São listadas algumas instruções que já usamos, como FROM, ADD, COPY e WORKDIR, e também outras que ainda vamos conhecer, como ENV, EXPOSE, VOLUME e LABEL para etiquetar as imagens.
+
+Dentro da documentação, teremos diversos exemplos para entender como funcionam essas instruções e como aplicar aos nossos projetos. Mas ainda teremos outros exemplos de criação de imagens. Esse é só o primeiro para entender realmente como vai funcionar.
+
+**** Iniciando um container
+Agora, vamos limpar o terminal e dar um docker images na máquina para analisar o que temos.
+
+	docker images	
+
+REPOSITORY				TAG	IMAGE ID		CREATED			SIZE
+danielartini/app-node	1.0	4cb1da959a47	10 seconds ago	945MB
+node					14	acd951b9df10	2 weeks ago		944MB
+
+Temos o danielartini/app-node na versão 1.0 com o ID 4cb1da959a47.
+
+E se agora fizemos um docker run nessa imagem danielartine/app-node para fazer um mapeamento? Lembra que definimos a nossa aplicação dentro do container, mas ela é isolada? Como podemos saber em qual porta essa aplicação está rodando dentro do container?
+
+Vamos usar a criatividade, conferindo o arquivo index.js e descobrindo que ela está sendo executada a princípio na porta 3000.
+
+index.js:
+     app.listen("3000", ()=>{
+         console.log("Server is listening on port 3000")
+     })
+
+Após docker run, vamos acrescentar -p. Vamos usar a porta 8081. Além disso, queremos que a porta 8081 reflita na porta 3000, que é onde a nossa aplicação vai ficar em execução dentro do nosso container.
+
+Também vamos acrescentar um -d para ficar em modo detached. Também faltou especificar a versão da imagem, nesse caso, será 1.0.
+
+	docker run -d –p 8081:3000 danielartine/app-node:1.0
+
+Após executar, vamos ao navegador para tentar acessar o localhost na porta 8081.
+
+	localhost:8081
+
+Conseguimos acessar a nossa aplicação agora de maneira containerizada! Então, criamos a nossa própria imagem e executamos um container a partir dela.
+
+Próximos passos
+Mas ainda tem algumas questões que precisamos resolver, deixamos em aberto aquela questão de como sabíamos em qual porta a nossa aplicação estava em execução, como sabemos como expomos ou não.
+
+*** Incrementando a imagem (AP: OPCIONAL - entra em detalhes de outras instruções)
+**** Parando a execuação de todos os containers com um único comando
+Primeiramente, vamos retornar ao nosso terminal. Antes de mais nada, vamos entender um novo comando que, na verdade, nem é tão novo, é uma junção de dois comandos que já conhecemos.
+
+Antes, vamos executar um docker ps para conferir que temos vários containers em execução.
+
+docker ps
+CONTAINER ID	IMAGE	COMMAND	CREATED	STATUS	PORTS	NAMES
+4f437608038f	ubuntu	"sleep 1d"	4 minutes ago	Up 4 minutes	-	clever_gates
+092466f3459c	ubuntu	"sleep 1d"	4 minutes ago	Up 4 minutes	-	unruffled_haslett
+
+Como poder parar todos de uma vez? Podemos usar o comando docker stop. Agora, podemos simplesmente dizer que queremos parar todos os nossos containers, passando os IDs deles. Para isso, basta executar o comando docker container ls.
+
+No entanto, precisamos dizer que queremos executar este comando e usá-lo como entrada para o nosso stop. Então, vamos colocar esse segundo comando entre cifrão e parênteses ($()).
+
+Além disso, precisamos dizer que queremos pegar apenas o ID. Entre os parênteses, colocamos a flag -q, de quiet (silencioso), assim, ele vai pegar apenas o ID.
+
+	docker stop $(docker container ls -q)
+
+Ao dar "Enter", ele dará aqueles 10 segundos para parar os containers de maneira segura, por assim dizer. Ele vai parar todos os containeres a partir desse momento.
+
+**** Documentando a porta
+Enquanto isso, o que podemos observar no nosso Dockerfile? Nós construímos a nossa imagem. E no momento em que a executamos, o que acontece?
+
+Mais uma vez, vamos dar um docker run no terminal. Também vamos colocar o -p 8080:3000. Sabemos que a porta 3000 é onde a nossa aplicação está executando. A imagem será do danielartine/app-node na versão 1.0. Também adicionaremos a flag -d para rodar em modo detached.
+
+	docker run -p 8080:3000 -d danielartine/app-node:1.0
+
+Após rodar, vamos dar um docker ps mais uma vez.
+
+CONTAINER ID	IMAGE						COMMAND					CREATED			STATUS
+b000aa8556ab	danielartine/app-node:1.0	"/bin/sh -c 'npm sta…"	8 seconds ago	Up 7 seconds	
+
+PORTS										NAMES
+0.0.0.0:8000->3000/tcp, :::8080->3000/tcp	infallible_torvalds
+
+Repara que ele nos mostra o mapeamento de portas, que estamos fazendo graças à flag -p.
+
+Mas o que acontece se executamos esse mesmo container sem fazer o -p, só com o -d?
+
+	docker run -d 8080:3000 danielartine/app-node:1.0
+
+Vamos dar um docker ps novamente.
+
+CONTAINER ID	IMAGE						COMMAND					CREATED			STATUS			
+e0c765d4a03a	danielartine/app-node:1.0	"/bin/sh -c 'npm sta…"	3 seconds ago	Up 2 seconds
+b000aa8556ab	danielartine/app-node:1.0	"/bin/sh -c 'npm sta…"	27 seconds ago	Up 26 seconds	
+
+
+PORTS										NAMES
+ - 								  		    peaceful_mendel
+0.0.0.0:8000->3000/tcp, :::8080->3000/tcp	infallible_torvalds
+
+Repara que ele não exibe nada na coluna de portas, ainda que saibamos que a nossa aplicação roda na porta 3000.
+
+Então, como poderíamos documentar isso, para que outras pessoas que fossem utilizar o container posteriormente, baseado na nossa imagem, soubessem que a aplicação está exposta na porta 3000?
+
+Na verdade, existe uma maneira com a qual podemos fazer essa atribuição a fim de documentar e explicitar em qual porta a aplicação está sendo executada. Basta colocarmos a instrução EXPOSE seguido da porta 3000.
+
+    FROM node:14
+    WORKDIR /app-node
+    EXPOSE 3000
+    COPY . .
+    RUN npm install
+    ENTRYPOINT npm start
+
+Nesse momento, estamos dizendo que a nossa aplicação vai estar exposta na porta 3000. Essa instrução não é obrigatória, até porque já fizemos o mapeamento anteriormente e funcionou.
+
+Mas agora, vamos fazer o seguinte teste: vamos salvar o arquivo e gerar uma nova imagem na versão 1.1 com o comando de build:
+
+	docker build –t danielartine/app-node:1.1 .
+
+Vamos conferir o que vai acontecer agora no momento em que executarmos, mais uma vez, esse container sem fazer nenhum tipo de definição de porta. Usaremos o docker run, porém, na versão 1.1.
+
+	docker run -d danielartine/app-node:1.1
+
+Em seguida, damos um docker ps e conseguimos notar que ele está falando que a porta 3000 está exposta.
+
+CONTAINER ID	IMAGE						COMMAND					CREATED			STATUS			PORTS		NAMES
+35d6a368a185	danielartine/app-node:1.1	"/bin/sh -c 'npm sta…"	2 seconds ago	Up 1 seconds	3000/tcp	hungry_rubin
+
+Qualquer pessoa que fizer esse comando, vai saber que tem alguma aplicação dentro daquele container executando na porta 3000. Com isso, não precisamos adivinhar e fica muito mais fácil fazer um possível mapeamento de portas a partir daí.
+
+**** Lendo uma variável de ambiente
+Entretanto, podemos aprimorar ainda mais a nossa imagem. Além de expor na porta 3000, o que mais poderíamos fazer? E se a nossa aplicação estivesse em um cenário diferente?
+
+Descobrimos que dentro do index.js estamos definindo que a porta 3000 é efetivamente a porta da nossa aplicação. Mas, e se quiséssemos fazer isso no momento da criação da nossa imagem? Se quiséssemos fazer isso de maneira mais parametrizada, através de uma variável de ambiente?
+
+É possível. No lugar da string 3000, basta simplesmente usar uma sintaxe muito específica do Node, que seria colocar um process.env.PORT, por exemplo, que é o nome da variável que estamos definindo.
+
+     index.js:
+
+     app.listen(process.env.PORT, ()=>{
+         console.log("Server is listening on port 3000")
+     })
+
+Basicamente, apenas atribuímos que queremos ler uma variável de ambiente chamada PORT.
+
+A partir desse momento podemos definir na nossa imagem que vamos querer receber esse parâmetro definido na nossa imagem. Podemos simplesmente definir que vamos ter um argumento com a instrução ARG. Esse argumento será usado para definir essa variável de ambiente dentro do nosso container posteriormente, que vai ser a porta que vamos querer utilizar.
+
+Por exemplo, podemos colocar PORT igual a 6000 só para conferir que realmente está funcionando.
+
+Depois, o que vamos fazer? Vamos colocar o EXPOSE com essa porta. E como pego o valor dessa variável que estamos utilizando dentro da criação da nossa imagem? Colocando $PORT.
+
+FROM node:14
+WORKDIR /app-node
+ARG PORT=6000
+EXPOSE $PORT
+COPY . .
+RUN npm install
+ENTRYPOINT npm start
+COPIAR CÓDIGO
+Só que tem um pequeno detalhe. Esse ARG só funciona em tempo de criação, de build da nossa imagem.
+
+*Se quisermos passar isso efetivamente para dentro do container que vai ser gerado, ou seja, se quisermos que em algum momento essa variável possa ser lida dentro do container, precisamos explicitar também um outro tipo de variável de ambiente que vai ser para dentro do container, que é um ENV.*
+
+*O ARG só é usado em tempo de build da imagem e o ENV vai ser usado dentro do container, posteriormente. Para ele, podemos passar PORT igual a $PORT.*
+
+Então, essa variável de ambiente PORT que estamos definindo para dentro do container vai ter um valor previamente definido por essa variável $PORT.
+
+Para ser mais semânticos, podemos trocar o $PORT de ARG, ENV e EXPOSE por PORT_BUILD.
+
+     FROM node:14
+     WORKDIR /app-node
+     ARG PORT_BUILD=6000
+     ENV PORT=$PORT_BUILD
+     EXPOSE $PORT_BUILD
+     COPY . .
+     RUN npm install
+     ENTRYPOINT npm start
+ 
+Agora, vamos buildar essa imagem mais uma vez com o comando docker build agora na versão 1.2.
+
+	docker build –t danielartine/app-node:1.2 .
+
+Ele vai buildar todo o nosso processo. Em seguida, vamos fazer o docker run da nossa versão 1.2 sem definir nenhuma porta para verificar se vai acontecer o que esperamos.
+
+	docker run -d danielartine/app-node:1.2
+
+Por fim, executamos o docker ps.
+
+CONTAINER ID	IMAGE						COMMAND					CREATED			STATUS			PORTS		NAMES
+11dd123857ef	danielartine/app-node:1.2	"/bin/sh -c 'npm sta…"	2 seconds ago	Up 1 seconds	6000/tcp	relaxed_neumann
+
+Com o docker ps, agora já sabemos que a porta que precisamos fazer algum mapeamento caso queiramos acessar esse container é na porta 6000.
+
+Novamente, vamos fazer o docker run -p da porta, por exemplo, 9090 da nossa máquina e na porta 6000 do nosso container em modo detached da imagem danielartini/app-node na versão 1.2.
+
+	docker run –p 9090:6000 –d danielartine/app-node:1.2
+
+No momento em que executarmos esse comando, voltamos ao navegador e colocamos localhost na porta 9090.
+
+localhost:9090
+
+Ainda assim conseguimos acessar a nossa aplicação.
+
+Próximos passos
+Em resumo, conseguimos definir variáveis de ambiente para dentro do nosso container, ou seja, conseguimos fazer a leitura dessas variáveis e colocá-las dentro do container.
+
+Também conhecemos instruções que são específicas para a parte de construção da imagem, que é o caso do ARG. Enquanto o ARG é usado para construção da imagem, o ENV serve posteriormente dentro do container.
+
+Conseguimos também utilizar a instrução de EXPOSE, para ser mais semânticos e deixar claro para as pessoas que vão utilizar o nosso container posteriormente que a aplicação que vai estar ali dentro está exposta em determinada porta.
+
+Com isso, conseguimos deixar a nossa imagem ainda mais fácil de ser manuseada posteriormente, além de tornar mais parametrizável através também das variáveis de ambiente.
+
+**** Subindo a imagem para o Docker Hub
+Agora, vamos fazer o push da nossa imagem para o Docker Hub. O que precisamos fazer de início?
+***** Criando a conta no Docker Hub
+Primeiro, é necessário que você crie uma conta na parte direita da home do Docker Hub. Insira seu nome de usuário, e-mail, senha, aceite os termos e marque a opção recaptcha. Depois, clique em "Sign up" e confirme sua conta por e-mail.
+
+Após a confirmação, no canto superior direito, clique em "Sign in". Insira seu nome de usuário e a senha que utilizou no momento do cadastro.
+
+Quando entrar, o site carregará e na barra de navegação superior, você terá a opção "Repositories" (repositórios).
+
+***** Autenticando a conta do Docker Hub
+No momento, nós não temos nenhum repositório, porque já criamos a nossa imagem, mas ainda não a enviamos para o Docker Hub. Para fazer isso, precisamos voltar ao nosso terminal e autenticar a nossa conta no Command Line Interface (Interface de Linha de Comando) do Docker, para que ele saiba que somos.
+
+Para isso, usamos o comando docker login -u. Em seguida, inserimos o nosso nome de usuário, aluradocker.
+
+	docker login -u aluradocker
+
+Ao pressionar "Enter", será solicitada a senha (password) que usou durante o cadastro no Docker Hub. Por questões de segurança, o número de caracteres não aparecerá, mas estará sendo digitado.
+
+Login Succeeded
+
+Quando pressionar "Enter" e o login for bem-sucedido, receberá um aviso que sua senha foi armazenada de maneira não criptografada em um determinado caminho no arquivo config.json.
+
+***** Subindo a imagem para Docker Hub
+Agora, o que queremos fazer? Queremos enviar a imagem danielartini/app-node na versão 1.0 para o Docker Hub.
+
+Para isso, usamos um comando específico. Ao invés do docker pull, utilizaremos o docker push seguido da imagem. Assim, esse comando enviará automaticamente a nossa imagem para o Docker Hub.
+
+	docker push danielartine/app-node:1.0
+
+Ao pressionar "Enter", ele preparará todas as camadas, mas observe que ele retornará "access denied".
+
+denied: requested access to the resource is denied
+
+Isso significa que não temos permissão para enviar a imagem danielartini/app-node:1.0.
+
+É a mesma questão do dockersamples/static-site, onde temos um nome de usuário ou organização, barra e o nome da imagem. O nome de usuário efetivo da nossa conta é aluradocker, portanto, não faz sentido ter permissão para fazer um push em nome de danielartini.
+
+Sendo assim, precisamos voltar ao terminal e gerar uma cópia dessa imagem, mas com uma nova tag, com um novo repositório na coluna que queremos gerar.
+
+Para fazer isso, executamos o comando docker tag com a imagem que vai ser copiada e a imagem que queremos gerar. Nesse caso, queremos gerar aluradocker/app-node na versão 1.0.
+
+	docker tag danielartini/app-node:1.0 aluradocker/app-node:1.0
+
+Ao pressionar "Enter", ele criará a imagem sem nenhum output visível. Porém, se executarmos docker image, teremos o aluradocker/app-node:1.0. Inclusive com o mesmo ID, mas agora com um repositório diferente.
+
+REPOSITORY	TAG	IMAGE ID	CREATED	SIZE
+aluradocker/app-node	1.0	4cb1da959a47	47 hours ago	945MB
+danielartini/app-node	1.0	4cb1da959a47	47 hours ago	945MB
+…	…	…	…	…
+
+Se tentarmos novamente fazer o docker push, mas agora com o repositório correto aluradocker, ele fará o push sem nenhum problema de acesso.
+
+Isso porque ele sabe que somos realmente a pessoa que deveria ter essa permissão, baseado no nome do repositório que definimos para a nossa imagem.
+
+	docker push aluradocker/app-node:1.0
+
+Quando o push terminar, podemos acessar o Docker Hub na parte de repositórios e atualizar a página. Dessa forma, teremos a nossa imagem que acabamos de enviar, aluradocker/app-node. Se a acessamos, podemos conferir em "Tags and scans" que é a versão 1.0.
+
+***** Subindo novas versões
+Se fizermos docker tag de danielartini/app-node:1.2 para aluradocker/app-node:1.2 e em seguida um push dessa nova versão, o Docker Hub fará o processo de envio novamente.
+
+	docker tag danielartini/app-node:1.2 aluradocker/app-node:1.2
+	docker push aluradocker/app-node:1.2
+
+Porém, agora ele sabe que várias dessas camadas já existem no Docker Hub e só fez o push das camadas necessárias.
+
+O Docker Hub consegue saber que uma camada já está armazenada e, assim, é capaz de reaproveitá-la para gerar uma imagem nova com as camadas já existentes.
+
+Se atualizamos a página do Docker Hub no navegador, teremos, além da nossa tag 1.0, também a nossa 1.2.
+
+TAG	OS		PULLED				PUSHED
+1.0	Linux	a minute ago		a minute ago
+1.2	Linux	a few seconds ago	a few seconds ago
+
+**** removendo todas as imagens de uma vez, num único comando
+Caso tenhamos imagens ainda, vamos removê-las também. Para verificar, executamos o comando docker images. Temos algumas imagens, então vamos fazer algo parecido: usar docker rmi com docker images ls -aq
+
+	docker rmi $(docker image ls -aq)
+
+E ele remove todas as imagens. Repare que ele apresentou alguns conflitos no retorno, porque a imagem em questão está sendo referenciada por múltiplos repositórios, então precisamos forçar essa remoção. Para isso, vamos digitar docker rmi passando o --force:
+
+	docker rmi $(docker image ls -aq) --force
+
+Agora, ele vai conseguir remover essas imagens também. Lembre-se disso: caso não consiga remover, a flag --force vai ajudar.
+
+Se executarmos docker images agora, o que teremos? Nada, tudo foi removido!
+*** AP: Comandos dessa seção
+docker images, docker inspect, docker history
+docker build
+docker push, docker tag
+** Persistindo dados
+*** O problema de persistir dados
+**** Tamanho do container
+Qual será a grande novidade dessa etapa do curso? Para descobrir, vamos voltar às origens e rodar um docker run em um container. Podemos rodar docker run -it no Ubuntu para iniciar um container do Ubuntu em modo interativo. Depois entenderemos o porquê.
+
+	docker run -it ubuntu bash
+
+Até agora, nada de novo. Mas, existe uma flag interessante que podemos adicionar a esse comando: a flag -s. Se digitarmos docker ps -s, ou docker container ls -s, surge uma coluna extra no retorno, onde ele informa o tamanho desse container que, no caso, é de 0 bytes, sendo o seu tamanho virtual de 72.8 megabytes.
+
+Retorno
+
+CONTAINER ID	IMAGE	COMMAND	CREATED			STATUS			PORTS	NAMES			SIZE
+341ecf2608e8	ubuntu	"bash"	26 seconds ago	Up 24 seconds	.		crazy_meninsky	0b (virtual: 72.8MB)
+O que isso significa?
+
+Vamos retornar um pouco na nossa explicação. Lembre-se de que uma imagem, no final das contas, é um conjunto de camadas empilhadas, uma em cima da outra. Podemos, inclusive, consultar essas informações com o comando docker history. Vamos usá-lo na imagem do Ubuntu, por exemplo:
+
+	docker history ubuntu
+
+No retorno, observamos que essa imagem é composta por duas camadas: uma de 0 bytes e uma de 72.8.
+
+Repare que o tamanho virtual do nosso container é equivalente ao tamanho total da nossa imagem. E isso faz total sentido, afinal, o container não é nada mais do que a imagem com uma camada extra de read-write (leitura e gravação).
+
+No momento em que criamos esse container, ele não tem nenhuma informação, nenhum dado dentro dele, além das informações originais da imagem. Então, o tamanho virtual dele será igual ao tamanho da imagem. Mas, o tamanho real dele é de 0 bytes.
+
+Vamos voltar ao nosso outro terminal e fazer algumas operações no container para observar o que começa a acontecer com aquele tamanho inicial.
+
+Iniciaremos executando o comando apt-get update para atualizar o repositório. Podemos também criar alguns arquivos, por exemplo. Você pode fazer as experiências que quiser. No momento, estamos apenas atualizando o repositório.
+
+Vamos voltar ao outro terminal para checar se teve algum efeito. Para isso, rodamos o comando docker ps -s. Repare que o tamanho do container aumentou para 16.2MB, e o virtual para 89MB.
+
+O que está acontecendo? Agora o tamanho virtual do nosso container é o tamanho original da imagem, que tínhamos com o Docker History, mais o tamanho das informações que temos dentro do container.
+
+Ou seja, o tamanho exibido na coluna "Size", de 16MB, nada mais é do que as informações que estão agora na nossa camada de read-write. São informações temporárias, porque, conforme sabemos, essa camada é fina e temporária, apenas para informações que serão escritas dentro daquele container.
+
+E é por isso que, se criarmos outros containers a partir da mesma imagem do Ubuntu, teremos cada um com uma camada de read-write diferente. Os containers terão o mesmo tamanho base, no final das contas, para podermos realizar essas operações, mas cada um terá sua camada de escrita separada.
+
+Repare que se rodarmos o "docker ps -s" mais uma vez, o tamanho já estará praticamente dobrado, porque a execução apt-get update já deve ter sido concluída.
+
+**** Persistência de dados
+Se sairmos do container com o comando exit e executarmos docker ps, ele já não estará mais em execução. Vamos criar um novo container com:
+
+	docker run -it ubuntu bash
+
+Se voltarmos ao nosso outro terminal e executarmos docker ps -s, teremos no retorno um novo container, com outro ID, e com o tamanho zerado. Isso porque as camadas de read-write são isoladas umas das outras, cada container terá a sua.
+
+Se rodarmos um docker ps -sa, teremos no retorno o nosso container antigo (crazy_meninsky), que já não está mais em execução, e o novo (dreamy_noether) que ainda está em execução.
+
+CONTAINER ID	IMAGE	COMMAND	CREATED			STATUS						PORTS	NAMES			SIZE
+bbe39b246640	ubuntu	"bash"	17 seconds ago	Up 16 seconds				.		dreamy_noether	0b (virtual: 72.8MB)
+341ecf2608e8	ubuntu	"bash"	4 minutes ago	Exited (130) 27 seconds ago	.		crazy_meninsky	32.1MB (virtual: 105MB)
+Agora, precisamos entender como podemos persistir essas informações de alguma maneira, para que containers que já foram removidos, e talvez subam de novo com alguma informação, mantenham esses dados.
+
+Afinal, entendemos que essa camada não é persistente entre containers, e ela também não é persistente caso removamos esse container e subamos um novo. Perdemos essas informações.
+
+**** Como persistir informações entre containers?
+Há três formas principais de fazer isso.
+
+A primeira é o *bind-mount*, que é uma maneira de fazer um vínculo (bind) entre o sistema de arquivos do nosso sistema operacional e o sistema de arquivos do nosso container. Assim, teremos uma ponte entre esses dois que persistirá essa informação no nosso host.
+
+Temos o *volume*, efetivamente, que será gerenciado pelo Docker, o que vamos entender em mais detalhes adiante.
+
+Por fim, temos o *tmpfs mount*, que é temporário, cuja utilidade também vamos entender mais adiante.
+*** Utilizando bind mounts
+Basicamente, essa solução faz uma ligação entre um ponto de montagem do nosso sistema operacional e algum diretório dentro do container.
+**** Criando um bind mount: Flag -v
+Vamos executar o já conhecido comando docker run -it ubuntu para criar um container.
+
+No entanto, a ideia agora é definir que, quando esse container for criado e executado, as informações persistidas em determinado diretório dentro dele sejam persistidas em algum diretório na nossa máquina, localmente, no nosso host.
+
+Para isso, além de definir os comandos básicos e a flag -it, podemos colocar uma flag -v.
+
+	docker run -it -v ubuntu
+
+Com essa flag, podemos dizer que queremos que o diretório no nosso host corresponda a um determinado caminho dentro do nosso container.
+
+Então, vamos abrir um novo terminal e criar uma nova pasta chamada volume-docker (você pode dar outro nome), para esse caso específico:
+
+	mkdir volume-docker
+
+Vamos retornar ao outro terminal. Queremos que esse diretório, cujo caminho é /home/daniel/volume-docker na máquina do instrutor, corresponda, por exemplo, ao diretório /app do nosso container. Fazemos isso da seguinte maneira:
+
+	docker run -it -v /home/daniel/volume-docker:/app ubuntu bash
+
+Assim, tudo o que for gravado dentro desse diretório /app será persistido no diretório /home/nome-de-usuario/volume_docker do nosso host (o nome de usuário deve ser o da sua máquina).
+
+Vamos executar para entender como isso funciona. Já dentro desse novo container, se rodarmos um ls, poderemos notar que o nosso container possui o diretório "app". Vamos acessá-lo com o seguinte comando:
+
+	cd app/
+
+Dentro dele, vamos rodar ls novamente. Em seguida, vamos criar um arquivo arquivo_qualquer.txt dentro do diretório /app do nosso container, com o comando touch:
+
+	touch arquivo-qualquer.txt
+
+Agora, ao abrir o gerenciador de arquivos da nossa máquina e entrar na pasta volume_docker, encontramos o arquivo arquivo-qualquer.txt.
+
+Ou seja, conseguimos definir um caminho dentro do nosso diretório local para um diretório dentro do nosso container e salvar esse arquivo.
+
+Mas como isso vai funcionar se pararmos o container e criarmos um novo? Vamos fazer isso.
+
+Primeiro, vamos parar esse container com o comando exit. Agora, vamos criar um novo container definindo o mesmo bind mount, ou seja, o mesmo caminho na nossa máquina para o diretório /app. Lembre-se: é um novo container, com um novo run, portanto com uma nova camada de read-write.
+
+	docker run -it -v /home/daniel/volume-docker:/app ubuntu bash
+
+Agora, se rodarmos ls nesse novo container, podemos observar que continuaremos tendo a pasta /app. Se dermos um cd app/ para entrar no diretório "app", e depois um ls para consultar seu conteúdo, observaremos que o arquivo arquivo_qualquer.txt ainda está nesse diretório.
+
+Isso significa que conseguimos persistir informações entre containers e salvar os dados que queremos, de maneira prática! Isso é muito útil nos casos em que, de alguma maneira, o container para de funcionar, por exemplo, e nós queremos persistir seus dados.
+
+Para fazer isso, recapitulando, apenas definimos um diretório dentro do nosso host em ligação com um diretório do nosso container. Muito simples!
+
+No entanto, há outra maneira de criar *volumes* que vem sendo mais recomendada pelo Docker.
+
+**** Criando um bind mount: Flag --mount
+Consultando a documentação, verificamos duas maneiras de criar o bind mount: a que estamos utilizando, a flag -v, e a flag --mount. Essa última vem sendo recomendada por ser mais semântica.
+
+Vamos sair do container atual com o comando exit e criar um terceiro container, agora utilizando a flag --mount, da seguinte maneira:
+
+	docker run -it --mount type=bind,source=/home/daniel/volume-docker,target=/app ubuntu bash
+
+Vamos entender como essa flag funciona. No comando acima, dissemos que queremos fazer um mount do tipo bind, e que o diretório da nossa máquina, nossa source, vai ser /home/nome-de-usuario/volume-docker. Já o nosso target vai ser /app também, dentro desse container.
+
+No vídeo, o instrutor erra o caminho do diretório local por escrever o nome de usuário incorretamente. Caso o diretório que você esteja tentando utilizar não exista no seu host, a flag --mount vai informar que esse caminho não existe.
+
+Dando um "Enter", estamos dentro do novo container. Se dermos um ls, notaremos o diretório "app" dentro dele. Se entrarmos nesse diretório com o comando cd app/, notaremos que o arquivo arquivo-qualquer.txt continua lá!
+
+Tudo continua funcionando. Utilizando tanto a flag --mount quanto a flag -v, conseguimos persistir os dados entre os containers e também entre os próprios containers!
+
+Assim, se tivermos um arquivo de configuração que a nossa aplicação precisa executar, por exemplo, ou dados essenciais desse tipo, conseguimos mantê-los sem problemas.
+
+Por fim, nos questionamos: será que é interessante o nosso container depender de um caminho dentro do nosso host?
+
+Podemos escrever, como aconteceu, um caminho que não existe e ter algum problema, ou não ter permissão para acessá-lo, ou alguém pode simplesmente deletar esse caminho localmente, pois ele estará no host. Devemos nos preocupar com esses possíveis cenários.
+
+Para isso, podemos utilizar uma solução ainda mais robusta, ainda mais recomendada pelo Docker: os volumes em si, gerenciados pelo próprio Docker.
+
+*** Utilizando volumes
+A segunda solução, a mais recomendada pelo Docker para uso em ambientes produtivos, é a utilização de volumes. Por quê?
+
+Conforme a documentação, os volumes são uma área gerenciada pelo Docker dentro do sistema de arquivos. Então, mesmo que as nossas informações continuem no nosso host original para serem persistidas, nós teremos uma área que o Docker vai gerenciar, o que é muito mais seguro em termos de alguém fazer alterações indesejadas ou causar algum problema.
+
+Mas, como funciona? Como criamos um volume inicialmente?
+
+**** Criando um volume
+Vamos voltar ao nosso terminal, sem nenhum container em execução.
+
+Existe, dentre os diversos comandos do Docker, um comando chamado docker volume. Se dermos um 
+	docker volume ls
+confirmaremos que não temos nenhum volume criado. Então, vamos criar um.
+
+Para isso, usamos o comando docker volume create e chamá-lo de, por exemplo, meu-volume:
+
+	docker volume create meu-volume
+
+Ao executar esse comando, criamos um volume. E se executarmos docker volume ls em seguida, poderemos verificá-lo no retorno, e ele estará usando o driver local do nosso sistema com o nome que demos:
+
+Retorno
+
+DRIVER	VOLUME NAME
+local	meu-volume
+
+Mas onde o volume está na nossa máquina? Como sabemos que ele vai gravar essas informações? Vamos chegar lá. Primeiro, vamos fazer o mesmo experimento que fizemos anteriormente.
+
+**** Utilizando o volume
+Vamos executar um comando para criar um container com a flag -v, como fizemos originalmente.
+
+Mas, ao invés de colocar o caminho para o diretório volume-docker, não vamos mais definir nenhum diretório da nossa máquina manualmente. Vamos simplesmente explicitar que queremos utilizar o meu-volume, que é o nome do nosso volume, e ele será mapeado nesse nosso diretório /app dentro do nosso container, seguindo a mesma ideia:
+
+	docker run -it -v meu-volume:/app ubuntu bash
+
+Após executar esse comando e dar um ls dentro do container, vamos verificar a presença do diretório "app" mais uma vez.
+
+Se o consultarmos com o comando cd app/ seguido de ls, notaremos que ele está vazio, porque mesmo que o /app do comando seja igual, agora estamos utilizando um ponto diferente dentro do nosso host. Antes estávamos utilizando o diretório na nossa home, e agora estamos usando um novo volume, chamado meu-volume, gerenciado pelo Docker.
+
+Podemos testar a persistência agora. Vamos criar um novo arquivo chamado um-arquivo-qualquer no container atual:
+
+	touch um-arquivo-qualquer
+
+Agora, vamos parar o container atual com o comando exit e criar um novo container, com o mesmo comando de antes:
+
+	docker run -it -v meu-volume:/app ubuntu bash
+
+Se dermos um cd app seguido de um ls, teremos o nosso um-arquivo-qualquer no retorno.
+
+Tudo continua funcionando, mas a pergunta que precisamos responder agora é: onde está esse arquivo? Afinal, antes sabíamos que se fôssemos na nossa home e entrássemos no diretório volume-docker, o arquivo estaria lá. Mas onde está o meu-volume?
+
+Vamos descobrir.
+
+**** Onde estão os arquivos armazenados pelo volume?
+Primeiro, vamos parar o container atual com o comando exit. Em seguida, vamos entrar como superusuário com o comando sudo su e inserindo a senha, se for necessário.
+
+Existe um diretório na nossa máquina onde o Docker está realmente; ou melhor, onde estão as diversas informações que o Docker armazena na nossa máquina. O caminho para ela é /var/lib/docker, então vamos acessá-lo:
+
+	cd /var/lib/docker/
+
+Se dermos um ls dentro dessa pasta, teremos diversas informações: plugins, buildkit, imagem, overlay e várias outras. Dentre elas, estão os volumes. Vamos acessá-lo com cd
+
+	cd volumes
+
+Dentro desse diretório, podemos dar um ls para consultar seu conteúdo e, então, notaremos o meu-volume lá dentro! Vamos acessá-lo:
+
+	cd meu-volume
+
+Damos um ls em seguida e notaremos um hash dentro desse volume, a pasta _data. Vamos acessá-la com cd:
+
+	cd _data
+
+Aqui dentro vai estar o nosso um-arquivo-qualquer.
+
+Então, agora sabemos onde os nossos arquivos estão: /var/lib/docker/volumes/meu-volume/_data. É um lugar completamente gerenciado pelo Docker.
+
+Sendo assim, conseguimos utilizar os comandos do Docker para gerenciar esse volume.
+
+**** Gerenciamento do volume
+Se sairmos do modo de superusuário (com o comando exit) e executarmos um docker volume simplesmente, sem passar nada, ele vai mostrar no retorno os comandos possíveis para gerenciamento do volume:
+
+    create para criar volumes;
+    inspect para inspecioná-los;
+    ls para listá-los;
+    prune para remover os volumes que não estão sendo usados;
+    rm para remover qualquer volume, sendo usado ou não.
+
+Ou seja, conseguimos gerenciar esses volumes por meio da interface do Docker e não ficamos 100% dependentes do sistema de arquivos do nosso sistema operacional, pois o Docker é quem vai gerenciar isso para nós agora.
+
+Isso é muito interessante, porque agora não dependemos diretamente de uma estrutura de pastas específica do nosso sistema operacional - ele vai estar sempre nesse diretório de volumes.
+
+**** Criando volume com --mount
+Também temos a possibilidade de criar um volume com a flag --mount. Essa maneira é até mais fácil, porque por padrão ele assume que o tipo que vamos criar é um volume, então não precisamos colocar o tipo, como fizemos com o bind.
+
+Vamos executar o comando de criação de um container com o --mount, sendo a source o nosso meu-volume e o target sendo o /app:
+
+	docker run -it --mount source=meu-volume,target=/app ubuntu bash
+
+Estamos dentro do novo container. Se dermos um ls dentro de app, teremos o nosso um-arquivo-qualquer.
+
+Temos ainda mais uma particularidade dos volumes. Se formos criar mais um container e colocarmos como source, por exemplo, um volume chamado meu-novo-volume, ou seja, um volume que não temos criado até então, ele será criado automaticamente:
+
+	docker run -it --mount source=meu-novo-volume,target=/app ubuntu bash
+
+Dentro desse novo container, se dermos um ls em app, ele vai estar vazio, porque estamos usando um volume novo.
+
+Se sairmos desse container atual (com o comando exit) e executarmos um docker volume ls, verificaremos dois volumes criados:
+
+DRIVER	VOLUME NAME
+local	meu-volume
+local	meu-novo-volume
+
+Ou seja, não precisamos nos preocupar necessariamente em criar o volume antes de utilizá-lo, porque como ele é gerenciado pelo Docker, ele pode fazer isso por nós.
+*** Utilizando tmpfs
+Antes de prosseguirmos, é importante destacar algumas peculiaridades. A primeira é que tmpfs só funcionará no host Linux. Por isso é importante utilizar o Linux, pois várias funcionalidades, como essa, são projetadas para rodar em ambientes Linux.
+
+**** Como funciona o tmpfs?
+Nós executamos containers várias vezes. E agora, qual será a diferença? Como utilizamos um tmpfs?
+
+Definiremos o funcionamento do container de maneira bem simples agora, porque não vamos utilizar a flag -v. Ele possui uma flag própria: a --tmpfs:
+
+	docker run -it --tmpfs=/app ubuntu bash
+
+Se executarmos esse comando, criamos um novo container.
+
+Vamos dar um ls para conferir seu conteúdo. Ele criou a pasta "app" mas, diferente das outras vezes em que criamos essa pasta, agora ela está destacada em verde no retorno do ls, assim como a pasta "tmp".
+
+Isso significa que a pasta "app" é temporária. Ela está sendo escrita na memória do nosso host. Ou seja, no momento em que esse container parar de funcionar, os arquivos da pasta "app" serão perdidos.
+
+Para exemplificar, vamos criar um arquivo no diretório "app", chamado um-arquivo-qualquer novamente:
+
+	touch app/um-arquivo-qualquer
+
+Se dermos um ls em app, verificaremos nosso novo arquivo lá dentro.
+
+Agora, vamos dar exit para parar esse container e criar um novo, com o mesmo comando de antes. Executando ls app mais uma vez, não teremos nada lá dentro.
+
+Então, qual é a utilidade prática desse tipo de armazenamento que não armazena?
+
+*A ideia do tmpfs é, basicamente, persistir dados na memória do seu host, mas esses dados não estão sendo escritos na camada de read-write*. Eles são escritos diretamente na memória do host.
+
+Isso é importante quando temos algum dado sensível que não queremos persistir na camada de read-write, por questões de segurança, mas queremos tê-los de alguma maneira.
+
+Nesse caso, poderíamos utilizar o tmpfs, então esses dados não seriam escritos na camada de read-write, ficando em memória, temporariamente. É uma questão de segurança que seria interessante em alguns cenários, como arquivos de senha, ou algum arquivo que não queremos carregar e manter durante a execução como um todo.
+
+**** Tmpfs com a flag --mount
+Assim como todas as outras abordagens que conhecemos (tanto de bind mount quanto de volume), podemos utilizar a flag --mount com o tmpfs, seguindo a mesma ideia: o type sendo tmpfs e a destination sendo a pasta app dentro do container:
+
+	docker run -it --mount type=tmpfs,destination=/app ubuntu bash
+
+Se executarmos ls dentro do container, mais uma vez as pastas "app" e "tmp" estarão destacadas em verde, como pastas temporárias.
+
+Vamos criar um novo arquivo em "app", chamado um-arquivo-qualquer:
+
+	touch app/um-arquivo-qualquer
+
+Executando ls app, lá teremos o nosso novo arquivo.
+
+Mas, se pararmos o container atual e criarmos um novo container (com o mesmo comando), não haverá nenhuma informação dentro de "app".
+
+Então, recapitulando: caso queiramos colocar algum dado temporário que não deve ser armazenado, de maneira alguma, na camada de read-write, podemos utilizar o tmpfs.
+
+Conclusão
+Conhecemos três possibilidades de persistência de dados: 
+- tmpfs; 
+- bind-mounts, que fazem uma ligação direta entre o sistema de pastas do nosso host e do nosso container; 
+- volumes, que são a solução recomendada, pois são gerenciados pelo Docker e permitem um controle maior, sem depender, diretamente, da estrutura de pastas do nosso host.
+
+* dicas de como usar o docker na minha máquina
+** para ter permissão de executar comandos no bash quando crio containers como usuário simples (como na máquina da Nexti, por exemplo)
+basta definir a senha na primeira execução de um bash do container, mas que não tenha sido finalizado o processo do docker run
+	docker run -it ubuntu bash
+executar o
+	passwd
+e assim definir uma senha qualquer para o root. Quando rodar o container posteriormente não dá mais erro de permissão de execução.
+* Dúvidas que tive
+** quando a partir de uma image mysqlX eu subo um container: ao fazer um INSERT na base desse container, ele aparecerá em todos outros novos containers dessa imagem do mysqlX?
+Isolamento de Contextos
+Como cada contêiner possui seu próprio sistema de arquivos, processo, espaço de rede e recursos, garantindo que a aplicação dentro do contêiner não interfira em outras aplicações ou no *sistema hospedeiro*, isso proporciorna um alto grau de independência e isolamento. Como coloquei em negrito: é em relação ao sistema hospedeiro. Mas volta a pergunta: e em relação à imagem do docker?
