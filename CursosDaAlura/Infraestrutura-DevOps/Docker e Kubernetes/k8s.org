@@ -1,0 +1,68 @@
+* Curso de Kubernetes: Pods, Services e ConfigMaps
+** Notas Gerais
+*** Há 2 propostas de implementação de Kubernets
+ - Docker Swarm
+ - Kubernetes
+** Conhecendo o Kubernets
+*** O que é o Kubernets
+ O Kubernetes entra do seguinte modo: eu falei para vocês agora que nós resolvemos o problema na escalabilidade horizontal dividindo o poder computacional das máquinas trabalhando em paralelo. Então o Kubernetes é capaz de fazer isso, ele gerencia uma ou múltiplas máquinas trabalhando em conjunto, que nós vamos chamar de cluster.
+
+Uma ou mais máquinas trabalhando em conjunto, dividindo o seu poder computacional, nós vamos chamar de um *cluster*. O Kubernetes é capaz de criar esse cluster e o gerenciar para nós.
+
+É aí que Kubernetes entra na história! Então nós conseguimos encontrar um cluster com Kubernetes; seja na AWS, seja no Google Cloud Plataform e na Azure também, aqui com Minikube no final.
+
+O Kubernetes é capaz de criar e gerenciar um cluster para que nós consigamos manter a nossa aplicação escalável sempre que nós quisermos adicionar novos containers, sempre que nós quisermos reiniciar a nossa aplicação de maneira automática, caso ela tenha falhado. Então nós chamamos isso de orquestração de containers.
+
+*** Arquitetura do Kubernets
+ver as imagens: "./Imagens/aula1_video3_imagem1.png" a "aula1_video3_imagem4"
+** Criando o cluster
+*** Inicializando o cluster no Linux
+Pro/AP: Tanto o Kubernets do Windows como o do Google Cloud Platform usam Linux debaixo dos panos.
+
+
+AP:************* pegar no video o endereço
+[00:29] O segundo passo agora é para tornar o Kubectl que nós estamos baixando agora para nós darmos permissão de executável para ele no nosso sistema. Então, copiando e colando. E por fim, nós movemos ele para o nosso path sem nenhum problema, mais uma vez nós colocamos a nossa senha e sem problemas.
+
+[00:47] Para confirmar se tudo foi instalado sem nenhum problema, nós executamos esse comando. E repare que ele executou e nos retornou as informações do Kubectl.
+
+[00:55] Se nós executarmos aquele mesmo comando que nós fizemos no Windows do Kubectl get nodes, o que vai acontecer? Repare que ele deu um erro de conexão recusada, porque nós não temos um cluster ainda. Sem cluster nós não temos API, logo nós não estamos nos comunicando com ninguém.
+
+[01:11] E para nós termos o nosso cluster, a nossa API em si, nós vamos utilizar uma ferramenta chamada Minikube, onde ela já cria um ambiente virtualizado com o cluster pronto para nós.
+
+
+sudo mkdir -p /usr/local/bin 
+sudo install minikube /usr/local/bin/.
+
+[01:53] Se nós executarmos Minikube, nós veremos que apareceram diversas opções. O mais importante é a opção do minikube start, onde ele vai criar para nós um cluster local do Kubernetes na nossa máquina virtualizada.
+
+[02:13] E para nós executarmos esse comando do minikube start, nós precisamos informar para ele mais uma coisa: qual é o drive de virtualização que nós vamos utilizar para criar esse cluster?
+
+[02:23] Para isso, nós utilizamos a flag --vm-driver. No caso desse curso, nós vamos utilizar o VirtualBox, onde você vai escolher a sua versão. Estou utilizando a versão do Ubuntu 20.04, ele vai baixar aqui o Debian para nós.
+
+AP:************* pegar no video o endereço do virtualbox
+
+[02:57] E nós executamos o comando sudo dpkg –i e passamos para ele esse .deb, que nós queremos utilizar para instalar. Então, apertamos a tecla “Enter” e ele vai pedir a nossa senha e vai iniciar todo o processo de instalação. Nós não vamos precisar fazer mais nada.
+
+[03:14] Nós não vamos utilizar o VirtualBox fisicamente. Nós não vamos lidar com ele diretamente, nós só vamos utilizar essa ferramenta como o nosso driver de virtualização.
+
+[03:27] Enquanto ele vai terminando todo esse processo de instalação, nós voltamos para a inicialização, para o start do Minikube.
+
+	minikube start --vm-driver =virtualbox
+
+onde nós estamos falando que o Minikube, que ele vai utilizar o VirtualBox como driver de virtualização para criar um ambiente virtualizado com o nosso cluster kubernetes dentro. E o melhor: o Kubectl já vai conseguir fazer essa comunicação de maneira automática.
+
+[04:13] Repare que ele terminou e no final ele ainda nos mostra que o Kubectl já está até configurado para usar o Minikube.
+
+[04:21] Então se agora nós executarmos o nosso comando 
+	
+	kubectl get nodes
+
+repare o que vai acontecer: ele nos exibe o nosso nó chamado Minikube com status de Ready e o papel aqui de master, sem nenhum problema.
+
+[04:35] Mas caso você que está acompanhando essa aula e vai fazer todo o curso no Linux, a única diferença que você vai ter em relação até então ao Windows, é que sempre que você iniciar a sua máquina:
+
+	minikube start --vm-driver =virtualbox
+
+[04:57] No Linux, sempre que você iniciar o seu sistema e você for fazer algo relativo ao curso, você vai precisar executar esse comando minikube start --vm-driver=virtualbox novamente, que ele vai reiniciar a sua máquina virtual e o seu cluster consequentemente, para que você consiga se comunicar efetivamente com o seu cluster, ele vai precisar estar iniciado.
+
+[05:17] Então, agora que nós vamos ver como funcionam as coisas no , e como nós podemos criar um cluster lá sem nenhum problema, eu consigo ver que é mais fácil do que no Windows e no Linux. É bem intuitivo!
