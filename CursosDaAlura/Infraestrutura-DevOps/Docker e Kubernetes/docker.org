@@ -670,7 +670,7 @@ docker run -it ubuntu bash
 
 *Contudo, havíamos criado na home um arquivo qualquer de exemplo com o comando touch um-arquivo-qualquer.txt. Isso significa que estaríamos escrevendo dentro do container. Mas como estamos conseguindo fazer isso se a imagem que gera o nosso container é apenas para leitura (read only)?*
 
-*Se ela é bloqueada para escrita, como é que o container consegue escrever informação dentro dela? Porque um container nada mais é do que uma imagem com uma camada adicional de read-write (leitura e escrita).* (Ver arquivo: "./Imagens/03_Camadas_Container=CamadasImagem+RW.png")
+*Se ela é bloqueada para escrita, como é que o container consegue escrever informação dentro dela? Porque um container nada mais é do que uma imagem com uma camada adicional de read-write (leitura e escrita).* (Ver arquivo: "./Imagens-Docker/03_Camadas_Container=CamadasImagem+RW.png")
 
 Quando criamos um container, criamos uma camada temporária em cima da imagem, onde conseguimos escrever informações. E, no momento em que esse container é deletado, essa camada extra também é deletada.
 
@@ -681,7 +681,7 @@ Agora voltamos àquela primeira pergunta, onde questionávamos por que os contai
 
 Além de serem simplesmente processos dentro do nosso sistema, podemos dizer que, quando um container entra em execução, estamos sempre reaproveitando a mesma imagem.
 
-Como a imagem é apenas de leitura, podemos ter vários containers baseados na mesma imagem. A diferença é que cada um desses containers terá apenas uma camada diferente de read-write, e como essa camada é extremamente leve, a fim de manter essa performance, temos uma reutilização da imagem para múltiplos containers.  (Ver arquivo: "./Imagens/04_Reaproveitamento_da_Imagem_Nos_Containers.png")
+Como a imagem é apenas de leitura, podemos ter vários containers baseados na mesma imagem. A diferença é que cada um desses containers terá apenas uma camada diferente de read-write, e como essa camada é extremamente leve, a fim de manter essa performance, temos uma reutilização da imagem para múltiplos containers.  (Ver arquivo: "./Imagens-Docker/04_Reaproveitamento_da_Imagem_Nos_Containers.png")
 
 *No fim das contas, o que acontece é que quando definimos um container ou outro container baseado na mesma imagem, o tamanho desse container será apenas o tamanho da camada de escrita que estamos gerando para ele, porque a imagem será reutilizada para cada um deles.*
 
@@ -1410,12 +1410,12 @@ O que vai acontecer nesse momento? Já sabemos, o contêiner vai ficar em execu�
 Existe um comando interessante que podemos inspecionar os detalhes de um contêiner quando ele já está em execução ou até mesmo em outras ocasiões também. E como é que esse comando funciona? É o docker inspect e podemos simplesmente colocar o id desse contêiner, ele vai dar diversos detalhes para nós.
 
 **** A rede bridge
-Após pressionar Enter, encontraremos a parte que estamos procurando no fim do resultado, ele fala sobre essa parte de Networks (redes) e dentro desse conjunto aqui de redes, ele tem uma chamada bridge, que tem diversas configurações (ver arquivo: "./Imagens/05_InfosDeRedeDeUmContainer.png"). Mas em que momento configuramos essa rede? A questão é que não configuramos, quem fez isso foi o próprio Docker.
+Após pressionar Enter, encontraremos a parte que estamos procurando no fim do resultado, ele fala sobre essa parte de Networks (redes) e dentro desse conjunto aqui de redes, ele tem uma chamada bridge, que tem diversas configurações (ver arquivo: "./Imagens-Docker/05_InfosDeRedeDeUmContainer.png"). Mas em que momento configuramos essa rede? A questão é que não configuramos, quem fez isso foi o próprio Docker.
 
 
 Vamos fazer uma comparação: vamos abrir outro terminal, executar mais um contêiner do Ubuntu, docker run -it ubuntu bash, e vamos comparar a saída desses outputs de rede. Vamos abrir mais um terminal e escrever docker ps, seguido de docker inspect neste outro Ubuntu que acabou de criar.
 
-Repare que se colocarmos lado a lado os dois resultados, a parte de rede é igual para os dois contêineres. Só o EndpointID e o IPAddress mudam, mas toda a parte até NetworkID é a mesma (ver imagem: "./Imagens/06_ComparativoDasInfosDeRedes.png").
+Repare que se colocarmos lado a lado os dois resultados, a parte de rede é igual para os dois contêineres. Só o EndpointID e o IPAddress mudam, mas toda a parte até NetworkID é a mesma (ver imagem: "./Imagens-Docker/06_ComparativoDasInfosDeRedes.png").
 
 Isso significa então que esses contêineres estão na mesma rede, mas será que conseguimos fazer algum tipo de comunicação entre eles, já que estão na mesma rede, que é um driver aqui que o Docker está colocando pra nós?
 
@@ -1435,11 +1435,11 @@ df26e341d36e	host	host	local
 6ef79c7aa3d6	none	null	local
 O que isso tudo significa? Por que precisamos nos preocupar com isso?
 
-Se pegarmos um dos nossos inspects, temos que o id da rede é 80a01db (na sua máquina será diferente), e essa é exatamente a mesma rede que estamos vendo no nosso network ls. (Ver imagem: "./Imagens/06_ComparativoDasInfosDeRedes.png" que o NetworkID de ambas começam com o hash do hash do NETWORK ID")
+Se pegarmos um dos nossos inspects, temos que o id da rede é 80a01db (na sua máquina será diferente), e essa é exatamente a mesma rede que estamos vendo no nosso network ls. (Ver imagem: "./Imagens-Docker/06_ComparativoDasInfosDeRedes.png" que o NetworkID de ambas começam com o hash do hash do NETWORK ID")
 
 Isso significa que os dois contêineres que criamos sem definir nenhuma rede, foram colocados nessa rede padrão bridge, utilizando esse driver também de bridge.
 
-Isso significa que, se tentarmos acessar algum desses contêineres, como o 8ea67, e usarmos o comando docker ps, o que acontece? Se dermos um docker inspect nele de novo, ele tem o IPAddress 172.17.0.2, e se dermos um docker ps no contêiner b02, seguido de um docker inspect, veremos que o IDAddress dele é 172.17.0.3. (Ver imagem para saber de quais containers ele está falando: "./Imagens/07_SaidaDosHashsDosContainers.png")
+Isso significa que, se tentarmos acessar algum desses contêineres, como o 8ea67, e usarmos o comando docker ps, o que acontece? Se dermos um docker inspect nele de novo, ele tem o IPAddress 172.17.0.2, e se dermos um docker ps no contêiner b02, seguido de um docker inspect, veremos que o IDAddress dele é 172.17.0.3. (Ver imagem para saber de quais containers ele está falando: "./Imagens-Docker/07_SaidaDosHashsDosContainers.png")
 
 Então, se tentarmos, por via das dúvidas, comunicar o contêiner b02 com ID de final 03, com outro via IP, provavelmente conseguiremos, já que eles estão na mesma interface de rede.
 

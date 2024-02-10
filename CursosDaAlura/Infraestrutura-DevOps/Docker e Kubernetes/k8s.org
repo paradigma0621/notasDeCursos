@@ -1,3 +1,4 @@
+Do curso abaixo: https://github.com/alura-cursos/1846-kubernetes/tree/Aula3
 * Curso de Kubernetes: Pods, Services e ConfigMaps
 ** Notas Gerais
 *** Há 2 propostas de implementação de Kubernets
@@ -14,42 +15,62 @@ Uma ou mais máquinas trabalhando em conjunto, dividindo o seu poder computacion
 O Kubernetes é capaz de criar e gerenciar um cluster para que nós consigamos manter a nossa aplicação escalável sempre que nós quisermos adicionar novos containers, sempre que nós quisermos reiniciar a nossa aplicação de maneira automática, caso ela tenha falhado. Então nós chamamos isso de orquestração de containers.
 
 *** Arquitetura do Kubernets
-ver as imagens: "./Imagens/aula1_video3_imagem1.png" a "aula1_video3_imagem4"
+ver as imagens: "./Imagens-k8s/aula1_video3_imagem1.png" a "aula1_video3_imagem4"
 ** Criando o cluster
+*** Inicializando o cluster no Windows
+precisamos intermediar pelo Docker
 *** Inicializando o cluster no Linux
 Pro/AP: Tanto o Kubernets do Windows como o do Google Cloud Platform usam Linux debaixo dos panos.
+-----------Para instalar
+ir em https://kubernetes.io/releases/download/
 
+   curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
 
-AP:************* pegar no video o endereço
+sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+
+-----------
+
 [00:29] O segundo passo agora é para tornar o Kubectl que nós estamos baixando agora para nós darmos permissão de executável para ele no nosso sistema. Então, copiando e colando. E por fim, nós movemos ele para o nosso path sem nenhum problema, mais uma vez nós colocamos a nossa senha e sem problemas.
 
 [00:47] Para confirmar se tudo foi instalado sem nenhum problema, nós executamos esse comando. E repare que ele executou e nos retornou as informações do Kubectl.
 
+	kubectl version --client
+
+
 [00:55] Se nós executarmos aquele mesmo comando que nós fizemos no Windows do Kubectl get nodes, o que vai acontecer? Repare que ele deu um erro de conexão recusada, porque nós não temos um cluster ainda. Sem cluster nós não temos API, logo nós não estamos nos comunicando com ninguém.
+
+	kubectl get nodes
 
 [01:11] E para nós termos o nosso cluster, a nossa API em si, nós vamos utilizar uma ferramenta chamada Minikube, onde ela já cria um ambiente virtualizado com o cluster pronto para nós.
 
+	curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+	sudo install minikube-linux-amd64 /usr/local/bin/minikube
 
-sudo mkdir -p /usr/local/bin 
-sudo install minikube /usr/local/bin/.
+
+	sudo mkdir -p /usr/local/bin 
+	sudo install minikube /usr/local/bin/
+
+
+Ir em: https://www.virtualbox.org/wiki/Linux_Downloads
+Ele será usado como driver de virtualização:
+e baixar o arquivo semelhante à: virtualbox-7.0_7.0.14-161095~Ubuntu~jammy_amd64
+(essa era a última versão quando acessei)
+
+dpkg -i virtualbox-7.0_7.0.14-161095~Ubuntu~jammy_amd64
+
+(Obs: eu precisei instalar além do que o professor do curso apresentou também: sudo apt-get install virtualbox-dkms)
+
+minikube start --vm-driver=virtualbox
 
 [01:53] Se nós executarmos Minikube, nós veremos que apareceram diversas opções. O mais importante é a opção do minikube start, onde ele vai criar para nós um cluster local do Kubernetes na nossa máquina virtualizada.
 
-[02:13] E para nós executarmos esse comando do minikube start, nós precisamos informar para ele mais uma coisa: qual é o drive de virtualização que nós vamos utilizar para criar esse cluster?
+	minikube start
 
-[02:23] Para isso, nós utilizamos a flag --vm-driver. No caso desse curso, nós vamos utilizar o VirtualBox, onde você vai escolher a sua versão. Estou utilizando a versão do Ubuntu 20.04, ele vai baixar aqui o Debian para nós.
-
-AP:************* pegar no video o endereço do virtualbox
-
-[02:57] E nós executamos o comando sudo dpkg –i e passamos para ele esse .deb, que nós queremos utilizar para instalar. Então, apertamos a tecla “Enter” e ele vai pedir a nossa senha e vai iniciar todo o processo de instalação. Nós não vamos precisar fazer mais nada.
+[02:13] E para nós executarmos esse comando do minikube start, nós precisamos informar para ele mais uma coisa: qual é o drive de virtualização que nós vamos utilizar para criar esse cluster? AP: Foi o passado no argumento: virtualbox
 
 [03:14] Nós não vamos utilizar o VirtualBox fisicamente. Nós não vamos lidar com ele diretamente, nós só vamos utilizar essa ferramenta como o nosso driver de virtualização.
 
-[03:27] Enquanto ele vai terminando todo esse processo de instalação, nós voltamos para a inicialização, para o start do Minikube.
-
-	minikube start --vm-driver =virtualbox
-
-onde nós estamos falando que o Minikube, que ele vai utilizar o VirtualBox como driver de virtualização para criar um ambiente virtualizado com o nosso cluster kubernetes dentro. E o melhor: o Kubectl já vai conseguir fazer essa comunicação de maneira automática.
+*onde nós estamos falando que o Minikube, que ele vai utilizar o VirtualBox como driver de virtualização para criar um ambiente virtualizado com o nosso cluster kubernetes dentro. E o melhor: o Kubectl já vai conseguir fazer essa comunicação de maneira automática.*
 
 [04:13] Repare que ele terminou e no final ele ainda nos mostra que o Kubectl já está até configurado para usar o Minikube.
 
@@ -65,4 +86,696 @@ repare o que vai acontecer: ele nos exibe o nosso nó chamado Minikube com statu
 
 [04:57] No Linux, sempre que você iniciar o seu sistema e você for fazer algo relativo ao curso, você vai precisar executar esse comando minikube start --vm-driver=virtualbox novamente, que ele vai reiniciar a sua máquina virtual e o seu cluster consequentemente, para que você consiga se comunicar efetivamente com o seu cluster, ele vai precisar estar iniciado.
 
-[05:17] Então, agora que nós vamos ver como funcionam as coisas no , e como nós podemos criar um cluster lá sem nenhum problema, eu consigo ver que é mais fácil do que no Windows e no Linux. É bem intuitivo!
+** Criando e entendendo pods
+*** Entendendo o que são pods
+(Obs: ver imagens: "./Imagens-k8s/aula3-video1_imagem1.png" a "aula3-video1_imagem5.png")
+
+[00:00] Agora nós vamos entender o que é esse termo tão famoso quando nós ouvimos falar de Kubernetes, que são os pods. Nós vamos entender do que se trata, qual a diferença dele para um container, qual a vantagem da utilização de um pod, porque nós devemos utilizar ele e em qual cenário nós devemos utilizar.
+
+[00:16] Então vamos lá! Nós podemos começar fazendo aqui uma analogia com um Docker. Nós sabemos que o mundo Docker nós criamos, produzimos, gerenciamos e manipulamos o nosso container; não é verdade?
+
+[00:28] Então no mundo Docker nós trabalhamos com container. E a partir de agora no Kubernetes nós vamos criar, produzir, manipular e gerenciar - não mais os containers diretamente, e sim os nossos pods. Então o mundo kubernetes, pods, o mundo Docker e containers.
+
+[00:47] Então está aí uma diferença já de cara que nós vamos começar trabalhar agora com os pods. Mas o que é um pod? Vamos entender agora. Um pod, se nós traduzirmos literalmente, ele é uma capsula na verdade, e uma capsula pode conter um ou mais containers dentro dela.
+
+[01:06] Então nós entendemos já a diferença para um pod e entre um pod e um container. Nós sabemos que um pod é um conjunto de um ou mais containers, mas o que isso muda na pratica?
+
+[01:17] A partir de agora então, quando nós tivermos aqui a comunicação da nossa máquina com o kubectl para API, nós não vamos pedir pela criação diretamente de um container, e sim de um pod, que pode conter um ou mais containers dentro dele.
+
+[01:32] Isso sempre de maneira declarativa ou imperativa. 
+
+[01:40] Dentro de *um pod* nós temos liberdade, como eu falei para vocês de termos mais containers, mas sempre que nós criamos um pod ele ganha um endereço IP. (AP: *dentro de um pod podemos ter 1 ou mais containers*).
+
+[01:49] Então o endereço IP não é mais do container, e sim do nosso pod. Dentro do nosso pod nós temos total liberdade de fazermos um mapeamento de portas para os IPs que são atribuídos a esse pod. Então, o que isso quer dizer? Vamos entender agora!
+
+[02:06] No momento em que nós fazemos a requisição aqui, por exemplo, para o IP 10.0.0.1, repare que é o mesmo IP que nós estamos fazendo requisição para o IP do pod na porta 8080. Nós estamos nos referindo nesse momento ao nosso container dentro da porta :8080 no nosso pod.
+
+[02:25] A mesma coisa se nós tivermos outro container na porta 9000. Quando nós fizermos a requisição para esta porta neste endereço, nós vamos estar nos referindo a esse container :9000.
+
+[02:36] O que isso quer dizer? Quer dizer que eles estão compartilhando o mesmo endereço IP e nós consequentemente não podemos ter dois containers na mesma porta dentro de um mesmo pod.
+
+[02:48] Seguindo então, o que mais os pods são capazes de fazer? Nós vimos que nós temos um container ou mais dentro de um pod. Caso esse container falhe, o que vai acontecer? 
+
+[03:02] (AP: Peguemos o caso de um pod ter apenas um container)Nesse momento, esse pod vai parar de funcionar. Ele morreu para sempre e o kubernetes tem total liberdade de criar um novo pod para substituir o antigo, mas não necessariamente com o mesmo IP que ele tinha antes, nós não temos controle sobre isso.
+
+[03:19] Por quê? Porquê *os pods são efêmeros*, eles estão ali para serem substituídos a qualquer momento e toda criação de um novo pod é um novo pod efetivamente, não é o mesmo pod antigo que foi renascido.
+
+[03:36] E caso nós tivéssemos mais de um container dentro do mesmo pod, o que iria acontecer se esse pod falhasse? Para ele falhar efetivamente nós teríamos que ter a seguinte condição:
+
+[03:44] O primeiro container falhou dentro de um pod. *Caso ainda tenha algum container em funcionamento sem nenhum problema dentro desse mesmo pod, ele ainda está saudável*; mas caso nenhum container mais esteja funcionando dentro desse pod, esse pod foi finalizado e outro vai ser criado no lugar dele.
+
+[04:06] Por fim, vamos entender outra questão aqui de rede do nossos pods. Agora, como mostrei para vocês, nós vamos fazer esse mapeamento de portas entre o IP do pod e aqui os nossos containers, porque agora todo IP pertence ao pod, e não aos containers.
+
+[04:23] Isso quer dizer que no fim das contas, eles vão compartilhar os mesmos namespaces de rede e de processo, de comunicação entre o processo e eles também podem compartilhar volume. Nós vamos ver isso no decorrer do curso.
+
+[04:35] Mas qual é a grande vantagem? Talvez você já tenha se perguntado isso na sua cabeça. Qual é a grande vantagem deles compartilharem o mesmo IP? A grande vantagem é que agora eles podem fazer essa comunicação diretamente entre eles via localhost, porque eles têm o mesmo IP, não é verdade? Que é 10.0.0.1 nesse caso.
+
+[04:57] Então, agora nós temos essa capacidade de fazer uma comunicação de maneira muito mais fácil entre containers de um mesmo pod e isso, é claro, nós também vamos ter total capacidade de comunicar pods entre diferentes IPs. Eu tenho um pod com IP 10.0.0.1, ele pode começar com pod de IP 10.0.0.2. Por exemplo: aqui nós temos total liberdade de fazer essa comunicação.
+
+*** O primeiro pod
+Nós vamos criar o nosso primeiro pod.
+
+[00:16] E para nós criarmos eu falei para vocês que o Kubernetes, o kubectl, é capaz de fazer operações de criar, ler, atualizar e remover os recursos de dentro do nosso cluster, se comunicando com a API.
+
+[00:28] O comando "kubectl run" é capaz de criar um pod para nós. Os parâmetros que nós vamos informar são bem simples: o primeiro vai ser o nome do pod que nós queremos criar.
+
+[00:41] Então eu vou criar um pod utilizando a imagem do nginx, então eu vou chamar ele de "nginx-pod" e a partir daí eu posso e devo explicitar qual imagem eu quero utilizar para basear o container que será criado dentro desse pod. Então uso a flag --image e informo com = que eu quero utilizar o nginx, por exemplo na versão latest. Então 
+
+	kubectl run nginx-pod --image=nginx:latest
+
+[01:04] Se eu apertar a tecla “Enter”, olhe o que vai acontecer: ele falou que criou. Será que criou? Vamos ver aqui com o comando 
+
+	kubectl get pods
+
+Está aqui o nosso pod chamado nginx-pod, ainda não está pronto e está com status de criação.
+
+[01:19] Se nós executarmos esse mesmo comando 
+
+	kubectl get pods --watch
+
+ ele vai passar a acompanhar esse comando em tempo real. Então assim que tiver uma mudança no status desse comando, ele vai nos atualizar. Isso significa que assim que o nosso pod for criado, como ele acabou de ser, ele nos atualiza automaticamente.
+
+[01:40] Então nós podemos apertar as teclas “Ctrl + C” para sairmos desse comando e o nosso pod já está em execução, nós podemos ver outras informações também sobre ele, com o comando
+
+	kubectl describe pod nomeDoNossoPod
+No nosso caso: 
+	kubectl describe pod nginx-pod
+
+ E eu quero descrever esse meu pod chamado nginx-pod. Nós apertamos a tecla “Enter” e ele vai exibir diversas informações. (AP: abaixo a saida do meu terminal:)
+
+Events:
+  Type    Reason     Age    From               Message
+  ----    ------     ----   ----               -------
+  Normal  Scheduled  2m15s  default-scheduler  Successfully assigned default/nginx-pod to minikube
+  Normal  Pulling    2m15s  kubelet            Pulling image "nginx:latest"
+  Normal  Pulled     2m4s   kubelet            Successfully pulled image "nginx:latest" in 10.896s (10.896s including waiting)
+  Normal  Created    2m4s   kubelet            Created container nginx-pod
+  Normal  Started    2m4s   kubelet            Started container nginx-pod
+
+
+[02:00] Inclusive, no final nós conseguimos ver como foi o processo de criação desse pod. Primeiro ele atribuiu este pod a um nó chamado Docker Desktop, no caso do Linux vai instalar o Minikube e quem fez isso foi o “Scheduled”. Olhe que legal! Como é importante nós sabermos essa questão arquitetural do Kubernetes!
+
+[02:19] A partir daí ele começou a fazer o download da imagem. Baixou ela com sucesso, criou o container e iniciou o pod. Então repare: o pod só foi iniciado depois da criação do container que vai compor esse pod.
+
+[02:34] Nós podemos também ter outras informações, como por exemplo: o IP dele, esses labels e essas etiquetas que nós vamos entender do que que se tratam, pois elas são bem importantes e poderosas. Nós vamos entender bastante sobre elas no decorrer do curso, além de o nome dele e informações bem básicas sobre o nosso pod.
+
+[02:53] Se, digamos, eu estou usando a versão nginx:latest, digamos que eu queira mudar a versão do nginx que estou utilizando nesse pod. Eu quero atualizar esse pod já existente.
+
+[03:05] Eu tenho o comando 
+
+	kubectl edit pod nameDoPod
+no nosso caso:
+	kubectl edit pod nginx-pod
+
+e eu posso editar o quê? Um pod e qual é o pod que eu quero editar? Esse chamado nginx-pod, e ele vai abrir esse bloco de notas na nossa frente com diversas informações bem complexas. AP: Obs: no caso do Linux ele abre o vi.
+
+[03:21] Mas o que importa para nós? Nós vamos aceitar isso por enquanto, porque nós estamos trabalhando de maneira bem ingênua. Nós queremos atualizar a imagem do nosso pod, que se nós analisarmos bem, está logo embaixo com o nosso image. Nós não queremos utilizar a versão latest, nós queremos utilizar a versão 1.0.
+(editando a linha de " image: nginx:latest" para " image: nginx:1.0")
+
+[03:43] Nós salvamos o arquivo, fechamos e ele vai falar que o nosso pod foi editado. Se nós vermos aqui de novo o nosso comando kubectl get pods, olha o que vai acontecer: ele está agora com status de 0/1, de Ready, e deu erro de imagem para baixar.
+
+[04:01] O que isso quer dizer? Vamos descobrir o que isso quer dizer utilizando aqui o nosso comando kubectl describe pod e vamos passar aqui o nosso nginx-pod.
+
+[04:10] Se nós vermos aqui em baixo sem nenhum problema, olhe o que aconteceu - ele começou a tentar baixar essa imagem da versão 1.0 do nginx e não conseguiu. Por quê? Porque essa imagem não existe, então ele caiu meio que em um looping, no fim das contas de ficar tentando baixar essa imagem e não conseguir.
+
+[04:29] Por isso que se nós viermos aqui agora de novo, no status, nós estamos com esse ImagePullBackOff, porque ele não conseguiu fazer o download dessa imagem para a criação do nosso pod.
+
+[04:40] E foi um pouco complexo porque nós fizemos isso de maneira ingênua, *nós criamos esse pod de maneira imperativa e nós tentamos editar ele também de maneira imperativa. Nós fizemos essa edição, na verdade, de maneira imperativa.*
+
+[04:55] *Só que, qual é o problema da maneira imperativa? Nós acabamos não tendo meio que o acompanhamento de como tudo está acontecendo dentro do nosso cluster, nós não temos nada muito bem declarado e definido. Nós precisamos ter um histórico de quais comandos nós realizamos para saber qual é o nosso estado atual.*
+
+[05:11] Para evitarmos esse tipo de problema e deixarmos tudo muito mais claro e organizado no nosso cluster, nós vamos passar a trabalhar com maneira declarativa, usando um arquivo de definição para definir como é o pod que nós queremos criar.
+*** Para saber mais: Onde as imagens são armazenadas
+Executamos o nosso primeiro Pod. Porém, como o Kubernetes armazena as imagens baixadas dentro do cluster?
+
+A resposta é simples: quando definimos que um Pod será executado, o scheduler definirá em qual Node isso acontecerá. O resultado então é que as imagens quando baixadas de repositórios como o Docker Hub, serão armazenadas localmente em cada Node, não sendo compartilhada por padrão entre todos os membros do cluster.
+*** Criando pods de maneira declarativa
+AP: Adianto aqui o yaml escrito nessa aula (arquivo "./Arquivos-k8s/aula3/primeiro-pod.yaml")
+apiVersion: v1
+kind: Pod
+metadata:
+  name: primeiro-pod-declarativo       #pode-se dar qualquer nome aqui
+spec:
+  containers:
+    - name: container-pod-1            #pode-se dar qualquer nome aqui
+      image: nginx:latest
+
+
+[00:00] Agora nós vamos criar o nosso primeiro pod de maneira declarativa. O que isso quer dizer? Quer dizer que agora nós vamos precisar 
+trabalhar com algum editor de texto. 
+
+[00:17] Então eu criei uma pasta e vou abrir ela, chamada “kubernetes-alura”, e dentro dela vai ser onde nós vamos fazer todo o nosso processo de criação de arquivos. Então dentro dessa pastinha nós vamos criar os nossos arquivos de definição.
+
+[00:35] Mas como isso funciona? É bem simples na verdade, basta nós criarmos um novo arquivo dentro dessa pasta e nomear ele. Então eu vou chamar ele de “primeiro-pod” e ele precisa ter uma extensão específica para que o kubectl consiga enviar ele e a API consiga interpretar. Então, ou ele pode ser um .json, ou ele pode ser um .yaml também.
+
+[00:57] O mais comum e fácil de se trabalhar é o .yaml, então vai ser ele que nós vamos utilizar daqui para o final do curso.
+
+[01:04] Então dentro desses arquivos nós precisamos começar a escrever e a informar algumas coisas, como por exemplo: qual é a versão da API que nós queremos utilizar.
+
+[01:14] “Como assim versão da API?” Se nós virmos na documentação, nós vamos entender que na verdade a API era uma única aplicação centralizada que foi dividida em diversas partes. Embaixo nós temos uma delas, por exemplo: a versão alfa, a versão beta e a versão estável.
+
+[01:37] Onde a alfa tem coisas que podem ainda estar contendo bug; embaixo nós temos a beta que já pode ser considerada segura, mas ainda não é bom utilizar definitivamente; e a versão estável que é um “v” seguido de um número inteiro, onde é a versão estável efetivamente para uso.
+
+[01:56] E ela possui também diversos grupos para nós utilizarmos. Como nós queremos criar um pod, o pod está dentro da versão estável da API, logo está na versão “v” seguida de algum número - nesse caso ele está na versão “v1”.  (daí: "apiVersion: v1")
+
+[02:12] Logo depois nós precisamos informar o que nós queremos criar. Nós queremos criar um pod, então o tipo do que nós queremos criar, dos recursos que nós queremos criar, é um pod. (daí: "kind: Pod")
+
+[02:22] Logo depois nós definimos quais são os metadados desse pod. Como, por exemplo: nós vamos definir qual nome nós vamos dar para ele, no caso dentro de metadados nós vamos definir essas informações.
+
+[02:37] Como nós queremos fazer isso dentro de metadata, eu vou escrever que o nome que eu quero dar para esse pod vai ser o nosso "primeiro-pod-declarativo" e fechar. Não tem mais nada para colocar no meu metadado.
+
+[02:55] E agora, quais são as especificações que eu quero dar para esse pod. Eu quero que ele contenha um container, um ou mais containers. Aqui no caso que tenho o nome de, no caso, "nginx-container", que eu posso dar qualquer nome a esse container. É irrelevante para o nosso caso. Logo depois eu posso definir qual imagem eu quero utilizar para esse container.
+
+[03:26] Então nós queremos utilizar mais uma vez a versão do nginx na versão latest. Repare que eu coloquei um tracinho. Por quê? Eu posso ter diversos desses pares para definir exatamente essa questão, eu posso ter múltiplos containers dentro de um pod. Então esse tracinho é para marcar o início de uma nova declaração dentro do nosso container, mas nós só queremos um container dentro desse pod. Então ele está feito.
+
+[03:54] E agora, como nós utilizamos esse arquivo de definição? É bem fácil! Pedir para o kubectl fazer o quê? Não para ele criar um pod da maneira como nós fizemos antes, mas para ele aplicar o nosso arquivo de definição chamado de primeiro-pod.yaml
+
+	kubectl apply -f primeiro-pod.yaml 
+	
+[04:16] E olhe que legal, ele fala que o nosso primeiro-pod agora foi criado. Se nós dermos o comando 
+
+	kubectl get pods 
+
+ está ele, o nosso primeiro pod declarativo, 1/1 rodando.
+
+[04:29] E olhe que legal - agora nós só precisamos utilizar o nosso arquivo de definição e o comando foi para entregar esse arquivo para a API fazer e tomar a ação necessária!
+
+[04:41] Então nós não precisamos mais nos preocupar com qual comando nós vamos utilizar, e sim em entregar um arquivo de definição para o Kubernetes fazer o que nós queremos.
+
+[04:49] Então nós vamos ficar aplicando esses arquivos de definição, declarativos para criar os nossos recursos. Olhe que legal!
+
+[04:56] E com isso fica bem mais fácil nós manusearmos os nossos recursos. Por quê? Porque digamos que agora eu quero utilizar de novo a versão 1.0 que não existe do nginx. Basta eu vir no meu arquivo de definição, trocar para a versão 1.0 e aplicar esse arquivo novamente, o mesmo comando, a mesma ideia.
+
+	kubectl apply -f primeiro-pod.yaml 
+AP: antes trocar a linha da imagem para:
+      image: nginx:1.0
+
+[05:18] Ele vai nos informar que o pod não foi criado, e sim configurado (pod/primeiro-pod-declarativo configured); porque ele já existe e uma ação foi realizada sobre ele. Se nós formos olhar exatamente a mesma coisa da aula anterior, ele não conseguiu baixar a imagem. Se nós continuarmos repetindo isso, em algum momento ele vai cair nesse ImagePullBackOff.
+
+[05:39] E agora nós editamos. Conseguimos editar ele de uma maneira bem mais prática em relação àquele arquivo gigante que nós tínhamos, que também era um .yaml, mas era bem mais complexo de se entender.
+
+[05:50] Agora nós temos um arquivo mais simples, isso significa que se eu voltar e tentar colocar uma outra versão - por exemplo, a stable do nosso nginx, que é uma versão que existe; se eu voltar e aplicar de novo o nosso arquivo de definição, olhe que legal!
+
+[06:08] Vamos executar o "kubectl get pods" e vamos observar o que vai acontecer. Ele vai continuar com esse status de erro, mas ainda ele não se configurou, ele ainda não atualizou ali efetivamente. E agora sim ele baixou e está utilizando a nova imagem.
+
+[06:25] Se nós apertarmos as teclas “Control + C” e descrever esse nosso pod que nós fizemos o nosso primeiro pod declarativo.
+
+[06:36] A atribuição do scheduler como antes, a criação; o erro do ImagePullBackOff, que ele continuou tentando utilizar da versão 1.0; depois a nova tentativa de baixar a versão estável e a criação. Tudo feito sem nenhum problema, olhe que legal!
+
+[06:53] E isso tudo só com um comando,
+	kubectl apply -f primeiro-pod.yaml 
+ então nós centralizamos diversas dessas ações através desse único comando kubectl apply, ou seja, o kubectl foi responsável por fazer a comunicação com a API. Nós aplicamos um arquivo, esse -f de file - na verdade chamado primeiro-pod.yaml - e a mágica foi feita sem nenhum mistério, nós só definimos o que nós queríamos e isso foi criado dentro do nosso cluster.
+
+[07:23] Então a partir de agora, o que nós estamos conseguindo fazer? Nós estamos conseguindo criar, gerenciar e manipular recursos através de um único comando de uma maneira que é bem mais usada em produção e tendo um registro de como está o nosso estado atual.
+
+[07:39] Basta nós consultarmos um arquivo e vermos como nós queremos que o nosso recurso esteja, e ele vai estar conforme o arquivo de declaração de definição.
+
+[07:49] No próximo vídeo nós vamos começar a colocar a mão na massa com um projeto com um pouco mais bem elaborado, que nós vamos utilizar no decorrer da parte 1 e da parte 2 desse curso, para nós conseguirmos sedimentar bem os conceitos que nós vamos aprender. 
+*** Iniciando o projeto
+AP: ver:  (arquivo "./Arquivos-k8s/aula3/portal-noticias.yaml")
+
+[00:00] Agora nós vamos começar a colocar a mão na massa em um projeto mais bem elaborado, para nós conseguirmos, como eu falei, sedimentar os conceitos que nós viemos aprendendo.
+
+[00:08] Então, de início nós temos aqueles dois pods da aula passada funcionando ainda. Nós temos duas maneiras de fazer esses pods pararem de funcionar.
+
+[00:19] *Esse que foi criado de maneira imperativa, nós só temos essa possibilidade de executarmos o comando kubectl delete pod e passamos o nome do pod que nós queremos deletar.*
+
+	kubectl delete pod nginx-pod
+
+[00:28] Então a partir desse momento que nós executarmos o comando kubectl get pods de novo, que está terminando de deletar, nós vamos ver que esse nginx-pod foi removido; nós não temos esse pod em execução, só o nosso primeiro-pod-declarativo, que foi criado de maneira declarativa.
+
+[00:45] *A outra maneira que nós temos de eliminarmos um pod que foi criado também de maneira declarativa, que no caso é o nosso pod, é da seguinte maneira: nós podemos utilizar o*
+
+	kubectl delete -f primeiro-pod.yaml   (estando no terminal no diretório do arquivo)
+
+para passar um arquivo. Qual é o pod que nós queremos criar? O pod que está utilizando o arquivo de definição baseado no .\primeiro-pod.yaml.
+
+[01:10] Então, ele vai bater esse nome: primeiro-pod-declarativo e vai remover esse pod. Nós apertamos a tecla “Enter” e ele também vai ser deletado. Olhe que legal!
+
+[01:24] Então nós temos essa maneira de removermos imperativamente, mas também nós podemos remover ele em cima do nosso arquivo de definição. Olhe que legal!
+
+[01:33] Mas vamos criar o nosso projeto! Nós vamos trabalhar em cima de um portal de notícias, só que seguindo todas as boas práticas do Kubernetes e como nós podemos utilizar os recursos ao nosso favor.
+
+[01:44] Então, como nós vamos criar de início um pod para esse portal de notícias, que é uma imagem Docker que já existe, nós vamos criar esse pod. Vamos chamar ele de "portal-noticias.yaml".
+
+[01:58] E dentro dele nós temos aquelas informações que nós já vimos, da versão da API. Como é um pod que está na versão V1 e o tipo que nós queremos criar, nós já sabemos que é um pod.
+
+[02:09] Os metadados daqui que nós vamos definir, nós vimos que o nome que nós vamos definir é também arbitrário. Nós podemos colocar name: "portal-noticias", sem nenhum problema. Nós podemos dar o nome que nós quisermos, mas é sempre bom sermos semântico.
+
+[02:24] E as especificações desse name: portal-noticias, quais são as informações do container que vai compor esse pod para nós? Ele vai ter um nome que nós temos total liberdade para definirmos. Como, por exemplo: "portal-noticias-container". Nós podemos dar o nome que nós quisermos para esse campo desse nosso container.
+
+[02:45] E a imagem que nós vamos utilizar é uma imagem que já existe e está nesse repositório da Alura – "image: aluracursos/portal-noticias:1" (na versão 1). Nós salvamos esse arquivo e partindo daí basta nós repetirmos o nosso comando e aplicarmos o nosso arquivo de definição, passando 
+
+	kubectl apply -f portal-noticias.yaml 
+
+[03:10] Se agora nós escrevermos o nosso kubectl get pods –watch, ele vai começar a acompanhar esse status de criação.
+
+[03:28] Criado, rodando sem nenhum problema. Como nós acessamos agora essa aplicação dentro desse pod que nós acabamos de criar? Nós podemos de início verificarmos qual é o IP dele com o comando
+
+	kubectl describe pod portal-noticias
+
+Ele vai nos exibir todo o status de que tudo está rodando sem nenhum problema. Se nós vemos o nosso IPem cima, ele é 10.1.0.9.
+
+[03:54] Então vamos copiar. Nós podemos abrir o nosso navegador. Vamos abrir ele sem nenhum problema, vamos abrir e vamos tentar executar esse IP.
+
+[04:08] O que vai acontecer? Pelo tempo que está demorando nós já conseguimos ter uma breve noção de que alguma coisa está errada. Então ele vai continuar tentando acessar e enquanto ele tenta acessar nós vamos tentar acessar ele de uma outra maneira.
+
+[04:34] Nós conseguimos executar comandos dentro do nosso pod. Assim como no Docker, nós temos aquele comando docker exec. Aqui no Kubernetes, nós temos o comando kubectl exec e também de maneira interativa.
+
+[04:47] E qual é o comando? Qual é o pod que nós queremos executar de maneira interativa? Exatamente o nosso portal-noticias. E qual comando nós queremos executar dentro dele? Nós queremos executar o comando do bash, que é o terminal ali, no caso.
+
+[05:01] Mas para nós fazermos isso, nós precisamos colocar -- e o comando que nós queremos executar. Então nós apertamos a tecla “Enter” - e nós estamos no container, nós estamos no terminal dentro do container do nosso pod.
+
+	kubectl exec -it portal-noticias -- bash
+
+[05:16] E nós conseguimos executar comandos. Como, por exemplo, um curl, para enviarmos uma requisição. Eu quero enviar uma requisição para o meu localhost, ou seja, para o endereço dentro do meu pod, dentro do meu container.
+
+	curl localhost
+
+[05:30] Se eu apertar a tecla “Enter”, repare que ele exibiu todo o conteúdo da página web que eu esperava. Mas se nós voltarmos no nosso navegador, ele não conseguiu acessar essa página, ele demorou muito a responder; nós não conseguimos acessar.
+
+[05:44] Mas por que nós não conseguimos acessar? Se nós voltarmos mais uma vez no nosso comando - vamos sair do nosso pod, do nosso container, apertando as teclas “Control + D”, vamos descrever ele mais uma vez, kubectl describe pod, e vamos exibir as informações do nosso portal de notícias.
+
+[06:04] *Esse IP que ele está exibindo (10.1.0.9) é o IP desse pod, realmente - mas esse pod, esse IP especificamente, é para acesso só dentro do cluster. Então as outras aplicações dentro do cluster vão conseguir se comunicar com esse pod através desse IP.*
+
+[06:25] *E mais, nós não fizemos nenhum tipo de mapeamento para exibirmos o nosso container dentro do nosso pod porque, como nós vimos, o IP é do pod, e não do container.*
+
+[06:37] Como ele sabe que a partir desse IP ele deve acessar o nosso container dentro do pod? Nós precisamos fazer um mapeamento para isso - e mais, nós precisamos fazer a liberação para que esse IP seja acessível no mundo externo ao cluster.
+
+[06:52] E para isso, nós vamos começar a estudar um novo curso, um novo conceito do Kubernetes a partir da próxima aula, em que nós vamos começar a expor a nossa aplicação para o mundo externo para que nós consigamos acessar ela. Para isso, nós vamos terminar esse vídeo por aqui e no próximo nós começaremos. Eu vejo vocês lá. Até mais!
+** Expondo pods com services
+*** Conhecendo services
+AP: Ver imagens "./Imagens-k8s/aula4_video1_imagem1.png" até "aula4_video1_imagem4"
+		Ver arquivo na pasta: "./Arquivos-k8s/aula3/"
+
+[00:00] Falei para vocês que nós conseguimos fazer a comunicação entre diferentes pods dentro do nosso cluster. Então, por exemplo: se nós temos esse pod de IP 10.0.0.1, nós conseguimos normalmente nos comunicar com outro pod de IP 10.0.0.2 dentro do nosso cluster.
+
+[00:18] Mas essa comunicação está sendo bem simples, entre dois pods dentro do nosso próprio cluster. Se nós tivéssemos um cenário um pouco mais bem elaborado, onde nós teríamos um pod responsável pelas aplicações de login com esse IP terminado em .1, um de busca com .2, um de pagamentos com .3, um de carrinho com .4 e todos esses pods se comunicariam através dos seus respectivos IPs.
+
+Dois ícones de legenda "pod" conectados por uma linha, um com IP 10.0.0.1 e o outro 10.0.0.2
+
+[00:44] Mas vamos supor que esse pod do carrinho parasse de funcionar, ou seja, ele vai precisar ser substituído. Então criamos um novo pod para o carrinho. Só que nós não temos a garantia de que esse pod vai ter exatamente o mesmo IP do anterior.
+
+[01:04] Porque se nós viermos no nosso terminal, o que nós conseguiríamos fazer? Nós temos mais uma vez. Deixe-me ver esse para vocês do nosso kubectl get pods. Nós temos o nosso “portal-noticias” que se nós, ao invés de descrevermos ele, utilizarmos esse comando get pod –o para formatarmos o nosso output de maneira “wide”, nós teríamos que o IP dele de 10.1.0.9.
+
+	kubectl get pods -o wide
+
+Sistema interligado de "Login" com pod 10.0.01, "Busca" com pod 10.0.0.2, "Carrinho" com pod 10.0.04 e "Pagamentos" com 10.0.0.3. Fora do sistema, está outro ícone de "Carrinho" com pod 10.0.0.5
+
+[01:28] Se nós deletarmos esse nosso pod com o comando kubectl delete –f e passarmos o nosso arquivo de definição para ele - que é o nosso .\portal-notícias.yaml - ou até mesmo, nós deletarmos com o comando kubectl delete pod portal-noticias - que é o nome do nosso pod; ele vai ser removido. Nenhum mistério até aí.
+
+	kubectl delete pod portal-noticias
+
+[01:50] Mas se nós criarmos ele de novo... Vamos executar o comando kubectl apply -f e passar o nosso .\portal-noticias.yaml.
+
+kubectl apply -f portal-noticias.yaml
+
+[01:58] Se nós escrevermos um get pod -o wide de novo, repare, o IP veio diferente. Nós não temos controle sobre isso. Então se nós voltarmos para a nossa apresentação, nós estamos caindo exatamente nesse mesmo problema.
+
+(abaixo, ver imagem: aula4_video1_imagem2.png)
+[02:11] Como esses pods, que se comunicavam com esse pod , vão saber que eles devem se comunicar com esse pod novo? Como eles sabem o IP do pod novo? Essa é a pergunta que nós queremos responder agora.
+
+[02:25] *E para isso nós temos um recurso maravilhoso dentro do Kubernetes, chamado service, ou SVC. Eles são capazes de nos fazer essas coisas. Eles são uma abstração que expõem as aplicações executadas em um ou mais pods e nós permitirmos a comunicação entre diferentes aplicações de diferentes pods e com isso eles provêm IPs fixos*.
+
+Sistema interligado de "Login" com pod 10.0.0.1, "Busca" com pod 10.0.0.2, "Carrinho" com pod 10.0.04 e "Pagamentos" com 10.0.0.3. Ao lado, está a pergunta "Como os pods sabem o IP do pod novo?"
+
+[02:50] *Então, o IP que nós vamos utilizar para comunicarmos diferentes pods não vai ser o IP do próprio pod, e sim o IP do nosso serviço (AP:SVC)*. Os serviços sempre vão possuir um IP fixo, que nunca vai mudar. Além disso, um DNS que nós podemos utilizar para nos comunicar entre um ou mais pods. Olhe que legal!
+
+[03:11] E inclusive, eles são capazes também de fazer o balanceamento de carga. Então, como assim? O que isso muda na prática? Se nós voltarmos para aquele exemplo anterior, entre a comunicação do nosso pod de IP terminado em 1 e o terminado em 2, a questão é que nós não vamos nos comunicar com esse pod .2 diretamente.
+
+[03:32] O nosso pod vai fazer comunicação com o serviço que tem esse DNS ou esse IP que nunca vão mudar, eles são estáveis; então nós temos a garantia que por mais que o IP desse pod mude, ele vai continuar sendo o mesmo, sempre sendo comunicado por causa do nosso serviço.
+
+(AP: ver imagem citada no começo do tópico)
+Ícone de "Login" com pod 10.0.0.1 ligado ao ícone de "SVC" de primeiro-serviço 10.105.147.3 ligado ao ícone de "Busca" com pod 10.0.0.2
+
+[03:51] Então nós precisamos entender que os serviços têm esses três tipos:
+   - ClusterIP
+   - NodePort
+   - LoadBalancer
+cada um com uma finalidade específica.
+
+[04:04] E nos próximos vídeos nós vamos entender e vai aplicar um ClusterIP, um NodePort e um LoadBalancer.
+
+[04:11] Nós vamos entender na prática como utilizamos os serviços para mantermos uma comunicação estável entre todos os nossos pods, entre os nossos recursos dentro do nosso cluster.
+
+[04:20] Então por esse vídeo é só isso! Nós já entendemos qual é o problema e quem vai resolver ele - que são os services. A partir de agora nós vamos implementar, nós vamos criar esses services de maneira também declarativa para resolver os nossos problemas, entendendo cada um desses três tipos : o ClusterIP, o NodePort e o LoadBalancer.
+*** Criando um ClusterIP
+AP: Ver imagens em: "./Imagens-k8s/aula4_video1_imagem1.png" à "aula4_video1_imagem6"
+    Ver aquivos em: "./Arquivos-k8s/aula4/"
+
+[00:00] O primeiro tipo de serviço que nós vamos abordar dentro do Kubernetes é o ClusterIP.
+
+(Imagem 1)
+Ao lado, está a área delimitada de "Cluster" contendo o sistema interligado de quatro ícones de "pod" com os números "10.0.0.1", "10.0.0.2", "10.0.0.4" e "10.0.0.3".
+
+[00:05] *E qual é o propósito dele? Para que ele serve? Ele serve para nada mais, nada menos, que fazer a comunicação entre diferentes pods dentro de um mesmo cluster.*
+
+[00:15] Então, nesse cenário que nós estamos visualizando, todo e qualquer pod. Esse de final .2, .4 e .3 eles vão conseguir fazer a comunicação para este pod de final .1 a partir desse serviço, utilizando o IP e o DNS, ou o DNS no caso desse serviço.
+
+[00:35] *E vale ressaltar que o serviço não é uma via de mão dupla, não é porque este pod tem um serviço que ele vai conseguir se comunicar com os outros que não têm também, porque eles não têm o serviço atrelado a eles. Então unilateralmente falando, todos os outros vão se comunicar a este pod de maneira estável, mas ele só porque é um serviço não vai se comunicar aos outros se eles também não tiverem.*
+
+[01:00] Tendo isso em mente, se nós tentarmos acessar esse pod a partir de fora do cluster, o que vai acontecer? Utilizando esse serviço, claro, ClusterIP, nós não vamos conseguir, porque a comunicação, como eu falei, é apenas interna do cluster utilizando um ClusterIP.
+
+(imagem 2)
+Mesma imagem anterior, mas abaixo do ícone de "SVC" há a figura de um computador com uma seta com um "x" em cima indicando para a área de "Cluster". Ao lado de "SVC", esta escrito "Apenas para comunicação interna do cluster!". Dentro da área delimitada de "Cluster", há um pequeno ícone de "SVC" ao lado do primeiro pod de número 10.0.01.
+
+[01:18] Então vamos começar na prática! Nós vamos criar de início dois pods para fazermos o nosso experimento com o ClusterIP. O que nós vamos fazer imediatamente? Nós vamos primeiro criar um arquivo de definição para esse nosso primeiro pod, o nosso “pod-1-antes.yaml”.
+
+[01:36] E vamos definir todo ele, a versão da API; nós vamos definir o tipo, que é um pod; no metadata nós vamos definir o nome dele, nós vamos chamar ele de pod-1 assim como o nome do arquivo. Isso não é obrigatório, só frisando.
+
+[01:52] E nas especificações nós vamos colocar as informações do container que vai compor esse pod, que vai ter um nome também não relevante para nós nesse cenário, mas é sempre bom nós definirmos semanticamente. Vou colocar ele como container-pod-1 e a imagem que ele vai utilizar ainda vai ser do nginx:latest.
+
+[02:13] Dito isso, nós vamos dar um pequeno parêntese. Caso você esteja olhando para esse arquivo como desenvolvedor, se você não soubesse, olhando na documentação do nginx no Docker Hub, que ele é executado na porta 80 por padrão, como você poderia saber que este container definido dentro desse pod está escutando na porta 80?
+
+[02:38] A boa prática em questão de documentação seria nós definirmos através desse campo ports e colocarmos dentro a instrução também: containerPort, indicando que este container definido dentro deste pod está ouvindo na porta 80.
+
+[02:55] Então quando o pod for criado e tiver um IP atribuído a ele, se nós tentarmos fazer essa requisição na porta 80, nós vamos cair no nosso nginx.
+
+[03:06] Tendo isso já pronto, nós podemos criar o nosso segundo pod. Então a mesma ideia vai ser aplicada. Eu vou copiar e vou criar um novo arquivo chamado “pod-2.yaml”, vou colar e vou trocar para pod-2, para manter o mesmo nome padronizado no container também.
+
+[03:27] E ele também está exposto na porta 80. Por quê? Não vai dar problema isso? Porque os dois são pods diferentes e cada um tem o seu respectivo IP, então não vai ter nenhum conflito em relação a isso.
+
+[03:39] Vou salvar os dois arquivos e agora nós vamos criar esses dois pods, com o comando kubectl apply -f .\pod-1-antes.yaml e logo depois também o nosso pod-2.
+
+[03:55] E agora o que nós temos, se nós voltarmos na nossa apresentação? Nós temos o nosso “Cluster”, o nosso portal de notícias em execução, o nosso “pod-1” e o nosso “pod-2” também.
+
+[04:07] Só que, falta o que? Nós termos o nosso serviço. Nesse cenário que nós estamos testando o nosso cluster pela primeira vez a ideia vai ser que esse serviço pod-2 seja voltado apenas ao pod-2.
+
+(Imagem 3)
+Área delimitada "Cluster" com um retângulo tracejado. Dentro, está o ícone de "pod-1", outro pod de "portal-noticias", outro de "pod-2" e um quarto ícone "SVC" de "svc-pod-2".
+
+[04:22] Então nós queremos criar uma maneira estável de comunicarmos com o nosso segundo pod, então vamos criar esse serviço para nós entendermos como isso funciona.
+
+[04:32] *Assim como nós temos o recurso do pod dentro do Kubernetes, nós temos o recurso de service, de serviço. Como nós queremos criar esse recurso, nada mais válido do que nós criarmos um arquivo de definição. Então vamos criar o nosso “svc-pod-2.yaml”, o nome do arquivo.*
+
+[04:52] E dentro dele nós vamos continuar utilizando a versão 1 da API, nada vai mudar até então. Quando mudar, eu vou destacar isso para vocês e o tipo que nós queremos criar.
+
+[05:02] *É um pod? Não é mais um pod, é um serviço (AP: por isso: "kind: Service"). Olhe que legal! E nós vamos definir no metadata dele o quê? Também um nome, então nós podemos chamar ele de svc-pod-2 e também uma especificação.*
+
+[05:19] *E dentro dessa especificação nós também não vamos definir containers, porque ele não é mais um pod. Nós vamos definir o tipo. Qual é o tipo do serviço que nós estamos criando? É um ClusterIP.*
+
+[05:33] E agora, o que nós temos? Se nós salvássemos isso agora, tecnicamente, na teoria nós já temos o nosso serviço. Só que, o que acontece? Quando o nosso pod-1 ou o nosso portal de notícias quiserem se comunicar com o nosso pod-2, ele precisa encaminhar essas requisições que ele receber para o nosso pod-2.
+
+(imagem 4)
+Mesma imagem anterior, mas Os ícones de "pod-1" e "portal-noticias" se conectam por uma seta ao ícone de "SVC-pod-2", o qual se conecta por uma seta a "pod-2".
+
+[05:56] Só que, como ele sabe que ele deve se comunicar com o pod-2? Como ele sabe que, isso se refere a isso ?
+
+(imagem 5)
+Mesma imagem anterior. Porém, no canto superior direito do retângulo tracejado, está o escrito "Labels!". Ao lado do ícone de "SVC", está a etiqueta escrita "selector: app: segundo pod", e ao lado do ícone de "pod-2" está a etiqueta escrita "app;segundo-pod".
+
+[06:11] *Caso você esteja pensando, não é pelo nome, o nome é completamente irrelevante nesse caso. Nós precisamos ter uma maneira sólida e estável de fazermos essa atribuição. Esse serviço está selecionando este recurso, e para isso nós temos as labels - lembra que eu falei delas para vocês? Nós vamos usar elas agora!*
+
+[06:33] Então nós podemos e devemos, nesse cenário, etiquetar o nosso recurso - por exemplo: o nosso pod-2 - e informarmos que este serviço seleciona apenas os recursos que possui essa label.
+
+[06:47] E como isso funciona no nosso arquivo declarativo? Basta nós virmos e definirmos dentro do nosso metadata as labels que nós queremos utilizar, através de uma chave. Nesse caso, "app", que nós estamos chamando e um valor que nós definimos como "segundo-pod".
+
+[07:04] E nós também temos a liberdade de utilizarmos quantas e quaisquer label nós quisermos, então qualquer chave com qualquer valor nós podemos definir sem nenhum problema. Nós podemos colocar diversas coisas.
+
+[07:22] Mas nesse caso o importante é mantermos sempre a semântica, a informação do que realmente está sendo feito .
+
+[07:28] E agora com a nossa label criada (app), a nossa chave com este valor "segundo-pod", nós precisamos informar para este serviço que ele vai selecionar todos os recursos que tiverem esta chave "app" com o valor "segundo-pod". Olhe que legal!
+
+[07:48] Então a partir desse momento ele já sabe que quando ele estiver recebendo alguma requisição, ele deve encaminhar para o nosso "segundo-pod", o nosso "pod-2".
+
+[08:02] Só que outra pergunta: agora, como ele sabe que ele deve despachar a requisição que ele receber para a porta 80 do nosso pod? Porque como nós vimos, o que está sendo exposto dentro desse pod (no pod-2.yaml) é a porta 80, mas não tem nada claro para esse nosso serviço que ele deve, assim que receber uma requisição, encaminhar ela para a porta 80.
+
+[08:27] É claro então que nós precisamos definir também configurações de porta dentro - e isso é bem fácil: basta nós definirmos do nosso port, definirmos a instrução "port" e informarmos qual é a porta que nós queremos ouvir e qual é a porta que nós queremos despachar.
+
+[08:49] Isso significa o quê? Que nós já sabemos em qual porta nós estamos soltando a nossa requisição. Mas em que porta o nosso serviço está ouvindo? Porque ele vai ter um IP, mas ele vai ter também uma porta para receber essas requisições. Então nós precisamos, e devemos, nesse cenário também definirmos uma porta onde esse serviço vai escutar.
+
+(imagem 6)
+Mesma imagem anterior. Porém, ao lado de "SVC", está a pergunta "Qual a porta que esse serviço escuta?". Na seta que conecta "SVC" ao "pod-2", está o valor ":80".
+
+(AP: *se nós definirmos só a port, implicitamente ele vai nos definir também o TargetPort sendo igual ao port? Então nós não precisamos explicitar o TargetPort se nós explicitarmos só o port, ele assume que os dois são iguais se nós definirmos só o primeiro.*)
+
+[09:13] Mas olhe que legal: se nós definirmos a nossa porta - e nós temos a liberdade de definirmos a porta de entrada igual a porta de saída – então, o que nós estamos fazendo? Nós estamos falando que o nosso serviço vai receber as requisições na porta 80 e vai despachar para a porta 80 também. De quem? De qualquer recurso que tiver a label app segundo pod.
+
+[09:39] Vamos entender isso na prática. Agora nós vamos criar esse recurso efetivamente, vamos atualizar primeiro o nosso "pod-2", porque nós definimos essa label para ele, ou seja, agora ele foi configurado.
+
+[09:54] Se nós viermos em "kubectl describe pod pod-2", olhe só, em cima - ele tem as nossas labels, : labels: app-segundo-pod. Que legal!
+
+[10:08] E se nós agora criarmos o nosso serviço também com 
+
+	kubectl apply -f svc-pod-2-antes.yaml
+
+ele foi criado.
+
+[10:17] Assim como nós temos o comando kubectl get pods, nós temos o comando 
+
+	kubectl get service
+ou 
+	kubectl get svc
+
+os dois funcionam.
+
+AP: Saida do meu terminal
+NAME         TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)    AGE
+kubernetes   ClusterIP   10.96.0.1      <none>        443/TCP    3h12m
+svc-pod-2    ClusterIP   10.111.33.72   <none>        80/TCP     16s
+
+[10:25] E ele vai nos mostrar esse nosso serviço. Esse primeiro "kubernetes" já vem por padrão criado com o nosso cluster. Esse "svc-pod-2" é do tipo "ClusterIP", ele tem um IP que foi definido ali no momento da criação dele, ele não tem nenhum IP externo e a porta que ele ouve é a porta 80 e vai ser a porta também que ele vai despachar.
+
+[10:50] Então, como isso vai funcionar agora? Como nós nos comunicamos com o nosso pod-2? Vamos fazer o seguinte: eu vou digitar um kubectl get pods, nós temos o nosso pod-1 e o nosso portal de notícias (AP: o portal de noticias vem da execução da aula anterior). Vamos fazer o seguinte: eu vou digitar um kubectl exec -it pod-1 e vou entrar nele com um bash.
+
+	kubectl exec -it pod-1 -- bash
+
+[11:11] O que eu quero fazer agora é enviar uma requisição. Vou fazer um curl para nós pegarmos essa página que nós queremos adquirir. Para onde? Para que o nosso endereço IP do nosso ClusterIP, que é 10.111.33.72. Onde? Na porta 80.
+
+	curl 10.111.33.72:80
+
+[11:32] E olhe só que legal: está o nosso retorno do nginx. Se nós tentarmos fazer a mesmíssima coisa a partir do nosso portal de notícias, o que vai acontecer? Vamos lá: curl 10.111.33.72:80. A mesma coisa, que legal! Passei até batido, que legal!
+
+[11:58] E agora o ponto é o seguinte: eu vou sair de dentro também do nosso pod, do nosso container, vou limpar a nossa tela e vou fazer o seguinte. Eu vou digitar kubectl delete –f e vou deletar o nosso pod-2.
+
+[12:15] Mas o serviço vai continuar em execução no nosso cluster IP. Não é à toa que se eu executar agora um kubectl get svc, ele vai continuar ouvindo na porta 80.
+
+[12:28] Se eu tentar mais uma vez executar esse curl que eu acabei de fazer para a porta 80 deste serviço, ele vai continuar ouvindo, mas ele não vai ter lugar nenhum para despachar porque não tem ninguém ouvindo na porta 80. Olhe que triste!
+
+[12:44] Então, isso significa que se em algum momento nós criarmos qualquer outro pod. Por exemplo: o nosso pod-2 de novo (com essa label que ele vai ser selecionado pelo serviço), independentemente do IP dele ser diferente (AP: ou seja: quando nós matamos o pod-2 e subimos ele denovo, ele sobe com o IP diferente do que tinha antes), que nós vimos que vai ser (AP: como a prática de matar pods e subi-los novamente - que vemos que sempre sobem com outro IP), o comando vai continuar funcionando; porque agora o nosso serviço tem um IP estável, DNS estável para fazer essa comunicação.
+
+[13:12] Se nós tentarmos, inclusive, também fazer a comunicação via DNS, também vai funcionar. Então, um último comentário também para ficar bem direto e bem passado o que eu quero passar para vocês é que dentro da configuração de porta nós temos a liberdade de definirmos que a porta em que nós vamos ouvir é diferente da porta que nós queremos despachar.
+
+[13:38] Como assim? nós vamos continuar despachando na porta 80, mas ao invés do nosso serviço ouvir na porta 80, ele pode ouvir em qualquer outra porta. Então basta nós definirmos, por exemplo, a porta 9000. Nós temos essa liberdade.
+
+(AP: para isso, ver agora a service: "svc-pod-2-depois.yaml")
+
+[13:55] *E ao invés do nosso pod ouvir na porta 9000, nós sabemos que ele está ouvindo na porta 80. Então como a porta que o nosso serviço ouve é diferente da porta que nós queremos ouvir no nosso pod, nós devemos definir também então um outro campo chamado "TargetPort" - que nesse caso é o 80. Qual é a porta que nós queremos despachar o nosso serviço? A porta 80.*
+
+[14:23] Então se nós salvarmos e executarmos, nós vamos configurar o nosso serviço novamente. Olhe o que que vai acontecer, vamos lá! Ele foi devidamente configurado. Se nós escrevemos kubectl get svc, repare que agora ele não ouve mais na porta 80, ele ouve na porta 9000.
+
+NAME         TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)    AGE
+kubernetes   ClusterIP   10.96.0.1      <none>        443/TCP    3h33m
+svc-pod-2    ClusterIP   10.111.33.72   <none>        9000/TCP   21m
+
+
+[14:44] Mas o IP é exatamente o mesmo, a diferença é que agora quando nós fizermos alguma requisição, por exemplo, a partir do nosso portal de notícias para esse pod-2, nós não vamos mais enviar requisição para a porta 80; nós vamos enviar ela para a porta 9000 e tudo vai continuar funcionando.
+
+[15:04] Então, o que acontece ? Quando nós temos o nosso pods - eu vou botar o - wide para nós vermos o nosso IP - o nosso pod-2 tem este IP que ouve na porta 80, que é onde está a nossa aplicação do nginx.
+NAME              READY   STATUS    RESTARTS   AGE     IP            NODE       NOMINATED NODE   READINESS GATES
+pod-1             1/1     Running   0          22m     10.244.0.8    minikube   <none>           <none>
+pod-2             1/1     Running   0          7m37s   10.244.0.11   minikube   <none>           <none>
+portal-noticias   1/1     Running   0          11m     10.244.0.10   minikube   <none>           <none>
+
+
+[15:19] Vou até abrir mais um texto para nós entendermos. Nós temos o nosso pod no IP 10.244.0.11 ouvindo na porta 80, nós conseguimos nos comunicar a esta aplicação usando este endereço (AP: por exemplo: fazendo uma requisição do bash à partir da pod-1: curl 10.244.0.11:80 ele encontra a html). Mas qual é o problema dela? O problema é que ela não é estável.
+
+[15:46] Então nós temos total liberdade para fazermos isso, só que se nós tentarmos também nos comunicar agora a partir do IP do nosso serviço, que é 10.111.33.72, o que vai acontecer? Nós precisamos fazer essa comunicação a partir da porta como nós definimos agora, 9000 e ele vai fazer o bound, ele vai fazer esse bind para nós, para o nosso 10.244.0.11 na porta 80.
+
+[16:19] Então nós também temos a possiblidade de variarmos essa porta, como nós fizemos e da maneira como nós quisermos, contanto que ele esteja livre para este IP e ele vá fazer esse redirecionamento para a nossa "TargetPort" definida do nosso container, dentro do nosso pod.
+*** Criando um Node Port
+AP: ver imagens "./Imagens-k8s/aula4_video3_imagem1.png" e "aula4_video3_imagem2.png"
+
+[00:00] *Tendo entendido o que são ClusterIP, fica muito mais fácil nós entendermos do que que se trata um NodePort. Eles nada mais são do que um tipo de serviço que permitem a comunicação com o mundo externo.*
+
+[00:14] Então agora nós conseguimos fazer uma requisição, enviar uma requisição de uma na que não está dentro do nosso cluster para o nosso cluster, para algum pod dentro dele.
+
+[00:26] Então significa que agora nós conseguimos acessar, por exemplo, a partir do navegador alguma aplicação que está dentro do nosso cluster, utilizando o nosso NodePort.
+
+[00:34] *E ele vai além disso, ele também funciona dentro do próprio cluster como um ClusterIP. Então se você quer ter algum pod que além de ser acessado dentro do cluster, também deve ser acessado de maneira externa, você pode utilizar o NodePort, porque ele também vai funcionar como ClusterIP.*
+
+[00:53] Isso significa que, por exemplo, este pod, que tem a label version 2.0, consegue ser acessado tanto por esse pod de dentro do cluster a partir desse serviço, quanto fora do nosso cluster, também a partir desse serviço.
+
+[01:09] Então agora nós vamos conseguir fazer toda a criação do nosso NodePort. Nós vamos deixar posteriormente tudo bem elaborado com o projeto. Como eu falei para vocês, nós vamos alcançar o estado onde nós conseguimos gerenciar múltiplos pods com o mesmo serviço, tudo a partir das nossas labels e com o balanceamento de carga automático. Mas vamos com calma, vamos primeiro criar o nosso NodePort na primeira vez.
+
+[01:36] Qual é a ideia ? Nós já temos o nosso cluster do jeito que ele está agora, nós temos o nosso pod-1, o nosso pod-2, o nosso portal-noticias e um serviço que faz essa requisição esse tratamento de requisição para enviar para o nosso pod-2 - tudo isso feito através das nossas labels que nós criamos.
+
+(imagem 1)
+Ícone de "SVC" com legenda "NodePort" ao lado do texto "Abre comunicação para o mundo externo" sobre um computador com uma seta indicando para a área tracejada de "Cluster". Dentro desta, há o "selector:" de "version: 1.0" sobre o ícone de "SVC" conectado a três pods de "version 1.0", e outro "selector:" de "version: 2.0" com ícone de "SVC" conectado a um pod e a outro pod de "version: 2.0". Ao lado, há o texto "NodePorts também funcionam ClusterIPs"
+
+[01:56] A ideia agora vai ser bem parecida, só que nós vamos querer criar um serviço para o nosso pod-1, onde ele vai expor o nosso pod-1 para o mundo externo. Então, agora nós precisamos, mais uma vez, voltar ao nosso Visual Studio Code. Nós já temos o nosso pod-1 e o nosso pod-2, o nosso portal-noticias também e o ClusterIP criado anteriormente já rodando.
+
+(imagem 2)
+Área tracejada de Cluster contendo o ícone de "svc-pod-1" vindo de fora deste e ligado ao "pod-1" ligado ao "svc-pod-2", que por sua vez está ligado pela porta ":80" ao "pod-2". O ícone pod de "portal-noticias" se conecta ao "svc-pod-2".
+
+[02:20] A ideia agora vai ser nós criarmos o nosso service chamado NodePort desse tipo. A ideia é bem parecida, vamos chamar então de name: svc-pod-1 porque esse serviço vai ser voltado para o nosso pod-1.
+
+[02:36] E nós vamos definir a versão da API também como V1. Nada de novo, o tipo ainda é um serviço, um service, então escrevemos Service .
+
+[02:48] Na metadata vamos dar um nome para ele, vamos seguir a mesma ideia que nós colocamos no anterior que foi "svc-pod-2". nós vamos colocar também "svc-pod-1".
+
+[02:59] *Nas especificações, olhe só como é bem parecido: o tipo, ao invés de ser ClusterIP, vai ser um NodePort. Olhe que legal!*
+
+[03:10] E dentro nós também vamos ter aquelas configurações de porta. Vamos definir, qual é a porta que, como eu falei para vocês, esse serviço, o nosso NodePort também vai funcionar como ClusterIP.
+
+[03:24] Então, de maneira similar ao nosso serviço 2, nós também vamos definir um port dentro. Qual é a porta em que o nosso serviço vai ouvir dentro do cluster? Nós queremos, por exemplo, que seja na porta 8080. Nós temos total liberdade para isso.
+
+[03:45] Vamos colocar só port: 80. Lembra que eu falei para vocês que *se nós definirmos só a port, implicitamente ele vai nos definir também o TargetPort sendo igual ao port? Então nós não precisamos explicitar o TargetPort se nós explicitarmos só o port, ele assume que os dois são iguais se nós definirmos só o primeiro.*
+
+[04:09] Então, agora nós já definimos o nosso port. Se nós tentarmos executar para valer, ele vai funcionar a princípio. Vamos ver, eu vou salvar, vou no nosso terminal vou digitar 
+	
+	kubectl apply -f svc-pod-1-antes.yaml
+
+[04:31] Se nós apertarmos a tecla “Enter”, ele vai ser criado. Mas ainda faltam alguns pequenos detalhes. Como, por exemplo: nós temos o nosso serviço do tipo NodePort, e nós precisamos, assim como nós fizemos anteriormente, fazer o bound desse serviço com este pod? Então, vamos colocar as labels, no caso, vamos seguir a mesma ideia de, por exemplo: app e vamos chamar ele de primeiro-pod para seguirmos o mesmo padrão que nós viemos fazendo.
+
+[05:08] E nós vamos adicionar fora de port alinhado, o seletor. Então: selector: e vamos chamar o nosso app: primeiro-pod.
+
+[05:22] Então agora, como isso vai funcionar ? Se nós voltarmos e configurarmos os dois da maneira correta... Configuramos o nosso serviço e agora nós configuramos também o nosso pod. Devidamente configurado!
+
+[05:41] E se nós tentarmos, como eu falei para vocês, fazer o acesso a partir de dentro do cluster, nós vamos conseguir. Então, vamos lá!
+
+[05:48] Vamos digitar "kubectl get svc". 
+AP: meu resultado no terminal:
+NAME         TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)        AGE
+kubernetes   ClusterIP   10.96.0.1      <none>        443/TCP        20h
+svc-pod-1    NodePort    10.107.54.58   <none>        80:31977/TCP   10m
+svc-pod-2    ClusterIP   10.111.33.72   <none>        9000/TCP       17h
+
+Está o nosso svc-pod-1, ele tem esse IP e olhe só como ele nos mostra que ele faz o bound da porta 80 para a porta 31977. O que isso quer dizer? Nós vamos entender, com calma.
+
+[06:07] Primeiro nós vamos fazer o mesmo teste que nós fizemos com o ClusterIP. Vamos acessar ele a partir do nosso portal de notícias. Então, docker não, kubectl exec –it. Vamos executar o nosso portal-noticias em modo interativo e o bash.
+
+	kubectl exec -it portal-noticias -- bash
+
+[06:25] Se nós colocarmos, fazer um curl novamente para 10.107.54.58, que é o nosso IP na porta 80, o que vai acontecer? Mágica! Tudo continua funcionando sem nenhum problema!
+
+[06:46] Mas como nós fazemos para acessar agora esse NodePort a partir do mundo externo, a partir do nosso navegador? Então vou abrir uma nova aba. Vamos lá, o que vai acontecer ?
+
+[06:57] Se nós tentarmos acessar esse serviço... Vamos colocar o IP dele, vamos pegar 10.107.54.58 e vamos colocar ele na porta 80. O que vai acontecer pessoal? Ele está carregando e mais uma vez aparentemente está demorando demais e não vai conseguir.
+
+[07:18] Por quê? Porque olhe só a peculiaridade. Vou limpar a nossa tela e vou apertar as teclas “Ctrl + D” para sair de dentro do container. Vou digitar get svc de novo, para nós destrancarmos melhor.
+
+[07:30] Nós temos o nosso IP para esse svc-pod-1, mas repare na coluna que ele está:  "CLUSTER-IP".
+
+[07:36] O que isso quer dizer? Quer dizer que esse IP é para comunicação dentro do cluster. Então qual é o IP que eu devo utilizar para fazer a comunicação a partir de fora do cluster? Eu tenho que fazer isso a partir do IP do meu nó, porque é um NodePort.
+
+[07:55] Então se eu vier e fizer 
+
+	kubectl get nodes -o wide 
+
+AP:minha saída:
+NAME       STATUS   ROLES           AGE   VERSION   INTERNAL-IP      EXTERNAL-IP   OS-IMAGE               KERNEL-VERSION   CONTAINER-RUNTIME
+minikube   Ready    control-plane   20h   v1.28.3   192.168.59.100   <none>        Buildroot 2021.02.12   5.10.57          docker://24.0.7
+
+
+para ele botar o IP, olhe só - o nosso external IP no caso do Windows é none e o nosso IP interno é 192.168.59.100.
+
+[08:13] No caso do Windows, agora é um momento em que nós vamos ter uma pequena diferença entre o pessoal que está no Windows e no Linux, porque no caso do Docker Desktop no Windows ele faz um bound automaticamente do Docker Desktop para o nosso LocalHost, então o IP desse nó no Windows vai ser LocalHost.
+
+[08:33] Então se nós viermos no nosso navegador e colocarmos LocalHost na porta 80, nós vamos a princípio acessar, só que não é isso que nós queremos. Isso é o Windows que tem alguma coisa rodando na porta 80 para nós. O que nós queremos acessar é a página do nginx.
+
+[08:53] Mas eu botei, não botei pessoal!? A porta 80? *Por que eu não estou conseguindo acessar? Por que isso não funciona? Porque, na verdade, se nós formos um pouco mais "malandros", nós vamos observar que a porta 80 é a de uso interno do cluster, mas ele faz o bound para a porta 30363 - que é aquela porta louca que nós vimos.*
+
+[09:16] Então se nós copiarmos esse número, pegarmos esse 30363 e colocarmos LocalHost nessa porta – mágica! Nós conseguimos agora a nossa aplicação através do nosso serviço de maneira externa.
+
+[09:31] Mas tem uma peculiaridade: esse (AP: número que o kubectl definiu para porta do nosso svc-pod-1) número é arbitrário, ele vai variar de 30000 até 32767. Mas nós temos a liberdade para nós definirmos o NodePort que nós queremos utilizar (*AP: assim podemos padronizar o número de nossas portas, não deixando o kubectl escolhe-las aleatoriamente para nós*)
+
+[09:51] Então vamos fazer o seguinte: nós podemos voltar no nosso serviço que nós acabamos de definir e definirmos também uma instrução, um outro campo chamado NodePort, onde nós podemos definir qualquer valor no intervalo de 30000 até 32767.
+
+[10:09] Nesse caso vou colocar, por exemplo, o próprio 30000 (AP: ver no arquivo "svc-pod-1-depois.yaml" que foi definido um novo campo: "nodePort: 30000"). No momento em que eu aplicar a minha mudança a esse serviço, olhe o que vai acontecer.
+(AP: Antes de seguir abaixo eu tenho que recarregar o svc-pode-1 no arquivo com essa porta 30000:
+	kubectl apply -f svc-pod-1-depois.yaml
+)
+
+(AP: A fala abaixo é da execução no windows - ele colocou no navegador localhost:30000 e conseguiu carregar - no meu Linux não carrega quando escrevo essa url... mas apenas colocando o IP:30000... pouco abaixo ele menciona que é isso que devemos fazer no linux, e não via "localhost:30000")
+[10:20] Ele foi configurado! Se nós digitarmos get svc de novo, olhe só, localhost:30000. Então se nós viermos e executarmos na porta 30000, repare que tudo continua funcionando.
+
+[10:34] Agora pessoal, repare que tudo, da maneira como nós esperávamos e que nós vamos fazer agora. Eu vou dar uma pequena pausa, nós vamos cortar esse vídeo e eu vou entrar no Linux para o pessoal que também está no Linux entender como tudo funciona sem nenhum problema.
+
+[10:49] Pessoal, agora nós estamos no Linux, com as exatas mesmas configurações, o pod-1, o pod-2, o portal-notícias, os nossos dois serviços que nós criamos. Nada de novo, os mesmos arquivos.
+
+[11:02] E a diferença para acessarmos é que se nós viermos no nosso navegador e executarmos localhost:30000, ele não vai conseguir acessar - porque como eu falei para vocês, no Linux nós estamos utilizando o Minikube com o Virtual Box e ele não faz o bind automático para o nosso LocalHost.
+
+[11:20] Para nós conseguirmos acessar, nós vamos executar o comando kubectl get nodes -o wide e ele vai nos retornar, nessas informações todas, o internal IP.
+
+[11:32] E vai ser ele. no caso, o meu é 192.168.99.106 (AP: esse é o do professor do curso); no caso de vocês provavelmente vai ser diferente (AP: o meu é: 192.168.59.100). Então eu vou copiar esse IP e agora no meu navegador vou fazer o acesso através dele na porta 30000. Olhe só que legal, tudo funcionando normalmente!
+
+[11:53] Então LocalHost não vai funcionar, nós vamos usar o nosso internal IP no Linux. Enquanto no Windows, todo o acesso vai ser via LocalHost porque ele vai bind direto. A única diferença vai ser essa, o comportamento do resto todo é exatamente o mesmo.
+
+[12:08] Então por esse vídeo é só! NodePort, agora nós conhecemos ele e como nós podemos defini-lo e criá-lo. Eu vejo vocês no próximo vídeo, onde nós vamos falar sobre LoadBalancer. Até mais!
+*** Criando um Load Balancer
+AP: Ver imagens: "./Imagens-8s/aula4_video4_imagem1.png" e "aula4_video4_imagem2.png"
+Arquivo de código em: "./Arquivos-k8s/aula4/svc-pod-1-loadbalancer.yaml"
+
+[00:00] Entender o que é um LoadBalancer depois que nós já entendemos do que se trata um NodePort e um ClusterIP é bem fácil - principalmente porque o *LoadBalancernada mais é do que um ClusterIP que permite a comunicação entre uma máquina do mundo externo e os nosso pods. Só que ele automaticamente se integra ao LoadBalancerdo nosso cloud provider*.
+
+(imagem1)
+Ícone proeminente de "SVC" com legenda "LoadBalancer". Ao lado, a área tracejada de "Cluster" contém os logotipos de "AWS", Google Cloud e Azure, ligados a dois ícones de "SVC". No primeiro, há conexão com três pods, e o segundo com apenas um.
+
+[00:23] Então quando nós criamos um LoadBalancer ele vai utilizar automaticamente, sem nenhum esforço manual, o cloud provider da AWS ou do Google Cloud Platform ou da Azure, e assim por diante.
+
+(imagem 2)
+Mesma imagem anterior, porém com o texto "Abre comunicação para o mundo externo usando o Load Balancer do provedor! ao lado do ícone poreminente de "SVC" com legenda "LoadBalancer"
+
+[00:37] Então, vamos ! Eu vou pegar o nosso pod-1 que nós viemos trabalhando e vou criar esse mesmo pod no nosso cluster do Google Cloud Platform.
+
+[00:48] Vou colocar o arquivo, vou criar ele com as mesmas definições que eu acabei de copiar ali, vou colar, vou digitar um apply, kubectl apply –f e passar o nosso pod-1.yaml. Ele foi criado sem nenhum problema, nós digitamos um kubectl get pods, ele foi criado e agora nós precisamos criar o nosso LoadBalancer.
+
+[01:11] Nós vamos fazer o seguinte: vamos criar o nosso "svc-pod-1-loadbalancer.yaml" e dentro dele nós vamos definir mais uma vez a versão da nossa API como v1. O que nós queremos criar continua sendo um service e em metadata vamos chamar ele também pelo name: "svc-pod-1-loadbalancer".
+
+[01:44] nas especificações nós vamos definir o tipo que vai ser o nosso "type: LoadBalancer", agora sem nenhum problema. em "ports:" nós vamos definir a nossa porta de entrada, onde nós podemos ir definindo. Nós queremos que dentro do cluster.
+
+[02:02] Como ele é um NodePort, ele também é um ClusterIP, ele ouça na porta 80 e despacha também para a porta 80, dentro do cluster. E que também o nosso "nodePort : 30000", por exemplo. Nós podemos fazer essa definição.
+
+(AP: A respeito do que foi dito abaixo em [02:19]: nós estamos editando o arquivo svc-pod-1-loadbalancer.yaml, nós vamos definir nela:
+  selector:
+    app: primeiro-pod
+se referindo à label 
+  labels:
+    app: primeiro-pod
+que está dentro do arquivo "pod-1-depois.yaml"
+)
+
+[02:19] Por fim, falta apenas nós selecionarmos qual é o nosso pod. Nesse caso vamos definir a "label" com a chave API e o valor "primeiro-pod".
+
+[02:30] Tudo perfeito! Basta agora nós copiarmos essas mesma definição, vir no nosso Google Cloud Platform e criar esse arquivo que vai ser o nosso “lb.yaml”. Nós colamos sem nenhum mistério: kubectl apply -f lb.yaml e ele vai criar para nós sem nenhum problema.
+
+(AP: Abaixo é olhando na Google Cloud Plataform)
+[02:57] Se nós viermos agora dentro do nosso cluster na atividade na parte visual dele, nós conseguimos vir em “Serviços e entradas” e olhe só que legal: está - o nosso serviço que nós acabamos de criar! E mostra que tem 1 de 1 pod sendo gerenciado por ele no nosso “cluster-1”.
+
+[03:17] Ele está terminando de criar os endpoints para acesso. Se nós continuarmos atualizando, vai ser bem rapidinho, nós vamos conseguir acessar esse nosso pod a partir do próprio navegador.
+
+[03:28] Então se vocês estivessem assistindo agora em tempo real, vocês também conseguiriam ao mesmo tempo que eu fazer o acesso a esse pod, porque nesse exato momento ele está sendo publicado e sendo possivelmente acessado com o LoadBalancer do Google Cloud Platform - já tudo integrado sem nenhum problema, sem nenhuma configuração adicional na gestão de balanceamento de carga que acabou de ficar pronto.
+
+[03:55] Basta nós clicarmos no link que foi gerado o do IP. Ele está alertando sobre o redirecionamento e está o nosso nginx, que é o nosso pod-1 sem nenhum problema na web. Olhe que legal e fácil, bem simples!
+
+[04:11] Então agora que nós já nos familiarizamos com os três tipos de serviço, ClusterIP, NodePort e LoadBalancer, nós vamos colocar eles na prática em uma aula em que nós vamos trabalhar com eles em cima do nosso projeto, do portal de notícias e nós vamos sedimentar o conteúdo que nós aprendemos agora nessas últimas aulas.
+*** Visão geral das aulas
+O que são e para que servem os Services
+Como garantir estabilidade de IP e DNS
+Como criar um Service
+Labels são responsáveis por definir a relação Service x Pod
+Um ClusterIP funciona apenas dentro do cluster
+Um NodePort expõe Pods para dentro e fora do cluster
+Um LoadBalancer também é um NodePort e ClusterIP
+Um LoadBalancer é capaz de automaticamente utilizar um balanceador de carga de um cloud provider
+* Toda vez que quiser iniciar o cluster no Linux
+rodar antes:
+
+	minikube start --vm-driver=virtualbox
+
+	minikube start  (AP: esse não tenho certeza se já não rodou acima)
+* Comandos gerais
+kubectl get pods -o wide
+
+kubectl delete pod portal-noticias
+
+kubectl apply -f portal-noticias.yaml
+
+kubectl describe pod pod-2
+
+kubectl get service
+
+kubectl exec -it pod-1 -- bash
+
+kubectl get nodes -o wide 
