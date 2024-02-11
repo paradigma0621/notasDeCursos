@@ -1,0 +1,512 @@
+
+* Material da Alura
+** Agile x Waterfall (cascata)
+Em seu início, a Engenharia de Software utilizava um modelo sequencial, o cascata ou Waterfall, em inglês. Mas, ao longo do tempo, devido ao fluxo de novas informações e mudanças no mercado, emerge a necessidade um novo modelo, daí surge o ágil ou Agile em inglês.
+
+AP: Foi destacada a ideia que no Agile podemos fazer correções de construção do software durante o desenvolvimento do mesmo, não esperando chegar no final para aí validarmos se era aquilo que queríamos - caso que acontece no modelo Waterfall. Há a possibilidade de o cliente não ficar satisfeito com determinadas implementações, o que acarretaria em talvez ter de fazer mudanças significativas no software, possivelmente sendo inviável.
+(obs: ver nesse documento: **** Metodologia cascata é ágil?)
+
+Em projetos com um escopo de poucas mudanças ou uma entrega de longo prazo — como, por exemplo, a construção de um prédio ou ponte — não se aconselha utilizar o Scrum.
+** Artigo 1
+https://www.alura.com.br/artigos/o-que-e-metodologia-agil
+
+O que é metodologia ágil?
+Você já imaginou trabalhar de maneira mais flexível, ajustando e melhorando a condução do seu projeto ao longo do processo, combinando eficiência e flexibilidade às mudanças do mercado? Então a metodologia ágil pode ser uma opção para você!
+
+A metodologia ágil é uma forma de gerir projetos, em que se busca a otimização dos processos. Em vez de seguir um plano rígido — como na gestão tradicional —, na metodologia ágil, podemos fazer ajustes e melhorias ao longo do desenvolvimento de projetos. Isso significa identificar e corrigir falhas rapidamente, garantindo resultados mais efetivos. Portanto, essa forma de gestão permite às pessoas gerentes uma abordagem moderna e eficiente para enfrentar desafios do mercado.
+
+A utilização da agilidade promove uma cultura de colaboração e engajamento da equipe, pois a comunicação entre as pessoas do projeto é facilitada, o que permite a troca de ideias e o alinhamento constante dos objetivos. O foco está no trabalho em equipe e na entrega de valor ao cliente.
+
+*** Quais são as principais características dos métodos ágeis?
+Além da flexibilidade e da adaptação às mudanças, as principais características dos métodos ágeis são:
+
+**** Iteratividade (repetição)
+Ao contrário de uma gestão cascata, saiba que os métodos ágeis são baseados em ciclos iterativos e incrementais de trabalho. Isso porque o gerenciamento com essa abordagem é dividido em iterações menores, permitindo que partes funcionais do produto sejam entregues em intervalos regulares, no lugar de esperar até o fim do projeto para entregar um produto final. Isso porque os requisitos e as necessidades do projeto podem evoluir ao longo do tempo, e, em vez de resistir a mudanças, os métodos ágeis abraçam-nas e estão preparados para se adaptar rapidamente aos novos contextos.
+**** Colaboração
+Esses métodos também incentivam tanto a colaboração quanto a comunicação entre todas as pessoas da equipe, bem como com os stakeholders do projeto. Uma das características das equipes ágeis é trabalhar de forma interdisciplinar, promovendo a troca constante de ideias, conhecimentos e experiências.
+**** Autonomia e empoderamento das equipes
+E, por sua vez, a colaboração gera mais autonomia e empoderamento dessas equipes, pois as pessoas são incentivadas a se auto-organizarem, a tomar decisões e a definir o melhor caminho para atingir os objetivos do projeto.
+**** Entrega de valor
+Esses atributos dos métodos ágeis e sua cultura de experimentação favorecem a entrega de valor, pois, ao priorizarem entregas contínuas e incrementos de valor em cada iteração, permitem que clientes e stakeholders obtenham benefícios tangíveis mais cedo e possam fornecer feedbacks para orientar o desenvolvimento do projeto.
+*** Quando devo optar pelo método ágil?
+Depois de conhecer as principais características dessa metodologia, uma dúvida que você pode ter é: quando devo optar pelo método ágil? A resposta é depende. Uma maneira de analisar a necessidade de optar pela agilidade é compreender o nível de complexidade dos projetos que são trabalhos e o nível de complexidade do seu negócio. Isso pode ser feito por meio do framework Cynefin.
+
+Esse framework fornece um modelo para analisar o contexto no qual um problema ou uma situação está inserida e sugere abordagens apropriadas com base nessa análise. O Cynefin classifica os problemas em quatro domínios: simples, complicado, complexo e caótico.
+
+Se seu projeto estiver no domínio complexo, em que há incerteza, múltiplos fatores interdependentes e falta de soluções claras, as metodologias ágeis podem ser mais adequadas, já que, neste domínio, elas oferecem flexibilidade, adaptação contínua e capacidade de responder às mudanças de forma ágil.
+
+No entanto, se estiver no domínio simples ou complicado, em que as causas e as soluções são conhecidas e previsíveis, outras abordagens mais estruturadas, como o modelo cascata, podem ser mais apropriadas.
+
+ A partir da compreensão do Cynefin, entendemos que são necessárias diferentes abordagens para problemas distintos, e as metodologias ágeis devem ser consideradas quando há complexidade e incerteza significativas.
+*** Quais são as metodologias ágeis? Exemplos
+Existem diferentes tipos de metodologias ágeis, cada uma com suas próprias características e objetivos específicos. Entre os mais conhecidos estão o Kanban, o Lean, o XP (Extreme Programming) e o Crystal. Além disso, temos alguns dos frameworks ágeis mais conhecidos, como o Scrum, o SAFe (Scaled Agile Framework), o LeSS (Large-Scale Scrum) e o Nexus.
+
+Tanto as metodologias ágeis quanto os frameworks ágeis, são ferramentas essenciais para aprimorar a gestão de projetos e o sucesso das equipes no desenvolvimento de softwares e em outras áreas. Conheça melhor cada um deles a seguir.
+
+**** Kanban
+O método Kanban enfatiza a visualização do trabalho, a limitação do trabalho em progresso ou Work In Progress (WIP) e a melhoria contínua do processo. O Kanban utiliza um quadro Kanban, no qual as tarefas são representadas em cartões e movidas pelas diferentes etapas do fluxo de trabalho. Saiba mais sobre este método no artigo Kanban: o que é o Método Kanban, principais conceitos e como funciona no dia a dia (https://www.alura.com.br/artigos/metodo-kanban).
+**** Lean
+O método Lean, também conhecido como Lean Thinking ou Pensamento Enxuto, em português, é uma abordagem de gestão originada no sistema de produção da Toyota, conhecido como Toyota Production System (TPS). Nesse método, procura-se otimizar os processos, identificando e eliminando desperdícios, e criar uma cultura de melhoria contínua, em que cada pessoa da equipe é incentivada a contribuir para a identificação e a solução de problemas. Apesar da sua origem na indústria manufatureira, o método tem sido aplicado com sucesso em diversos setores, como: serviços, saúde, tecnologia e desenvolvimento de software.
+**** XP
+Criado por Kent Beck e sua equipe no fim da década de 1990, o Extreme Programming (XP) é uma metodologia ágil de desenvolvimento de software que enfatiza práticas de engenharia de software e colaboração efetiva entre os membros da equipe. Ele busca fornecer um processo iterativo e adaptativo para entregar softwares de alta qualidade. O XP se baseia em uma série de práticas-chave que são implementadas em conjunto para promover resultados de alta qualidade e adaptabilidade às mudanças, que incluem: programação em pares, desenvolvimento orientado a Testes (TDD), integração contínua, refatoração e melhoria constante, entre outras.
+**** Crystal
+O Crystal é uma família de metodologias ágeis que foram desenvolvidas por Alistair Cockburn. Essas metodologias se adaptam a diferentes tipos de projetos e equipes, reconhecendo que não existe uma abordagem única que funcione para todos os contextos. O Crystal valoriza a comunicação efetiva, o trabalho em equipe e a adaptação às necessidades específicas do projeto, promovendo a entrega contínua de software de alta qualidade. Ele oferece uma série de práticas e diretrizes flexíveis para ajudar as equipes a alcançarem o sucesso em seus projetos, levando em consideração o tamanho, a criticidade e o ambiente do projeto.
+
+**** Scrum
+O Scrum é um framework ágil que visa facilitar a colaboração, a adaptação e a entrega de valor de forma iterativa e incremental. Ele se baseia em três pilares fundamentais: transparência, inspeção e adaptação. O Scrum divide o trabalho em iterações chamadas de Sprints, que geralmente têm duração de duas a quatro semanas e utiliza artefatos como o Product Backlog e o Sprint Backlog, além de cerimônias como as reuniões de planejamento, revisão e retrospectiva. O framework inclui papéis, como Scrum Master e Product Owner, eventos, como reuniões diárias de acompanhamento e revisões de sprint. Com um enfoque na auto-organização e na colaboração da equipe, o Scrum promove uma abordagem flexível para lidar com mudanças e busca maximizar o valor entregue ao cliente.
+**** SAFe
+O SAFe (Scaled Agile Framework) é um framework escalável para adoção ágil em grande escala. Ele fornece uma estrutura abrangente para organizações que desejam implementar e coordenar práticas ágeis em múltiplos níveis, desde equipes até portfólios. O SAFe se baseia em princípios ágeis e incorpora elementos do Lean, Scrum e Kanban, entre outras práticas. Ele oferece orientação para a definição de papéis, estruturas de equipe, planejamento de releases, gestão de requisitos e acompanhamento do progresso. O objetivo do SAFe é promover a colaboração, a eficiência e a entrega de valor contínua em ambientes empresariais complexos, permitindo a adoção ágil em larga escala.
+**** LeSS
+O LeSS (Large-Scale Scrum) é um framework ágil para escalar o Scrum em ambientes com múltiplas equipes trabalhando em um mesmo produto ou projeto. Ele visa simplificar e adaptar o Scrum para cenários de escala, mantendo a sua essência e seus valores fundamentais. O LeSS promove a colaboração, a transparência e o trabalho em equipe em toda a organização, buscando eliminar complexidades desnecessárias e promover a entrega de valor contínua. Tenha em mente que ele oferece orientações sobre como organizar as equipes, as cerimônias e os artefatos do Scrum em um contexto de escala, incentivando a comunicação efetiva, a descentralização e a aprendizagem organizacional. Com o LeSS, as organizações podem escalar o Scrum de forma ágil, mantendo a flexibilidade, a produtividade e a qualidade em projetos complexos.
+*** Qual o objetivo da metodologia ágil?
+Os principais objetivos da metodologia ágil são:
+
+**** Reduzir os desperdícios
+pois procuram identificar e minimizar desperdícios de recursos, tempo e esforços, visando à eficiência e à otimização dos processos de trabalho;
+
+**** Melhoria contínua
+já que buscam constantemente melhorar a eficiência, a qualidade e a produtividade por meio de ciclos de inspeção e adaptação, promovendo a identificação e a resolução de problemas, bem como a busca por melhores práticas e processos;
+
+**** Foco na qualidade
+porque priorizam a qualidade do produto ou serviço, incentivando práticas de desenvolvimento de software de alta qualidade, testes frequentes, revisões e melhorias contínuas;
+
+**** Entrega contínua de valor
+uma vez que o foco principal é fornecer produtos ou serviços de alta qualidade e valor, de forma constante e iterativa, priorizando o feedback e a satisfação de clientes.
+
+*** Quais as 6 funções da metodologia ágil?
+Ao longo da utilização dos métodos ou frameworks ágeis para o gerenciamento de projetos, as metodologias ágeis cumprem várias funções importantes para ajudar a validar a estratégia durante os projetos. Entre essas funções, você pode conferir:
+
+- Adaptabilidade: permitindo ajustes contínuos com base em feedback e novas informações;
+- Feedback contínuo: garantindo a validação da estratégia com base nas necessidades reais dos stakeholders;
+- Transparência: oferecendo visibilidade clara do progresso e resultados alcançados;
+- Entrega de valor contínua: validando a estratégia por meio de resultados tangíveis;
+- Experimentação e aprendizado: permitindo ajustes com base em insights obtidos;
+- Colaboração e engajamento: aproveitando o conhecimento coletivo para validar a estratégia e alinhar expectativas.
+
+Dentro desse contexto é importante que as equipes que trabalham com agilidade saibam gerenciar as expectativas das pessoas interessadas no projeto. Gerenciar expectativas envolve comunicar claramente as características, os benefícios e os desafios das metodologias ágeis, estabelecendo uma compreensão compartilhada dos resultados esperados e dos limites da abordagem ágil. Isso ajuda a evitar mal-entendidos, frustrações e resistência.
+*** Caso exemplar
+**** Como aplicar a metodologia ágil na sua empresa?
+Neste artigo, conto como decidimos parar de seguir a metodologia em cascata e seguir uma metodologia mais fluida.
+
+Uma vez, fui contratada por uma empresa que desenvolvia softwares e aplicativos para outras companhias. Nela, um dos meus primeiros trabalhos era auxiliar no desenvolvimento de um aplicativo que visa permitir que as pessoas encontrem restaurantes baratos perto de onde elas se encontram.
+
+Quando conheci o time, já me explicaram que eles seguiam uma estrutura clássica: planejamento, análise, design, documentação, codificação, realizar testes, implementar e, caso necessário, fazer a manutenção do aplicativo.
+
+*Essa é uma metodologia de desenvolvimento chamada em cascata, que significa que o processo é realizado por meio de fases, e uma delas só é iniciada quando a anterior termina e, assim, não é necessário retornar a um trabalho, já que ele já foi completamente finalizado.*
+
+Porém, por eu e a equipe levarmos muito tempo nas etapas de planejamento, análise e documentação de todo o projeto, o cliente ficou impaciente por não termos mostrado novidades a ele.
+
+Além disso, o que havíamos feito não poderia ser apresentado para o cliente, já que a documentação é para consulta de pessoas analistas, arquitetas, desenvolvedoras e testers do projeto, ou seja, não era para o cliente.
+
+Então, ele nos informou que o software agora tinha uma finalidade diferente da inicial. Tentamos mudar, porém, precisaríamos analisar, planejar e começar a documentação toda de novo. Pensando no tempo que demoramos para fazer isso, o cliente cancelou e, assim, o trabalho inteiro foi jogado fora.
+
+Vimos que este método não estava mais funcionando. E qual foi o nosso erro?
+**** Agilidade
+Começamos a pensar em maneiras para agilizar ainda mais os próximos projetos. Então, decidimos parar de seguir essa metodologia em cascata e seguir uma metodologia mais fluida.
+
+Mas aí, nos ocorreram várias dúvidas: como podemos fazer isso? Acabar com todas as regras?
+
+Pensando nisso, dividimos as tarefas entre todos os integrantes da equipe. Assim, decidimos que cada pessoa pegaria uma questão definida para ser feita naquele mês e iria desenvolvê-la.
+
+Quando começamos o projeto, fomos o desenvolvendo desta maneira: as tarefas foram divididas e cada uma atribuída a quem tinha mais facilidade em desenvolvê-la.
+
+Porém, como a equipe se dividiu, não sabíamos o que cada um estava fazendo e qual parte estava pronta ou não. Isso, com o passar do tempo, começou a nos deixar perdidos a respeito de qual fase estávamos e quando podíamos começar a desenvolver outro requisito.
+
+Esse cenário piorou quando fomos apresentá-lo ao cliente, pois, como não sabíamos como estava cada fase, algumas partes estavam completamente avançadas e outras ainda estavam no início.
+
+Sem contar que algumas pessoas estavam tendo muita dificuldade em realizar suas tarefas, porém, não conseguiam pedir ajuda, pois não havia uma comunicação entre a equipe.
+
+Também tínhamos os requisitos, mas não sabíamos o porquê eles eram necessários e isso nos deixava perdidos, sem saber como utilizá-los da melhor forma para entregar o projeto ao usuário.
+
+Percebemos que um método sem regras não estava funcionando também. Mas como poderíamos resolver, já que não fazia sentido voltar para as regras que também não haviam funcionado?
+
+Então, decidimos tentar colocar algumas premissas para serem cumpridas durante o processo.
+**** Os indivíduos e as interações entre eles mais que os processos e as ferramentas
+Como percebemos que estava havendo um obstáculo para a equipe falar em que ponto estava tendo dificuldade, decidimos que deveríamos ter mais integração entre nós, por meio de almoços e conversas durante o café.
+
+Além disso, conhecer o trabalho uns dos outros, por meio de reuniões em que cada pessoa poderia dizer o que estava fazendo, o que faria a seguir e se estava tendo alguma dificuldade ou facilidade. Nelas, planejamos o que faríamos a seguir e integramos toda a equipe no processo de desenvolvimento.
+
+Processos e ferramentas são importantes, mas eles são feitos e utilizados, respectivamente, pela equipe. Já a interação entre ela deve estar fluida e equilibrada para que a eficácia dos processos e das ferramentas ocorra sem grandes problemas.
+
+Ainda, para cada requisito, ao invés de escrevermos o que precisamos fazer, como “adicionar um campo de busca”, escrevemos como aquilo ajudará o usuário. Dessa forma, podemos escrever, por exemplo: “o usuário precisa pesquisar termos para encontrar as funcionalidades do software de maneira mais rápida”.
+**** Software funcionando mais do que documentação completa e abrangente
+Como perdemos muito tempo com a documentação, e ela não agrega muito valor ao cliente, decidimos que nosso foco seria mais no desenvolvimento.
+
+Assim, quando recebemos um projeto, analisamos como cada requisito pode ajudar o usuário e começamos a desenvolvê-lo.
+
+Dessa forma, temos menos trabalho com documentação, já que fazemos por partes, ao mesmo tempo que desenvolvemos o software e o apresentamos ao cliente.
+**** Colaboração com o cliente mais do que negociação de contratos
+Também definimos que o cliente deveria estar mais presente em todo o processo de desenvolvimento, avaliando o que foi feito e nos indicando as próximas prioridades.
+
+Além disso, dessa forma, caso o projeto precise de qualquer outra coisa, o cliente pode facilmente nos avisar, pois ele faz parte do projeto e participa de cada etapa.
+
+Para ter essa colaboração frequentemente, marcamos uma reunião por mês com o cliente. Nela, mostraremos o que foi feito e receberemos novas demandas ou alterações das anteriores, sem precisar jogar o projeto inteiro fora, pois, caso tenha alguma mudança, saberemos com antecedência.
+**** Resposta às mudanças mais do que seguir o plano inicial
+Como as necessidades do cliente e do projeto podem mudar a qualquer momento, precisamos sempre nos atentar. Assim, ao invés de planejarmos todo o projeto de uma vez, agora planejamos cada etapa individualmente e em conjunto com o cliente.
+
+Por termos esse contato mais direto com o cliente e por fazermos o projeto por partes, podemos nos adaptar às mudanças de forma mais rápida, já que é possível replanejar somente uma parte, quando necessário, e não o projeto todo.
+
+Depois de alguns meses, essa nova estratégia estava apresentando bons resultados por conta dos benefícios trazidos por aquele método, entre eles:
+
+- Satisfação do cliente;
+- Melhor gestão de prioridades;
+- Melhor visibilidade dos projetos, uma vez que todos sabiam o que estava acontecendo nele;
+- Maior produtividade da equipe, pois ela estava mais motivada por seguirmos um ritmo saudável e simplificado de desenvolvimento.
+
+Foi quando um novo integrante foi contratado para a equipe; assim que explicamos como tínhamos organizado as tarefas, ele nos respondeu que era uma metodologia ágil, e que a maneira que fazíamos seguia os valores do manifesto ágil.
+
+*** Manifesto Ágil
+O Manifesto para o Desenvolvimento Ágil de Software foi escrito em 2001 por um grupo de 17 pessoas desenvolvedoras. Elas agruparam e aprimoraram diversos conceitos de metodologia de desenvolvimento ágil no manifesto.
+
+Esses conceitos iam pelo caminho contrário ao método em cascata, ou seja, rígido, em que as regras e as etapas devem ser seguidas. A metodologia ágil fica no meio-termo entre o rígido e o livre.
+
+Esse manifesto conta com quatro valores e doze princípios que devem ser incluídos na rotina das empresas.
+
+Os valores, que já estávamos seguindo são:
+- Os indivíduos e a interação entre eles mais do que os processos e as ferramentas;
+- Software funcionando mais do que documentação completa e abrangente;
+- Colaboração com o cliente mais do que negociação de contratos;
+- Contratos e resposta às mudanças mais do que seguir o plano inicial.
+
+Isso não quer dizer que apenas a parte antes do “mais do que” seja importante, porém, ela é a prioridade.
+
+Agora, confira quais são os princípios dos métodos ágeis por trás dos valores, que devem ser mantidos sempre em mente enquanto o software estiver sendo desenvolvido:
+
+- A maior prioridade é satisfazer o cliente por meio da entrega adiantada e contínua de software de valor;
+
+- Aceitar mudanças de requisitos, mesmo no fim do desenvolvimento. Processos ágeis se adequam às mudanças, para que o cliente possa tirar vantagens competitivas;
+
+- Entregar software funcionando com frequência, preferencialmente em semanas;
+
+- Cooperação diária entre pessoas que entendem do “negócio” e desenvolvedores;
+
+- Projetos surgem por meio de indivíduos motivados, entre os quais existe relação de confiança.
+
+- A maneira mais eficaz e eficiente de transmitir informações são por meio de conversas cara a cara;
+
+- Software funcionais são a principal medida de progresso do projeto;
+
+- Processos ágeis promovem um ambiente sustentável. Os patrocinadores, os desenvolvedores e os usuários devem ser capazes de manter indefinidamente passos constantes;
+
+- Contínua atenção à excelência técnica e bom design aumenta a agilidade;
+
+- Simplicidade é essencial. Cultivar a arte de maximizar a quantidade de trabalho que não precisou ser feito;
+
+- As melhores arquiteturas, requisitos e projetos emergem de equipes auto-organizadas;
+
+- Em intervalos regulares, o time reflete sobre como se tornar mais efetivo, então, se ajustam e otimizam seu comportamento de acordo.
+
+O manifesto ágil é como se fosse o embasamento filosófico para as metodologias ágeis. Baseado nesses valores e princípios, muitas foram criadas. Entre elas, o Scrum, o Kanban e o EXtreme Programming, conhecido como XP.
+
+Agora que nossa equipe já conhece os valores do manifesto ágil, podemos utilizar algumas das metodologias para seguir no dia a dia do desenvolvimento.
+*** Perguntas Frequentes:
+**** Qual a metodologia ágil mais utilizada?
+Isso pode variar, pois as metodologias ágeis são indicadas para diferentes casos. Contudo, o Kanban, o XP (Extreme Programming) e o Lean são amplamente adotados e podem ser preferidos em diferentes situações, dependendo do contexto e das preferências da organização. Já o Scrum, como framework ágil, é amplamente utilizado em várias indústrias e organizações de diferentes tamanhos. O Scrum é valorizado por sua simplicidade, adaptabilidade e foco na entrega contínua de valor ao cliente. Ele oferece uma estrutura clara de papéis, cerimônias e artefatos que ajudam as equipes a gerenciar e controlar o trabalho de forma eficaz. Mas a escolha da metodologia ou do framework, deve obedecer às necessidades específicas de cada projeto ou organização.
+
+**** Metodologia cascata é ágil?
+Não. A metodologia cascata e a metodologia ágil se diferenciam pela sua abordagem. Os métodos ágeis têm um enfoque iterativo e incremental no desenvolvimento de projetos, valorizam a entrega contínua de valor com foco na colaboração entre a equipe de desenvolvimento e o cliente. Por outro lado, o método cascata segue uma abordagem linear, em que cada fase do projeto é concluída antes de passar para a próxima fase. Além disso, o escopo, os requisitos e as etapas do projeto são definidos no início do processo e seguidos rigidamente até a entrega final, o que significa que é menos adaptável às mudanças, ao contrário da metodologia ágil.
+
+** Curso: Scrum: agilidade em seu projeto
+*** O que é Scrum
+Nesta aula, você pôde:
+Reconhecer a origem do conceito de Scrum, uma analogia criada na década de 1980 por Nonaka e Takeuchi que se referia à formação chamada "scrum" do esporte Rugby e a relacionava a projetos de desenvolvimento de produtos que usavam equipes pequenas, colaborativas e multidisciplinares que eram altamente eficazes em suas entregas.
+
+Identificar como o conceito de Scrum foi adaptado para o mercado de tecnologia nos anos 1990 pelos desenvolvedores de software Jeff Sutherland e Ken Schwaber, virando um famoso framework de metodologia ágil que pode hoje ser implementado em diferentes contextos e mercados por meio das diretrizes do Scrum Guide.
+
+Entender que o processo do Scrum é baseado em um modelo de trabalho iterativo, em que ciclos curtos de projeto possibilitam ter um feedback inicial do usuário sobre a solução em desenvolvimento, permitindo que se possa eliminar tudo aquilo que não agrega valor. Logo, projetos que usam Scrum se diferenciam da forma tradicional de gerir projetos, baseada no modelo de trabalho waterfall, que contempla um fluxo de processos sequenciais. Ou seja, primeiro, há um planejamento; depois, a execução; por fim, o lançamento e a validação da solução apresentada.
+
+Reconhecer os principais benefícios de utilizar o Scrum em negócios, incluindo projetos de empresas que não são da área de TI. Entre esses benefícios estão: uma visão sistêmica do projeto, que auxilia gestores a enxergarem os problemas que impedem a produtividade e a eficiência do time; um maior alinhamento entre a equipe, fator que auxilia na colaboração, na autonomia e na motivação do time; possibilidade de medir o tempo de execução de cada tarefa para aumentar a agilidade dos processos de projeto; redução do desperdício de recursos e tempo, o que resulta na entrega de uma solução mais assertiva e de acordo com as necessidades das pessoas usuárias.
+
+Compreender que, por ter uma estrutura flexível e funcional, o Scrum Framework pode ser adaptado a diferentes tipos de problemas de negócio. Porém, apenas em projetos em que os requisitos não são plenamente conhecidos ou que podem mudar durante o desenvolvimento do produto.
+*** Scrum Framework
+**** Pilares e valores do Scrum
+Os três pilares do Scrum - Transparência, Inspeção e Adaptação - são conceitos fundamentais que sustentam a eficácia do framework Scrum. A transparência refere-se à clareza e à visibilidade de todas as informações relevantes sobre o trabalho realizado pelo time Scrum. A inspeção envolve a avaliação constante do trabalho realizado e dos resultados obtidos para identificar problemas e oportunidades de melhoria. A adaptação implica em ajustar e melhorar continuamente o processo de trabalho com base nas informações obtidas durante a inspeção. Tenha em mente que esses três pilares são interdependentes e essenciais para garantir a melhoria contínua e o sucesso do Scrum em projetos ágeis.
+**** Scrum Framework
+Aprendemos na aula anterior que o Scrum é um Framework, ou seja, uma ferramenta que ajuda a gerenciar projetos de forma ágil.
+
+O Scrum tem uma estrutura simples e flexível, capaz de ser adaptada a diferentes contextos e projetos. Porém, é importante que você saiba que para aplicá-lo corretamente é preciso seguir alguns passos e delegar algumas funções.
+
+Na prática, quando as empresas usam o Scrum acabam fazendo muitas adaptações no processo. Isso pode se transformar em um problema, afinal, essa ferramenta é eficaz justamente devido à lógica de aplicação.
+
+Vamos descobrir como começar a utilizar o Scrum em projetos.
+
+***** Estrutura do Scrum
+Para começar a aplicar o Scrum é preciso entender a estrutura da ferramenta e os principais elementos que compõem o Framework.
+
+Esse conhecimento é fundamental para compreender seu funcionamento e consequentemente como colocá-lo em prática no seu projeto.
+
+De forma geral, a estrutura do Scrum é simples. Porém, existem algumas diretrizes gerais que orientam o processo de projeto.
+
+Diferente de outras metodologias e ferramentas de negócio, o Scrum não oferece um passo a passo detalhado de como deve ser executado. Ao invés disso, o Framework orienta valores, funções e interações.
+
+****** Valores
+Os valores são responsáveis por guiar todo processo de decisão ao longo do projeto, por isso, são muito importantes.
+
+Valores do Scrum definidos pelo Scrum Guide, que devem ser seguidos ao aplicar o framework: Compromisso, Foco, Abertura, Respeito e Coragem.
+
+****** Funções
+Se referem ao ato de delimitar quais pessoas vão desempenhar determinados papeis no processo de projeto.
+
+****** Interações
+Além disso, também é preciso que durante todo esse processo os profissionais tenham interações. Isso irá fazer com que o time consiga entregar um produto, serviço ou solução na melhor qualidade e menor tempo possível.
+
+***** O Framework possui alguns elementos-chave, sendo eles os:
+Cada um desses componentes são essenciais para garantir o sucesso do seu projeto.
+****** Papéis
+Os papéis se referem a ocupação que cada membro deve ter no projeto. O Scrum delimita três papéis fundamentais, sendo eles:
+
+Scrum Master;
+Product Owner;
+Development Team.
+Usamos as nomenclaturas em inglês, pois nesse curso estamos usando como base o Scrum Guide. No Brasil, o Product Owner é geralmente chamado de PO ou dono do produto. O time de desenvolvimento pode ser chamado de devs ou developers.
+
+****** Artefatos
+O segundo elemento do Scrum são os artefatos, ou seja, as informações essenciais para o andamento correto do projeto. É a partir disso que toda equipe consegue orientar seu trabalho, ou seja, saber o que está acontecendo e o que deve ser entregue.
+
+Lembra do pilar chamado transparência? Ele está diretamente relacionado aos artefatos, afinal, quanto mais informação acessível o time tiver, maior será a efetividade do trabalho.
+
+Alguns artefatos fundamentais são:
+
+Product backlog;
+Sprint backlog;
+Incrementos.
+****** Eventos
+Os eventos são encontros fixos que o time tem ao longo do desenvolvimento do projeto. São momentos de interação planejados e essenciais, pois possuem uma data e horário fixo, justamente para otimizar a agenda e evitar que o foco seja perdido.
+
+Cada evento é uma oportunidade para colocar em prática outro pilar do Scrum, a inspeção.
+
+Lembrando que a inspeção é quando analisamos o que está sendo feito. Fazer isso nas reuniões é muito positivo para toda equipe.
+
+O Scrum Guide define cinco diferentes eventos oficiais:
+
+Sprint planning;
+Sprint, Daily Scrum;
+Sprint review.;
+Sprint Retrospective.
+No Brasil a Sprint review pode ser chamada de reunião de revisão, assim como a Sprint Retrospective de reunião de retrospectiva.
+
+Nas próximas aulas aprenderemos de forma detalhada cada um desses elementos.
+
+***** Processo do Scrum
+No processo do Scrum há uma definição de ciclos de trabalho e profissionais responsáveis.
+
+(ver: (Aula02-Imagem1.jpg")
+Esquema representando a estrutura do Scrum. Do lado esquerdo da tela, visualizamos três artefatos do Scrum e os papeis das pessoas responsáveis por essas atividades. O primeiro é o Product backlog feito pelo Product owner, seguido pela Sprint planning e a Sprint backlog, ambas feitas por todo o time. Dessa estrutura, sai uma seta, apontando para o restante do processo Scrum composto pela Sprint semanal, organizada pelo Scrum Master, a Daily Scrum e os incrementos responsável por todo o time
+O fluxo de trabalho do Scrum é totalmente interativo e incremental, ou seja, a solução vai sendo desenvolvida em pequenos ciclos de trabalho até a versão final ser entregue.
+
+Dessa forma é possível desenvolver uma determinada solução e avaliar como ela está se comportando, antes de entregá-la.
+
+É preciso lembrar que a ideia central do Scrum é adicionar valor a solução que está sendo desenvolvida.
+
+Agora, vamos descobrir como o Scrum funciona. Tudo começa com o Product owner ou dono do produto, que irá representar o usuário final ou o cliente do projeto. Esse profissional é o responsável por estabelecer as prioridades do projeto e as necessidades do cliente.
+
+A partir disso ele irá elaborar um artefato chamado Product backlog, uma lista com todas essas necessidades, funcionalidades e detalhes essenciais para desenvolvimento da solução.
+
+O product backlog norteia todo o trabalho da equipe de desnvolvimento, por isso é muito importante que ele seja detalhado e bem orientado.
+
+Antes de começar a desenvolver de fato a solução, a equipe de desenvolvimento se reúne em um evento chamado Sprint planing. Nela, o o time analisa o Product backlog e começa a planejar como será o trabalho futuro.
+
+Em seguida, a equipe começa a dividir o trabalho em pequenos ciclos com tempo pré-determinado, as Sprints. Nessa etapa o time irá fazer a divisão de trabalho e determinar quais tipos de atividades devem ser cumpridas em cada um dos ciclos de trabalho.
+
+Normalmente as sprints ocorrem entre uma e quatro semanas. Isso dependerá do tipo de projeto.
+
+Logo após acontece a Sprint backlog, nela são levantados os objetivos de cada sprint, assim como as atividades e pessoas que devem realizá-las.
+
+Seguindo o fluxo de trabalho, o time de desenvolvimento inicia uma sprint e começa a desenvolver a solução.
+
+Nesse processo também ocorrem as Dailys scrum, reuniões diárias de alinhamento entre a equipe sobre o que está sendo feito na sprint, além levantar e solucionar possíveis problemas na execução.
+
+No fim de cada Sprint o time de desenvolvimento entrega o incremento do produto ou serviço, podendo ser algo que possa ser usado ou testado pelo usuário final, equipe e stakeholders.
+
+A apresentação do incremento ocorre em um evento chamado Sprint review ou revisão da Sprint. Nela também é discutido os desafios enfrentados no desenvolvimento do produto, o que pode ser melhorado ou acrescentado.
+
+Depois disso, o time se reúne em outro evento chamado Sprint retrospectiv ou retrospectiva da Sprint, nesse momento o time avalia todo o processo de trabalho, levantando pontos de melhoria para a próxima sprint.
+
+Após essas etapas, o ciclo de trabalho se reinicia.
+
+Com o fluxo de trabalho do Scrum a solução vai sendo desenvolvida e avaliada de forma simultânea. Isso faz com que no fim do processo o produto seja mais assertivo.
+
+É muito importante que você aprofunde o conhecimento nos principais elementos do Scrum. Esse conhecimento é fundamental para que você e toda equipe consigam aplicá-lo da melhor forma possível.
+
+Isso envolve entender quem deve desempenhar cada um dos papéis propostos pelo Framework, como quando realizar cada um dos eventos ou quando criar cada um dos artefatos apresentados nessa aula.
+
+Na aula seguinte, aprenderemos quais são os principais papeis do Scrum e as competências necessárias.
+
+*** Papéis dentro do Scrum
+**** Product Owner
+***** Aula
+No contexto do projeto Scrum, o papel equivalente à pessoa atendente é o Product Owner. É responsabilidade do Product Owner compreender as necessidades de um cliente específico, bem como qualquer outra informação essencial para iniciar o projeto.
+
+É o profissional responsável por materializar os desejos e necessidades das pessoas clientes no projeto. Em outras palavras, essa pessoa será a porta-voz da pessoa cliente junto ao time de pessoas desenvolvedoras e às demais partes da empresa.
+
+A pessoa que desempenha a função de Product Owner deve sempre conciliar os interesses da empresa responsável pelo desenvolvimento da solução com os interesses das pessoas usuárias ou clientes dessa solução, independentemente do projeto.
+
+Stakeholders
+Ressaltando que o Product Owner (PO) é um indivíduo, não uma equipe. No entanto, essa pessoa pode representar as necessidades de diferentes stakeholders, ou seja, de diversas partes interessadas envolvidas no projeto.
+
+*Stakeholders são as partes interessadas ou envolvidas em um projeto, como clientes, usuários, acionistas, equipe de desenvolvimento e outros. Eles têm interesse, influência ou impacto direto no projeto e suas necessidades devem ser consideradas para alcançar os objetivos. Gerenciar as expectativas e envolvimento dos stakeholders é essencial para o sucesso do projeto.*
+
+Por isso, a pessoa profissional escolhida para desempenhar o papel de Product Owner (PO) deve ter um amplo conhecimento sobre negócios tanto da parte do cliente quanto da empresa e suas particularidades. Afinal, essa pessoa é a responsável por comunicar ao cliente o que a empresa pode ou não desenvolver durante o projeto.
+***** Responsabilidades do Product Owner
+Responsabilidades da pessoa Product Owner
+Ao nos referirmos a rotina de uma pessoa Product Owner, temos algumas responsabilidades principais:
+
+- Definir requisitos do produto
+- Alinhar as entregas do time
+- Gerenciar e atualizar product backlog
+- iniciar e/ou cancelar uma Sprint
+
+A função do Product Owner é definir todos os requisitos do produto ou solução em desenvolvimento. Além disso, ele deve alinhar as ideias da equipe Scrum, preferencialmente por meio de um cronograma que contenha as principais atividades e as pessoas responsáveis por elas.
+
+O Product Owner também é responsável por gerenciar e atualizar o product backlog, que deve ser acessível a todos os membros da equipe para garantir que todos saibam o que é esperado do projeto. Por fim, o Product Owner é responsável por iniciar e cancelar sprints, quando necessário. Essa tarefa é exclusiva do profissional que desempenha a função de Product Owner.
+
+***** Questão da Alura
+Maria e Cláudio possuem uma startup que vende sistemas de gestão financeira na nuvem para outras empresas. Para auxiliar no desenvolvimento de software, resolveram aplicar Scrum. Para isso, estão buscando um de seus colaboradores para ser Product Owner.
+
+Neste contexto, qual das seguintes alternativas apresenta uma característica (ou perfil desejável) para uma pessoa que deseja se tornar um Product Owner?
+****** Compreensão do negócio e das necessidades dos clientes e usuários.
+Alternativa correta
+Essa é uma característica fundamental para uma pessoa que deseja ser Product Owner, uma vez que precisa entender o contexto de negócio em que o produto será utilizado e também as necessidades de clientes e usuários. Esse conhecimento é básico para poder tomar decisões assertivas sobre o product backlog, garantindo que o produto atenda aos requisitos e aos objetivos de negócio.
+****** Capacidade de gerenciar o desenvolvimento do produto/solução em um projeto.
+Alternativa incorreta
+Uma pessoa Product Owner não é responsável por gerenciar o processo de desenvolvimento de software. Essa é uma responsabilidade da equipe de desenvolvimento, liderada por uma pessoa Scrum Master.
+		
+**** Scrum Master
+Isso ocorre porque o Scrum Master é responsável por capacitar o restante da equipe em relação aos processos Scrum, garantindo que cada membro entregue o melhor trabalho possível, no menor período de tempo e com maior eficiência.
+
+***** Teoria e prática Scrum
+Segundo o Scrum Guide, a pessoa que assume o papel de Scrum Master é responsável por garantir que não apenas a equipe Scrum, mas também a organização ou empresa em que o projeto está sendo realizado, compreendam tanto a teoria quanto a prática do Scrum.
+
+Quando falamos da teoria do Scrum, estamos nos referindo aos valores e pilares que fundamentam a aplicação dessa metodologia. Por outro lado, a prática envolve os eventos, artefatos, processos e etapas que fazem parte do framework Scrum.
+
+Isso acontece porque o Scrum Master é responsável pela eficácia da equipe Scrum, ou seja, garantir que todos os membros possam aplicar corretamente o processo Scrum.
+
+Vale ressaltar que o Scrum Master não atua como um fiscal de processos no projeto, nem assume as funções dos membros da equipe que não estão desempenhando suas respectivas tarefas. Pelo contrário, é a pessoa que ao exercer a função se torna menos necessária possível ao longo do projeto.
+
+O que isso significa?
+
+***** O Scrum Master deve:
+- Aumentar a autonomia do time Scrum
+- Ter um conhecimento técnico sobre Scrum
+- Entender e saber lidar com pessoas
+
+A pessoa encarregada de desempenhar o papel precisa conceder autonomia à equipe Scrum, capacitando os membros no uso da ferramenta. Isso implica em ensinar como aplicar o Scrum e como adotar uma mentalidade alinhada com os princípios do Scrum. Assim, os membros do time consequem de autogerenciar e executar suas funções sem uma grande necessidade de interferência do Scrum Master.
+
+Para exercer essa função, a pessoa Scrum Master deve possuir um amplo conhecimento técnico sobre o Scrum, como mencionado anteriormente. Além desse conhecimento técnico, o Scrum Master deve possuir competências e habilidades comportamentais necessárias para desempenhar o papel, incluindo habilidades de lidar com pessoas.
+
+Essa responsabilidade recai sobre a pessoa Scrum Master, pois ela atua como uma observadora dentro da equipe durante todo o projeto. Ela é capaz de identificar quando surge um problema e um membro da equipe não o relata. Nesses momentos, a pessoa Scrum Master precisa intervir e abordar a situação, seja ao se impor diretamente ou ao chamar o membro da equipe para uma conversa.
+
+Por estar em constante contato com as pessoas, a pessoa Scrum Master precisa possuir habilidades de comunicação e facilitação de eventos e reuniões. Essas habilidades são essenciais para garantir uma comunicação efetiva dentro da equipe e facilitar a realização de eventos e reuniões relacionados ao Scrum.
+
+***** Scrum Master e Gerente de projetos
+Em uma linguagem mais voltada para o ambiente de negócios, pode-se dizer que o Scrum Master desempenha um papel semelhante ao de um gerente de projetos. Isso porque a pessoa Scrum Master deve orientar e gerenciar a equipe para atingir os objetivos do projeto.
+
+Além das competências mencionadas anteriormente, é fundamental que aqueles que desejam gerenciar outras pessoas conheçam a empresa em que o projeto está ocorrendo e seus colegas. Isso ocorre porque esses indivíduos precisarão constantemente elevar a equipe, promovendo uma comunicação mais aberta e reduzindo as barreiras, com o objetivo comum de entregar uma solução específica em um determinado projeto.
+
+Conforme mencionado anteriormente, o conceito de equipe no Scrum é fundamental. Portanto, o papel do Scrum Master é crucial para garantir a integração contínua das pessoas, promovendo um trabalho mais unido.
+
+***** Responsabilidade da pessoa Scrum Master
+e forma geral, podemos dizer que a principal responsabilidade de uma pessoa Scrum Master são:
+
+- Garantir os valores, práticas e regras do Scrum
+- Remover barreiras
+- Dar feedbacks
+- Garantir a produtividade do time (eficácia no Scrum Guide)
+- Organizar e facilitar eventos Scrum
+
+O Scrum Master tem a responsabilidade de assegurar que a equipe esteja alinhada com os valores e princípios do Scrum, bem como seguir as práticas e regras estabelecidas pelo framework. Também atua como um pessoa facilitadora, identificando e removendo quaisquer obstáculos ou impedimentos que possam atrapalhar o progresso da equipe, seja em relação a recursos, comunicação ou qualquer outro aspecto.
+
+Além disso, desempenha um papel crucial no fornecimento de feedbacks, tanto positivos quanto negativos. Isso ajuda a equipe a melhorar seu desempenho, reconhecendo o bom trabalho realizado e fornecendo orientação construtiva quando necessário.
+
+Também trabalha para garantir a eficácia do time, seguindo as diretrizes estabelecidas pelo Scrum Guide. Isso envolve auxiliar a equipe a cumprir os objetivos do projeto dentro dos prazos estabelecidos, mantendo um fluxo de trabalho consistente e focado.
+
+Por fim, a pessoa Scrum Master é responsável por organizar e facilitar os eventos do Scrum, como reuniões diárias, planejamentos, revisões e retrospectivas. Esses eventos são essenciais para manter a transparência, a colaboração e o progresso do projeto.
+
+Outro ponto importante para deixarmos claro é que a pessoa Scrum Master apenas orienta e facilita o processo Scrum, não tomando as decisões.Como visto na aula passada, isso é responsabilidade do Product Owner.
+
+O envolvimento de uma pessoa Scrum Master com a equipe ocorre tanto durante os eventos, como sprint planning ou review, quanto no dia a dia do time. Ela realiza uma leitura constante para identificar quando é necessário intervir ou quando sua ajuda é solicitada para fornecer orientação.
+
+Agora que já entendemos sobre o Scrum Master, vamos compreender as atribuições de um time de pessoas desenvolvedoras.
+**** Development Team
+***** O Papel das Pessoas Desenvolvedoras no Time Scrum
+Habilidades: "Proatividade", "Colaboração" e "Autogerenciamento".
+Quando cada membro do time possui clareza sobre sua contribuição no projeto, as entregas se tornam mais eficientes e ágeis. Além disso, é essencial que as pessoas desenvolvedoras sejam proativas e capazes de se autogerenciar, compreendendo como e quando executar cada tarefa, sem depender exclusivamente das lideranças do time Scrum.
+
+Um perfil colaborativo é altamente desejável para uma pessoa desenvolvedora, pois as interações e conversas constantes são essenciais durante o desenvolvimento do projeto. Nas aulas anteriores, mencionamos a importância da Daily Scrum, que consiste em reuniões diárias para acompanhar o progresso do projeto.
+
+Resumidamente, o time de pessoas desenvolvedoras tem a responsabilidade de criar o produto com base nas orientações do Product Owner. Ou seja, o Product Owner prioriza determinadas tarefas que serão repassadas ao time para desenvolvimento. A cada sprint, o time entrega um incremento de produto, que consiste em uma parte da solução desenvolvida para obter feedback.
+
+***** Scrum Team e Development Team
+Há algumas diferenças entre o time Scrum e o time de pessoas desenvolvedoras.
+
+A diferença central reside no fato de que o time Scrum engloba todas as pessoas envolvidas em um determinado projeto, como o Product Owner, Scrum Master e outros stakeholders. Por outro lado, o time de desenvolvimento refere-se especificamente às pessoas responsáveis por criar a solução em si. No caso de um projeto de software, seriam as pessoas desenvolvedoras, engenheiras e outros profissionais envolvidos nessa tarefa.
+
+Normalmente, um time de pessoas desenvolvedoras é composto por cerca de 10 membros, embora isso possa variar. No entanto, é essencial que a equipe não seja muito grande, para facilitar a comunicação e a colaboração entre os seus membros. Manter um tamanho adequado permite que o trabalho flua de maneira mais eficiente e coesa dentro do time.
+
+***** Responsabilidades do time de pessoas desenvolvedoras
+- Elaborar um plano para a Sprint (Sprint Backlog)
+- Determinar tecnicamente um incremento
+- Coordenar e executar seu próprio trabalho
+- Garantir a melhoria contínua do produto
+- Informar impedimentos
+
+As responsabilidades desse time são elaborar um plano para as sprints, determinar tecnicamente um incremento de produto, isto é, definir o que deve ser entregue em cada sprint como parte do produto em desenvolvimento. Além disso, precisa coordenar e executar o próprio trabalho, o que está relacionado ao autogerenciamento.
+
+São responsáveis também por garantir a melhoria contínua do produto. Isso significa que devem buscar constantemente maneiras de aprimorar a solução, identificar oportunidades de otimização e implementar melhorias de forma iterativa a cada sprint.
+
+Além disso, o time de pessoas desenvolvedoras também tem a responsabilidade de informar impedimentos. Eles devem ser proativos ao identificar e comunicar quaisquer obstáculos ou dificuldades que possam estar impactando o progresso do projeto, para que essas questões possam ser resolvidas de forma ágil e eficaz.
+
+Um exemplo disso ocorre quando um membro do time não consegue entregar as demandas dentro do prazo estabelecido, o que pode resultar em atrasos no projeto. Nesse caso, é essencial que haja transparência, e a pessoa deve comunicar aos colegas de equipe e, principalmente, ao Scrum Master, que é responsável por garantir a aplicação do Scrum.
+
+Essa comunicação permite que o time tome conhecimento dos impedimentos e possa encontrar soluções em conjunto, promovendo a colaboração e o apoio mútuo. Além disso, a responsabilidade de informar os impedimentos recai também sobre o Scrum Master, que pode auxiliar na remoção de barreiras e na busca por alternativas para manter o projeto dentro dos prazos estabelecidos.
+
+Dessa forma, a melhoria contínua do produto e o cumprimento dos objetivos do projeto são assegurados através da identificação e solução proativa de possíveis impedimentos.
+
+O principal propósito de um time de pessoas desenvolvedoras é solucionar problemas de usuários ou clientes. Portanto, é de responsabilidade do time obter feedback sobre o incremento do produto a cada sprint por parte dos usuários.
+
+Esse feedback é essencial para compreender se as necessidades estão sendo atendidas de forma satisfatória e identificar possíveis melhorias ou ajustes a serem realizados. Em outras palavras, agregar mais valor à solução em desenvolvimento. Também auxilia o time na análise do processo de trabalho, entendendo o que pode ser melhorado nas etapas do Scrum.
+
+Frase retirada do livro "Scrum: Gestão Ágil para Projetos de Sucesso"
+Os desenvolvedores mais efetivos são aqueles que se envolvem e se engajam integralmente. Desde o entendimento dos problemas a serem resolvidos até a definição, a implementação e a validação de soluções, trabalhando lado a lado com Product Owner, clientes, usuários e demais partes interessadas durante todo o processo.
+Rafael Sabbagh
+
+Encerramos mais uma aula, na qual exploramos os diversos papéis do Scrum. Agora, é hora de aprofundarmos nosso conhecimento nos elementos do Scrum e como cada um desses elementos se relaciona com os papéis que já foram apresentados.
+***** Exemplo de devs que poderiam ser elencados para um time
+Desenvolvedores: as pessoas desenvolvedoras são responsáveis por desenvolver o produto de acordo com as prioridades definidas pelo Product Owner e as práticas do Scrum. João atribuiu os seguintes colaboradores como desenvolvedores da equipe Scrum:
+
+Carlos: um desenvolvedor experiente com conhecimentos em várias linguagens de programação e habilidades de resolução de problemas.
+
+Laura: uma desenvolvedora júnior que recentemente se juntou à empresa, mas demonstrou grande potencial em projetos anteriores e mostrou entusiasmo em aprender mais sobre o Scrum.
+
+Rafael: um desenvolvedor sênior com experiência em desenvolvimento ágil e habilidades de liderança que podem ajudar a orientar os membros mais juniores da equipe.
+
+Gabriela: uma testadora de qualidade experiente com conhecimentos abrangentes em testes de software e automação de testes. Ela será responsável por garantir a qualidade do produto por meio de testes rigorosos.
+
+(AP: Da última citada fica a nota que a pessoa do QA também entra na categoria de desenvolvedor).
+*** Elementos centrais do Scrum
+**** Product Backlog
+Saber montar um Product Backlog é fundamental para o sucesso de um projeto de desenvolvimento de software. O Product Backlog é a lista de itens que representam as necessidades, as funcionalidades e as melhorias planejadas para um produto. Construí-lo corretamente permite priorizar adequadamente às demandas das pessoas usuárias e do mercado, planejar o trabalho da equipe de desenvolvimento e garantir a entrega de um produto de alta qualidade.
+
+Ah! Além disso, saiba que o Product Backlog é uma ferramenta valiosa para a comunicação e a colaboração entre as equipes de negócios, usuários e time de desenvolvimento, permitindo um alinhamento eficaz de expectativas e objetivos.
+**** Spring Planning
+O propósito desse evento é definir:
+
+O que será entregue: o objetivo da Sprint;
+Como será entregue: plano de trabalho para atingir o objetivo.
+Tudo isso é definido pelo Product Owner em conjunto com o restante da equipe Scrum.
+
+Basicamente, uma Sprint Planning é divida em dois momentos diferentes. O primeiro momento serve para a equipe discutir e definir qual vai ser o objetivo da Sprint que vai ser iniciada. Ou seja, o que deve ser entregue e quais são as principais atividades que devem acontecer para que a entrega seja possível.
+
+O segundo momento do evento, o time Scrum e o PO analisam o objetivo definido do passo anterior e constroem um plano para detalhar tudo que deve ser feito para atingir o objetivo.
+
+Em outras palavras, é necessário desdobrar as atividades em pequenas tarefas e indicar quem são as pessoas responsáveis por cumpriá-las, além de estabelecer um prazo para seu cumprimento. Esse é o plano de ação da Sprint Planning.
+
+O Scrum Guide nos orienta que quando uma Sprint tem uma duração de um mês, o evento deve ter até oito horas de duração.
+
+Uma Sprint Planning é finalizada com o documento chamado plano de ação. Esse plano precisa pegar tudo o que foi definido até então e detalhar tarefas, responsabilidades e prazos de entrega.
+
+Por exemplo, "a tarefa 1 deve ser desenvolvido por integrante X. Essa pessoa tem prazo X para fazer essa entrega. Nessa entrega, a pessoa deve considerar A, B e C".
+
+Ao final da Sprint Planning, todo o time de Scrum deve estar comprometido com o objetivo da Sprint e também com o plano de ação. O comprometimento é um dos valores do Scrum.
+
+Além disso, ao final da reunião, cada integrante do time deve estar ciente do que é esperado dele, ou seja, qual trabalho que deve executar e a forma de fazê-lo.
