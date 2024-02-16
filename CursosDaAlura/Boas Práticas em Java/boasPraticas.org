@@ -1,0 +1,248 @@
+Mergulhe em boas práticas com Java (31 horas - 3 cursos)
+https://cursos.alura.com.br/formacao-boas-praticas-java
+
+ continuar em lendo na ordem as tarefas
+
+* Refatoração de código (continuar aqui)
+10 horas
+** Refatoração
+Aprendemos a extrair código em métodos, com o intuito de melhorar a legibilidade do nosso código, facilitando assim sua manutenção;
+
+O ideal para resolver o código duplicado é aplicar a reutilização de código (extraindo o código para um método, por exemplo), em que o código fica presente em apenas um local e referenciá-lo ao utilizá-lo. Dessa forma, toda manutenção será feita em apenas um local.
+** Artigo SOLID (continuar aqui)
+https://www.alura.com.br/artigos/solid?_gl=1*jvikqg*_ga*MTg2NzM1MzI3Ny4xNzAyNDM1NDg1*_ga_1EPWSW3PCS*MTcwODEwMTUxOC40My4xLjE3MDgxMDE5OTQuMC4wLjA.*_fplc*RTJVRWp0ZjZpYlZiOEt5MTRrdGJkdkVKa3hWb0olMkJhY3FUVE9CZzc2blRUS3UxZXZXOHR3WWglMkJnaVFBeFl1VFJaJTJGclJrbG9aWlpjcHdNT3VHOFVCa2lWTkU4b2ExWjkwTlRiSEdnSjdBeUhEdmNqJTJGeUcxclRPOUpRcFg4TFElM0QlM0Q.
+*** S
+Para entender o princípio da responsabilidade única, vamos pensar no desenvolvimento de um gerenciador de tarefas. Vamos começar com o seguinte código:
+**** código inicial
+Tente enumerar todas as funções que a classe GerenciadorTarefas tem. Ela é responsável por lidar com todas as operações das tarefas em si e também está consumindo uma API, enviando notificações para pessoas usuárias e ainda gerando relatórios da aplicação.
+
+Pense na Orientação a Objetos. Um objeto gerenciador de tarefas deveria enviar e-mails e gerar relatórios? Não! Um gerenciador de tarefas gerencia as tarefas, não e-mails ou relatórios.
+
+public class GerenciadorTarefas {
+
+    public String conectarAPI(){
+        //...
+    }
+    public void criarTarefa(){
+        //...
+    }
+
+    public void atualizarTarefa(){
+        //...
+    }
+
+    public void removerTarefa(){
+        //...
+    }
+
+    public void enviarNotificacao(){
+        //...
+    }
+
+    public void produzirRelatorio(){
+        //...
+    }
+
+    public void enviarRelatorio(){
+        //...
+    }
+
+}
+
+**** Solução
+Para resolver esse problema vamos criar classes diferentes, cada uma representando uma função.
+
+Nossa classe GerenciadorTarefas terá apenas o código relacionando a operação com tarefas. Outras operações estarão em outras classes. E cada classe será responsável por uma parte diferente da aplicação.
+
+Assim, teremos a classe GerenciadorTarefas refatorada:
+
+***** public class GerenciadorTarefas {
+
+    public void criarTarefa(){
+        //...
+    }
+
+    public void atualizarTarefa(){
+        //...
+    }
+
+    public void removerTarefa(){
+        //...
+    }
+}
+
+***** public class ConectorAPI {
+Assim, vamos criar uma classe para consumir uma API externa, outra classe para enviar notificações e uma última classe para lidar com os relatórios.
+
+    public String conectarAPI() {
+        //...
+    }
+
+}
+
+***** public class Notificador {
+
+    public void enviarNotificacao() {
+        //...
+    }
+
+} 
+***** public class GeradorRelatorio {
+    public void produzirRelatorio(){
+        //...
+    }
+
+    public void enviarRelatorio(){
+        //...
+    }
+
+}
+**** Talvez você se pergunte se as classes não são pequenas demais. Nesse caso, não estão. Cada classe reflete exatamente a responsabilidade que ela tem.
+
+Se precisarmos adicionar algum método, por exemplo, relacionado ao consumo da API, vamos saber exatamente em qual parte do código devemos ir. Ou seja, fica muito mais fácil alterar o que for preciso.
+
+**** Definição do Princípio da Responsabilidade Única
+Em resumo, o princípio da responsabilidade única diz que: “Cada classe deve ter um, e somente um, motivo para mudar.”
+
+Se uma classe tem várias responsabilidades, mudar um requisito do projeto pode trazer várias razões para modificar a classe. Por isso, as classes devem ter responsabilidades únicas.
+
+Esse princípio pode ser estendido para os métodos que criamos também. Quanto mais tarefas um método executa, mais difícil é testá-lo e garantir que o programa está em ordem.
+
+*Uma dica para aplicar o princípio na prática é tentar nomear suas classes ou métodos com tudo que eles são capazes de fazer.*
+
+Se o nome está gigante, como GerenciadorTarefasEmailsRelatorios, temos um sinal de que o código pode ser refatorado.
+**** Vantagens de aplicar o Princípio da Responsabilidade Única
+Existem vários benefícios ao aplicar esse princípio, principalmente:
+
+Facilidade para fazer manutenções
+Reusabilidade das classes
+Facilidade para realizar testes
+Simplificação da legibilidade do código
+*** O
+Princípio Aberto-Fechado (O - Open Closed Principle)
+Para entender o Princípio Aberto-Fechado (a letra O da sigla), vamos pensar que estamos trabalhando no sistema de uma clínica médica.
+
+**** código inicial
+Nessa clínica, existe uma classe que trata das solicitações de exames. Inicialmente, o único exame possível é o exame de sangue. Por isso, temos o código:
+
+public class AprovaExame {
+    public void aprovarSolicitacaoExame(Exame exame){
+        if(verificaCondicoesExameSangue(exame))
+            System.out.println("Exame aprovado!");
+    }
+    public boolean verificaCondicoesExameSangue(){
+        //....
+    }
+}
+
+Agora, precisamos incluir uma nova funcionalidade ao sistema: a clínica vai começar a fazer exames de Raio-X. Como incluir isso no nosso código?
+
+Uma alternativa seria verificar qual o tipo de exame está sendo feito para poder aprová-lo:
+
+public class AprovaExame {
+    public void aprovarSolicitacaoExame(Exame exame){
+        if(exame.tipo == SANGUE){
+            if(verificaCondicoesExameSangue(exame))
+                System.out.println("Exame sanguíneo aprovado!");
+        } else if(exame.tipo == RAIOX) {
+            if (verificaCondicoesRaioX(exame))
+                System.out.println("Raio X aprovado!");
+        }
+
+    }
+    private boolean verificaCondicoesExameSangue(){
+        //....
+    }
+
+    private boolean verificaCondicoesRaioX(){
+        //....
+    }
+}
+**** Problemática
+A princípio parece tudo certo, não é mesmo? Nosso código executa normalmente e conseguimos adicionar a funcionalidade corretamente.
+
+Mas, e se além de raio-x, a clínica passasse a fazer também ultrassons? Seguindo a lógica, iríamos adicionar mais um if no código e mais um método para olhar condições específicas do exame.
+
+Essa definitivamente não é uma boa estratégia. Cada vez que incluir uma função, a classe (e o projeto como um todo) vai ficar mais complexa.
+
+Por isso, é necessário uma estratégia para adicionar mais recursos ao projeto, sem modificar e bagunçar a classe original.
+
+**** Solução
+Nesse cenário, o projeto compreende vários tipos de aprovação de exames. Assim, podemos criar uma classe ou uma interface que representa uma aprovação de forma genérica.
+
+A cada tipo de exame fornecido pela clínica, é possível criar novos tipos de aprovação, mais específicos, que irão implementar a interface. Assim, podemos ter o código:
+
+public interface AprovaExame{
+    void aprovarSolicitacaoExame(Exame exame);
+    boolean verificaCondicoesExame(Exame exame);
+
+}
+
+public class AprovaExameSangue implements AprovaExame{
+    @Override
+    public void aprovarSolicitacaoExame(Exame exame){
+            if(verificaCondicoesExame(exame))
+                System.out.println("Exame sanguíneo aprovado!");
+
+    }
+    @Override
+    boolean verificaCondicoesExame(Exame exame){
+        //....
+    }
+}
+
+public class AprovaRaioX implements AprovaExame{
+    @Override
+    public void aprovarSolicitacaoExame(Exame exame){
+        if(verificaCondicoesExame(exame))
+            System.out.println("Raio-X aprovado!");
+
+    }
+    @Override
+    boolean verificaCondicoesExame(Exame exame){
+        //....
+    }
+}
+Agora, como a interface representa a aprovação de um exame, para incluir mais um recurso ou mais um tipo de exame, basta criar uma nova classe que implementa a interface AprovaExame. Essa classe vai representar como o novo exame é aprovado.
+
+Repare que sempre será possível implementar a interface AprovaExame ao adicionarmos recursos. Essa interface, no entanto, não muda. Estamos estendendo-a, mas não alterando.
+**** Definição do Princípio Aberto-Fechado
+Assim, é possível definir o Princípio Aberto-Fechado como: “entidades de software (como classes e métodos) devem estar abertas para extensão, mas fechadas para modificação”.
+
+Ou seja, se uma classe está aberta para modificação, quanto mais recursos adicionarmos, mais complexa ela vai ficar.
+
+O ideal é adaptar o código não para alterar a classe, mas para estendê-la. Em geral, isso é feito quando abstraímos um código para uma interface.
+
+Aplicando o Open-Closed, é possível deixar o nosso código semelhante ao mundo real, praticando de maneira sólida a orientação a objetos.
+**** Vantagens de aplicar o Princípio Aberto-Fechado
+Ao aplicar esse princípio, é possível tornar o projeto muito mais flexível. Adicionar novas funcionalidades torna-se uma tarefa mais fácil.
+
+Além disso, os códigos ficam mais simples de ler. Com isso tudo, o risco de introduzir bugs diminui de forma significativa.
+
+Além disso, esse princípio nos faz caminhar diretamente para a aplicação de alguns padrões de projeto, como o Strategy.
+
+Assim, alinhamos várias boas práticas de desenvolvimento. O resultado disso é um código cada vez mais limpo e organizado.
+*** L (continuar aqui)
+
+** SOLID (continuar aqui - texto depois do último video) reler texto (Refatoração) acima e acertar pontos
+*** S do acrônimo SOLID significa Single Responsability Principle
+Em português, princípio da responsabilidade única, ou seja, uma classe deve ter um, e somente um, motivo para mudar;
+
+Separamos nosso código em classes para que ficassem coesas e com apenas uma responsabilidade;
+
+Criamos classes de configurações para reaproveitá-las nas classes de serviço, evitando assim código duplicado.
+* Melhorando código de uma API com refatoração, SOLID e Design Patterns
+SOLID: é um acrônimo que representa cinco princípios de design de software orientado a objetos que visam criar sistemas mais flexíveis, extensíveis e fáceis de manter. Cada letra corresponde a um princípio específico:
+
+S (Single Responsibility Principle - Princípio da Responsabilidade Única): Cada classe deve ter uma única razão para mudar, ou seja, deve ter uma única responsabilidade.
+O (Open/Closed Principle - Princípio Aberto/Fechado): As entidades de software (classes, módulos, etc.) devem ser abertas para extensão, mas fechadas para modificação. Isso promove a adição de novas funcionalidades sem alterar o código existente.
+L (Liskov Substitution Principle - Princípio da Substituição de Liskov): As instâncias de uma classe derivada devem ser substituíveis pelas instâncias da classe base sem afetar a integridade do sistema.
+I (Interface Segregation Principle - Princípio da Segregação de Interfaces): Clientes não devem ser forçados a depender de interfaces que eles não usam. Em outras palavras, as interfaces devem ser específicas para as necessidades dos clientes.
+D (Dependency Inversion Principle - Princípio da Inversão de Dependência): Módulos de alto nível não devem depender de módulos de baixo nível. Ambos devem depender de abstrações. Além disso, abstrações não devem depender de detalhes, mas detalhes devem depender de abstrações.
+Resumindo, SOLID promove a modularidade e facilita a manutenção do código. Ajuda a evitar acoplamento excessivo e torna os sistemas mais flexíveis para mudanças.
+
+Design Patterns: são soluções reutilizáveis para problemas comuns de design de software. São abordagens e estruturas que foram testadas e documentadas para resolver desafios específicos de programação. Esses padrões ajudam a melhorar a organização do código, a modularidade e a manutenibilidade do sistema.
+* Testes automatizados
+* NOTAS refinadas
+
+SRP: *Uma dica para aplicar o princípio na prática é tentar nomear suas classes ou métodos com tudo que eles são capazes de fazer.*
