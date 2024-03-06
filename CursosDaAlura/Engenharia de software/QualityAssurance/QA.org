@@ -11,3 +11,139 @@ Quando - Qual ação será executada no sistema que fornecerá o resultado valid
 Então: - De acordo com a ação disparada, qual será o resultado esperado?
 ** Cenário de testes x Casos de Testes
 Conceitos de Cenários de testes definem “O que” deve ser testado, enquanto os Casos de Testes definem “Como”, ou seja, o passo a passo. O caso de teste é mais detalhado;
+** Aprofundando nos tipos de testes
+*** Testes de regressão
+Teste de regressão é uma técnica de teste a ser aplicada quando surgem novas versões mais recentes do software e garante que não surjam novos defeitos em componentes já analisados;
+
+
+O teste de regressão consiste em testar nas versões mais recentes do software as outras coisas que estão relacionadas à modificação que fizemos para ver se não surgiram novos defeitos nas funcionalidades que já estavam prontas.
+
+[02:35] Ou seja, precisamos analisar todos aqueles componentes relacionados para ver se eles permaneceram inalterados.
+
+Se, por exemplo, algum novo erro foi inserido em uma funcionalidade que não necessariamente é da última implementação que submetemos para ser testada, falamos que o nosso sistema regrediu, ou seja, aquela funcionalidade colocou um erro, e fazemos esse teste de regressão justamente para garantir que esses erros não aconteçam.
+*** Teste de fumaça (Smoke Tests)
+No teste de fumaça eu faço um cenário mais simples, só para garantir que as coisas críticas estão funcionando.
+
+[04:40] Eu faço isso, por exemplo, quando eu não tenho tempo para testar todas as funcionalidades regressivas e eu tenho que dar prioridade para algumas. Então eu seleciono, por exemplo, os testes que são mais importantes e que não podem falhar de jeito nenhum, e eu faço esse teste de fumaça neles.
+*** Teste de sanidade
+(Teste de sanidade é o subconjunto do teste de regressão e também é realizado quando não temos tempo suficiente para fazer o teste mais elaborado. Ele tem um nível superficial e verifica se as funcionalidades mais críticas do sistema estão conforme o esperado;)
+
+[04:54] Outro teste que temos também, relacionado às mudanças que temos no nosso sistema depois que ele já está pronto é um teste de sanidade. É bem parecido com o nosso Smoke Test, também não testamos tudo, apenas as coisas mais importantes. Mas são as coisas mais importantes do sistema como um todo.
+
+[05:12] Então nesse caso, por exemplo, testamos o nosso login e o nosso cadastro, que não podem falhar de jeito nenhum. Mas não faríamos todos aqueles cenários que fizemos para o login e nem todos aqueles cenários para o cadastro.
+
+[05:25] Como é só um teste de sanidade, só precisamos garantir que tudo o que é mais crítico está funcionando, fazemos geralmente os cenários felizes, que é um login com sucesso, um cadastro com sucesso; coisas bem críticas do nosso sistema.
+
+[05:37] E esse teste de sanidade também pode ser feito em produção, por exemplo. Se quisermos garantir que o nosso login nunca vai parar de funcionar, podemos, por exemplo, fazer um teste automatizado em produção.
+
+[05:49] Então ele fica rodando várias vezes no dia aquele login e tem um alerta. Se o login parar de funcionar, nós saberemos. Não necessariamente porque colocamos uma funcionalidade nova que afetou, mas, por exemplo, que algum servidor caiu, então é importante ter esse tipo de controle. E o teste de sanidade serve para isso.
+*** Teste limite 
+Testes de limite consistem em testar os valores mínimo e máximo (ou primeiro e último valores) de uma partição. Essa técnica é geralmente usada para testar requisitos que exigem um intervalo de números (incluindo datas e horas);
+
+[01:38] Se limitamos, por exemplo, que uma senha tenha 18 caracteres e colocamos essa mensagem no cadastro falando que ela precisa ter no máximo 18 caracteres, precisamos garantir que isso é verdade.
+*** Teste de estado
+(Teste de transição de estados é utilizado para testar a capacidade que o software tem de entrar em e sair de estados definidos através de transições válidas e inválidas;)
+
+[04:07] Eu vou clicar no nosso ícone de coração e vou curtir. Ele até mudou do número 0 para 1, mas o ícone de coração não mudou de cor.
+
+[04:18] Isso que acabamos de fazer foi um teste de estado. Um teste de estado é um teste de uma mudança que tem que ter no estado de uma coisa quando aplicamos determinado evento.
+
+[04:34] Ou seja, ao curtir esse botão ele deveria sair do estado desse botão branco e ir para um botão vermelho. Ou seja, esse botão tem dois estados: o estado de um botão branco e o estado de um botão vermelho, ou teria.
+
+[04:53] Precisamos sempre testar esses dois estados. Isso é um cenário bem simples, mas em casos mais complexos o sistema pode ter vários estados. Se pensarmos, por exemplo, em um semáforo, ele já tem três estados: um vermelho, um verde e um amarelo. E um evento é aplicado para essa mudança de estado.
+
+[05:17] É importante dizer que, por exemplo, uma vez que eu cliquei nesse botão e ele ficou vermelho, então até um outro evento acontecer ele deveria ficar vermelho, se eu tivesse um botão de descurtir, por exemplo.
+
+[05:30] Esses testes de estados também podem ser feitos, por exemplo, com um diagrama de estado, que nada mais é do que pegar todos esses estados e falar os eventos que aplicamos sobre eles e o que acontece. Também facilita para planejar todos os nossos testes e saber todos os estados que esse botão pode ter.
+*** Teste exploratório
+[05:51] Até agora, nesses testes funcionais que fizemos, sempre tivemos um escopo definido e uma técnica por trás. Você deve estar pensando o seguinte: “Eu posso fazer algum tipo de teste que é só explorar o sistema? Eu clico na nossa home, eu navego nas fotos, eu tenho que procurar alguma coisa, sem nenhum tipo de procedimento, de uma forma mais informal? Esse teste daria algum tipo de resultado?”
+
+[06:24] Existe um teste assim. Por exemplo, eu poderia só explorar, ver tudo que o sistema tem, clicar no menu. Esse é o chamado teste exploratório.
+
+[06:33] Os testes exploratórios servem mais para você conhecer o sistema. Quando, por exemplo, você tem um primeiro contato com um sistema, você lê o plano de teste e dá uma olhada, explora o sistema.
+
+[06:45] Ele realmente é um teste informal, você não precisa de nenhum tipo de cenário pré-definido. E você consegue, por exemplo, dar algumas sugestões de usabilidade.
+
+Mas se eu achar um erro no sistema quando eu estou fazendo esse teste exploratório, eu provavelmente terei que fazer de novo um teste mais planejado, para eu realmente ver o passo a passo de como eu fiz para encontrar aquele erro.
+
+[07:37] Então os testes exploratórios existem e são bem bons para você conhecer o sistema a primeiro momento, para uma pessoa que não está acostumada, e para achar alguns problemas, por exemplo, de usabilidade.
+
+[07:48] Mas, além disso, eles são um pouco mais difíceis de saber a origem do erro, já que você só está explorando o sistema. Então é bem legal você fazer, mas não podemos esquecer de que a maioria dos testes são sim bem estruturados.
+** Testes não funcionais
+Testes não-funcionais tem como objetivo testar aspectos do software que não são associados a funcionalidades. Ex: escalabilidade, desempenho, segurança;
+*** [00:00] Nós falamos bastante de testes funcionais, que é testar as nossas funcionalidades. Mas para o nosso sistema ter uma qualidade boa e real, não basta só as coisas funcionarem. Tem outros testes que devemos fazer além das funcionalidades, para verificar se nosso sistema tem qualidade ou não, se ele é bom ou não.
+
+[00:22] Um dos testes não funcionais mais comuns é o teste de performance. Eu sei, por exemplo, que a funcionalidade de login funciona. Nós testamos e conseguimos fazer um login nela.
+
+[00:35] Mas e se várias pessoas precisarem fazer um login ao mesmo tempo? Se, por exemplo, 50 pessoas fizerem login ao mesmo tempo, será que nosso login continuará funcionando, e funcionando da mesma forma que ele funcionava com uma pessoa?
+
+[00:52] Para isso temos que fazer um teste de performance, que é um teste não funcional. Existem vários tipos de testes de performance.
+
+[01:01] Eu quero fazer um teste de performance com vocês utilizando uma ferramenta da Google, chamada Google Lighthouse. Ela é uma ferramenta gratuita (AP: é um plugin do Chrome) e você pode usar para fazer alguns testes de performance simples, tem algumas métricas que ele mede.
+*** Testes de performance são um conjunto de testes que visam analisar o desempenho. Entre eles, temos:
+(AP: talvez esses testes se referem ao mesmo do tópico acima ([00:00] Nós falamos bastante ....))
+**** Teste de carga
+Tem como objetivo verificar o desempenho de um sistema quando ele é submetido a cargas variáveis de usuários ou transações.
+**** Teste de capacidade
+Parecido com o de carga, tem como objetivo identificar os limites da aplicação, ou seja, quantos usuários simultâneos ou chamadas por segundo a aplicação é capaz de suportar dentro dos parâmetros de qualidade definidos.
+**** Teste de stress
+Verifica a performance de um sistema quando é submetido a cargas que estão no limite ou acima do limite especificado inicialmente.
+*** Teste de usabilidade
+[00:00] Além do teste de performance e dos tipos que falamos, outro teste bem legal não funcional são testes de usabilidade. Nesses testes pedimos para um grupo de usuários utilizarem o nosso site e os observamos.
+
+[00:16] Por exemplo, eu poderia chamar um grupo de pessoas para utilizar o AluraPic com o intuito de saber se as pessoas vão saber onde fazer um upload de fotos. Eu não digo nada para elas, eu apenas observo e anoto o que elas fazem.
+
+*** Teste de acessibilidade
+[01:12] Outra métrica não funcional que é importante medir para ver se nosso sistema tem qualidade é se nosso sistema é acessível. É bem importante garantir que o nosso sistema possa ser utilizado por todas as pessoas.
+
+[01:24] E fazendo um teste de acessibilidade nós vemos se a nossa aplicação está apta a ser utilizada por pessoas com deficiência e se as ferramentas que elas utilizam conseguem interagir com nosso site.
+
+[01:38] Eu vou mostrar agora para vocês de novo um tipo de teste de acessibilidade que podemos fazer com aquela mesma ferramenta que é do Google Lighthouse.
+*** Teste de segurança
+[03:01] Mais um teste que eu quero falar para vocês é o teste de segurança. Esse teste não é necessariamente feito pelo time de QA, mas é importante que o time de QA acompanhe e garanta que esses testes sejam feitos, porque eles servem, por exemplo, para garantir a proteção de dados e se os nossos dados estão armazenados de uma maneira boa.
+
+[03:19] Esse time também faz simulação de ataque hacker, para ver se o sistema é resiliente para invasões. Então é bem importante para sistemas acessados por muitas pessoas que esses testes de segurança sejam feitos e que sejam feitos de maneira boa e eficiente.
+
+[03:36] Acabamos de ver sobre testes não funcionais e a seguir falaremos um pouco sobre os testes de caixa branca e os testes de caixa preta e a diferença entre eles.
+** Pirâmide de testes
+*** Pirâmide de testes
+Na base da pirâmide ficam os testes da menor parte testável de uma aplicação, aqueles que testam a classe ou uma função dentro do código, ou seja, os testes de unidade.
+
+No meio, os testes de integração, que testam como diferentes módulos do sistema interagem entre si, como os de comunicação entre serviços, comunicação com bancos de dados e assim por diante.
+
+No topo, teremos os testes de ponta a ponta que buscam testar todo o fluxo de funcionamento da aplicação.
+*** Testes caixa branca x Testes caixa preta
+[00:00] Nós vamos falar sobre duas abordagens de teste diferentes, que são conhecidas como caixa branca e caixa preta.
+**** Teste de caixa branca
+O teste de caixa branca é usado para testar um sistema de software com base na sua arquitetura. Esse tipo de abordagem serve para testar cada módulo do sistema de acordo com seu código. Pode ser feito pelos próprios desenvolvedores ou QAs técnicos que entendam da estrutura do projeto. Um exemplo de testes de caixa branca são: teste unitário, de integração de módulos e de serviço (API);
+
+O teste de caixa branca é usado para testar um sistema com base na sua arquitetura. Ou seja, é como se fosse uma caixa transparente e que você soubesse as coisas que estão ali dentro e você vê o código, os módulos, e testa sabendo como funciona esse sistema.
+
+[00:31] Então é um tipo de abordagem feita por QA’s que são um pouco mais técnicos e que entendem da arquitetura de testes.
+
+[00:56] Existem alguns tipos de teste de caixa branca. Tem o teste unitário, que geralmente é feito pelas pessoas que desenvolvem o software na hora em que elas estão desenvolvendo. Elas testam unicamente aquele módulo que elas estão fazendo, fazem alguns testes do próprio código, na mesma linguagem que ela programa esse teste unitário.
+
+[01:16] São testes mais rápidos de serem feitos porque eles já estão sendo feitos durante o desenvolvimento. Então é uma boa métrica para o QA perguntar para as pessoas que desenvolvem esse software se há esses testes unitários e se podem ser feitos mais testes unitários, nos módulos do nosso sistema.
+
+Outro teste de caixa branca são os testes de integração entre os componentes. Em vez de você testar só um módulo, você testa como um módulo interage com outro módulo.
+
+[02:03] O teste de integração é um teste também feito no módulo, e você testa essa ligação de um serviço batendo no outro serviço, o que acontece, se está vindo o resultado esperado.
+
+[02:18] E também temos os testes de serviço, que testam também a comunicação entre dois serviços, que às vezes até são feitos por times diferentes.
+
+[02:27] Ele é um desses tipos de teste de integração que você faz e que tem várias ferramentas para você, por exemplo, mandar uma comunicação do seu serviço para o serviço de outro time ou até do seu time que for feito por duas pessoas diferentes.
+
+[02:43] Então também é importante você testar. E esses são testes de caixa branca porque sem você saber como o seu sistema funciona e interage você não consegue fazer esses testes.
+
+**** Testes de caixa preta
+O teste de caixa preta é usado para testar a funcionalidade do sistema, independentemente de seu código. Seu objetivo principal é garantir que os requisitos sejam atendidos. Por exemplo: testes funcionais e regressivos;
+
+[03:02] O teste de aceitação que fizemos é um teste de caixa preta, com aqueles critérios de aceite que nós montamos.
+
+[03:08] Para esse teste não precisamos saber como nosso sistema funciona. Sabemos os nossos requisitos, lemos o nosso plano de teste e testamos. Eu não sei nada sobre o código da AluraPic e eu consigo fazer esse teste de aceitação.
+
+[03:22] Já um teste de caixa branca, como havíamos dito, não teria como. O teste dos sistemas nós conseguimos fazer, e o teste de usabilidade, que eu expliquei anteriormente, também conseguimos fazer sem saber nada sobre o código do sistema.
+
+[03:37] É importante fazer esses dois tipos de teste no nosso sistema, tanto testes de caixa branca quanto testes de caixa preta, porque assim ele fica mais completo e garantimos que vários pontos estão funcionando. 
+** Evidências de testes
+Evidência de testes são imagens e/ou vídeos que comprovam que um determinado teste foi executado e o resultado esperado foi obtido. Podem ser screenshots de uma determinada tela ou o vídeo de um software em funcionamento. São importantes para documentar os testes realizados, servindo de insumos e métricas.

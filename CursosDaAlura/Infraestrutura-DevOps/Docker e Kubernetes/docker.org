@@ -1789,4 +1789,8 @@ Isolamento de Contextos
 Como cada contêiner possui seu próprio sistema de arquivos, processo, espaço de rede e recursos, garantindo que a aplicação dentro do contêiner não interfira em outras aplicações ou no *sistema hospedeiro*, isso proporciorna um alto grau de independência e isolamento. Como coloquei em negrito: é em relação ao sistema hospedeiro. Mas volta a pergunta: e em relação à imagem do docker?
 ** como fica a questão de processamento em Clusters?
 * Importante
-AP: tirando o comando de buildar uma imagem (docker build) e o "docker run", todos os outros comandos operam sobre containers
+** AP: tirando o comando de buildar uma imagem (docker build) e o "docker run", todos os outros comandos operam sobre containers
+** quando temos alguns serviços que subiram com docker compose up, para desce-los
+Digitei 
+	docker composer down
+ou seja, derrubei todos esses containers dessa pasta

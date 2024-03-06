@@ -1,0 +1,49 @@
+* Submódulos
+Para saber mais sobre submodulos: https://www.atlassian.com/git/tutorials/git-submodule
+** Aula do curso de Microsserviços: (Git) Prática - Submódulos 
+Para baixar o repo baixando também os conteúdos de submódulos que estão dentro dele:
+git clone --recursive https://github.com/CViniciusSDias/alura-ms.git
+
+[00:00] Pessoal, bem-vindos de volta! Vamos dar uma olhada em como funcionam esses submódulos. Eu vou abrir o terminal de novo. Estou naquele projeto principal. Lembrando que o projeto real ainda está rodando. Então não interrompi os meus containers do docker. Vamos lá, vamos entender como funciona isso!
+
+[01:13] Então, o que eu vou fazer só para exercitar? Vou entrar em cada um dos meus repositórios e em vez de estar em um estado desanexado, vou fazer um switch, vou mudar de branch para main para que eles estejam em um branch conhecido. Eu vou entrar primeiro nesse “academico-php”. De novo digitei git status, ele está desanexado. Vou digitar um git switch main.
+
+[01:35] Beleza, alterei o branch local daquele commit para main. Se eu digitar um git log, repare que o último commit é exatamente aquele, 875bb etc. Você pode me perguntar: "Vinicius, por que os submódulos funcionam dessa forma?"
+
+[01:51] Quando você pega um repositório que tem submódulos, em vez de ter o projeto dentro daquela pasta, *o que ele tem é como se fosse um ponteiro para um commit, então o que ele salva ali não é um projeto como um todo*. O git não armazena aquele projeto como um todo, ele armazena o commit onde aquilo foi salvo, onde aquilo foi marcado como finalizado. Nós vamos ver um exemplo bem interessante de como funciona.
+
+[02:17] Eu vou acessar o front-end. Se eu digitar git status, terei uma modificação no meu package.json. Por quê? Nós já tínhamos um package-lock.json lá, só que quando eu dei docker composer up, ele rodou o npm install e provavelmente alguma dependência foi atualizada ou algo do tipo. Então tem uma modificação aqui.
+
+[02:35] Vou fazer o switch para main. Repare que ainda tenho essa modificação. O que vou fazer? Vou comitar esse package-lock.json. Então vou digitar 'git commit -am "Atualizando package-lock.json"., ou seja, vou "comitar". 
+
+[02:55] Beleza, fiz esse commit! Agora posso fazer o push dele. Então digito git push e ele vai mandar para o repositório de front-end. Só que o meu repositório central ainda não tem essa atualização. Por quê? Aquele repositório central estava apontando para outro commit, para o b743508. Só que agora o front-end não está mais no b743508, ele está no 78dcad. Então, como posso fazer para atualizar o meu repositório central?
+
+[03:30] Vou voltar para a pasta principal. Quando digito um git status, repara que ele me mostra que existem novos commits nesse meu submódulo de front-end. Então eu adiciono esse submódulo e posso fazer um commit.
+
+[03:43] Normalmente a mensagem aqui não é tão descritiva, é "Atualizando submódulo de frontend”. É só isso que estou fazendo, estou garantindo que a referência no meu repositório central está apontando para o commit correto.
+
+[03:56] Então quando faço isso e faço o push, está certo, tudo está organizado e o meu repositório central está apontando realmente para a última versão do meu repositório de front-end.  Agora vou entrar no “academico-php-web” e fazer o switch main também.
+
+[04:14] Vou entrar no “financeiro-php” e fazer o switch main. Por que estou fazendo isso? Para manter todos os meus repositórios dentro de uma branch existente. Para caso você queira fazer alguma modificação lá, você já poder sair codificando.
+
+[04:28] Você não precisar primeiro mudar a branch e depois começar a codificar, nós já estamos fazendo esse passo de uma vez. Porque, lembrando de novo que quando faço um clone de um projeto que tem submódulos, os submódulos são apenas um ponteiro para algum commit específico. Então se eu quiser adicionar novos commits, vou fazer isso a partir de um branch.
+
+[04:48] Como já vimos nos cursos de Git, é por isso que estou fazendo essa etapa. Mas para o projeto funcionar, eu não precisaria disso. Então aqui teoricamente não tem nada para comitar porque só fiz um switch. É como se fosse um checkout. Só modifiquei a branch que eu estava trabalhando e, com isso, nós temos um resumo do que são os submódulos.
+
+[05:06] É uma prática do Git para que tenhamos um projeto apontando para outro. Esse ponteiro fica parecendo como uma pasta no repositório local de forma que nós possamos trabalhar nas subpastas, mas que tenhamos um repositório centralizado.
+
+[05:21] O ideal é que, como cada equipe vai cuidar de um microsserviço, esse repositório central só sirva para realmente subirmos todos os repositórios, para subirmos todos os serviços, como você fez. Mas se eu for fazer alguma alteração, via de regra, cada equipe vai trabalhar em uma pasta separada e não nesse repositório grande. Mas se preferirem fazer dessa forma, também não tem nenhum problema.
+
+[05:45] A diferença é que vão precisar se lembrar de sempre ficarem atualizando o repositório central para ter os submódulos no local certo. Dessa forma, nós temos de novo um resumo do que são os submódulos do Git. Essa foi a escolha que eu fiz para organizar os meus microsserviços.
+
+
+** Mais sobre submódulos
+[00:47] Foi para eu atualizar baseado naquilo que dei o push, ou seja, eu atualizei o módulo e depois atualizei a referência no projeto principal. Para eu atualizar isso, o que preciso fazer? Digitei o git pull no projeto principal, no repositório central e isso nos mostra que existe um commit novo em front-end.
+
+[01:07] *E para eu atualizar lá, sem precisar entrar em cada um dos submódulos que têm atualização e fazer o pull, eu posso digitar isso*: 
+
+	git submodule update --remote --rebase
+
+ Aqui posso passar algumas opções. O remote em alguns casos já mantém a branch em vez de ir diretamente para o commit. Não é o meu caso. O rebase é a estratégia de fazer o pull, se ele vai fazer merge ou se ele vai fazer o rebase.
+
+[01:29] Então se eu fizesse somente o git submodule update --remote já resolveria, mas eu gosto sempre de mandar esse comando completo. O que isso vai fazer? *Vai entrar em todos os submódulos que têm atualização e fazer um git pull.* Só isso.
