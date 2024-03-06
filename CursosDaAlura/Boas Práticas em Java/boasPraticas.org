@@ -1,19 +1,19 @@
+curso geral: Boas Práticas em Java
 Mergulhe em boas práticas com Java (31 horas - 3 cursos)
 https://cursos.alura.com.br/formacao-boas-praticas-java
 
- continuar em lendo na ordem as tarefas
-
-* Refatoração de código (continuar aqui)
+* Curso de Java e refatoração: melhorando códigos com boas práticas
+** Refatoração de código
 10 horas
-** Refatoração
+*** Refatoração
 Aprendemos a extrair código em métodos, com o intuito de melhorar a legibilidade do nosso código, facilitando assim sua manutenção;
 
 O ideal para resolver o código duplicado é aplicar a reutilização de código (extraindo o código para um método, por exemplo), em que o código fica presente em apenas um local e referenciá-lo ao utilizá-lo. Dessa forma, toda manutenção será feita em apenas um local.
-** Artigo SOLID (continuar aqui)
-https://www.alura.com.br/artigos/solid?_gl=1*jvikqg*_ga*MTg2NzM1MzI3Ny4xNzAyNDM1NDg1*_ga_1EPWSW3PCS*MTcwODEwMTUxOC40My4xLjE3MDgxMDE5OTQuMC4wLjA.*_fplc*RTJVRWp0ZjZpYlZiOEt5MTRrdGJkdkVKa3hWb0olMkJhY3FUVE9CZzc2blRUS3UxZXZXOHR3WWglMkJnaVFBeFl1VFJaJTJGclJrbG9aWlpjcHdNT3VHOFVCa2lWTkU4b2ExWjkwTlRiSEdnSjdBeUhEdmNqJTJGeUcxclRPOUpRcFg4TFElM0QlM0Q.
-*** S
+*** Artigo SOLID
+https://www.alura.com.br/artigos/solid?_gl=1*jvikqg*_ga*MTg2NzM1MzI3Ny4xNzAyNDM1NDg1*_ga_1EPWSW3PCS*MTcwODEwMTUxOC40My4xLjE3MDgxMDE5OTQuMC4wLjA.*_fplc*RTJVRWp0ZjZpYlZiOEt5MTRrdGJkdkVKa3hWb0olMkJhY3FUVE9CZzc2blRUS3UxZXZXOHR3WWglMkJnaVFBeFl1VFJaJTJGclJrbG9aWlpjcHdNT3VHOFVCa2lWTkU4b2ExWjkwTlRiSEdnSjdBeUhEdmNqJTJGeUcxclRPOUpRcFg4TFElM0QlM0Q
+**** S
 Para entender o princípio da responsabilidade única, vamos pensar no desenvolvimento de um gerenciador de tarefas. Vamos começar com o seguinte código:
-**** código inicial
+***** código inicial
 Tente enumerar todas as funções que a classe GerenciadorTarefas tem. Ela é responsável por lidar com todas as operações das tarefas em si e também está consumindo uma API, enviando notificações para pessoas usuárias e ainda gerando relatórios da aplicação.
 
 Pense na Orientação a Objetos. Um objeto gerenciador de tarefas deveria enviar e-mails e gerar relatórios? Não! Um gerenciador de tarefas gerencia as tarefas, não e-mails ou relatórios.
@@ -49,14 +49,14 @@ public class GerenciadorTarefas {
 
 }
 
-**** Solução
+***** Solução
 Para resolver esse problema vamos criar classes diferentes, cada uma representando uma função.
 
 Nossa classe GerenciadorTarefas terá apenas o código relacionando a operação com tarefas. Outras operações estarão em outras classes. E cada classe será responsável por uma parte diferente da aplicação.
 
 Assim, teremos a classe GerenciadorTarefas refatorada:
 
-***** public class GerenciadorTarefas {
+****** public class GerenciadorTarefas {
 
     public void criarTarefa(){
         //...
@@ -71,7 +71,7 @@ Assim, teremos a classe GerenciadorTarefas refatorada:
     }
 }
 
-***** public class ConectorAPI {
+****** public class ConectorAPI {
 Assim, vamos criar uma classe para consumir uma API externa, outra classe para enviar notificações e uma última classe para lidar com os relatórios.
 
     public String conectarAPI() {
@@ -80,14 +80,14 @@ Assim, vamos criar uma classe para consumir uma API externa, outra classe para e
 
 }
 
-***** public class Notificador {
+****** public class Notificador {
 
     public void enviarNotificacao() {
         //...
     }
 
 } 
-***** public class GeradorRelatorio {
+****** public class GeradorRelatorio {
     public void produzirRelatorio(){
         //...
     }
@@ -97,32 +97,32 @@ Assim, vamos criar uma classe para consumir uma API externa, outra classe para e
     }
 
 }
-**** Talvez você se pergunte se as classes não são pequenas demais. Nesse caso, não estão. Cada classe reflete exatamente a responsabilidade que ela tem.
+***** Talvez você se pergunte se as classes não são pequenas demais. Nesse caso, não estão. Cada classe reflete exatamente a responsabilidade que ela tem.
 
 Se precisarmos adicionar algum método, por exemplo, relacionado ao consumo da API, vamos saber exatamente em qual parte do código devemos ir. Ou seja, fica muito mais fácil alterar o que for preciso.
 
-**** Definição do Princípio da Responsabilidade Única
+***** Definição do Princípio da Responsabilidade Única
 Em resumo, o princípio da responsabilidade única diz que: “Cada classe deve ter um, e somente um, motivo para mudar.”
 
 Se uma classe tem várias responsabilidades, mudar um requisito do projeto pode trazer várias razões para modificar a classe. Por isso, as classes devem ter responsabilidades únicas.
 
 Esse princípio pode ser estendido para os métodos que criamos também. Quanto mais tarefas um método executa, mais difícil é testá-lo e garantir que o programa está em ordem.
 
-*Uma dica para aplicar o princípio na prática é tentar nomear suas classes ou métodos com tudo que eles são capazes de fazer.*
+**Uma dica para aplicar o princípio na prática é tentar nomear suas classes ou métodos com tudo que eles são capazes de fazer.*
 
 Se o nome está gigante, como GerenciadorTarefasEmailsRelatorios, temos um sinal de que o código pode ser refatorado.
-**** Vantagens de aplicar o Princípio da Responsabilidade Única
+***** Vantagens de aplicar o Princípio da Responsabilidade Única
 Existem vários benefícios ao aplicar esse princípio, principalmente:
 
 Facilidade para fazer manutenções
 Reusabilidade das classes
 Facilidade para realizar testes
 Simplificação da legibilidade do código
-*** O
+**** O
 Princípio Aberto-Fechado (O - Open Closed Principle)
 Para entender o Princípio Aberto-Fechado (a letra O da sigla), vamos pensar que estamos trabalhando no sistema de uma clínica médica.
 
-**** código inicial
+***** código inicial
 Nessa clínica, existe uma classe que trata das solicitações de exames. Inicialmente, o único exame possível é o exame de sangue. Por isso, temos o código:
 
 public class AprovaExame {
@@ -158,7 +158,7 @@ public class AprovaExame {
         //....
     }
 }
-**** Problemática
+***** Problemática
 A princípio parece tudo certo, não é mesmo? Nosso código executa normalmente e conseguimos adicionar a funcionalidade corretamente.
 
 Mas, e se além de raio-x, a clínica passasse a fazer também ultrassons? Seguindo a lógica, iríamos adicionar mais um if no código e mais um método para olhar condições específicas do exame.
@@ -167,7 +167,7 @@ Essa definitivamente não é uma boa estratégia. Cada vez que incluir uma funç
 
 Por isso, é necessário uma estratégia para adicionar mais recursos ao projeto, sem modificar e bagunçar a classe original.
 
-**** Solução
+***** Solução
 Nesse cenário, o projeto compreende vários tipos de aprovação de exames. Assim, podemos criar uma classe ou uma interface que representa uma aprovação de forma genérica.
 
 A cada tipo de exame fornecido pela clínica, é possível criar novos tipos de aprovação, mais específicos, que irão implementar a interface. Assim, podemos ter o código:
@@ -206,7 +206,7 @@ public class AprovaRaioX implements AprovaExame{
 Agora, como a interface representa a aprovação de um exame, para incluir mais um recurso ou mais um tipo de exame, basta criar uma nova classe que implementa a interface AprovaExame. Essa classe vai representar como o novo exame é aprovado.
 
 Repare que sempre será possível implementar a interface AprovaExame ao adicionarmos recursos. Essa interface, no entanto, não muda. Estamos estendendo-a, mas não alterando.
-**** Definição do Princípio Aberto-Fechado
+***** Definição do Princípio Aberto-Fechado
 Assim, é possível definir o Princípio Aberto-Fechado como: “entidades de software (como classes e métodos) devem estar abertas para extensão, mas fechadas para modificação”.
 
 Ou seja, se uma classe está aberta para modificação, quanto mais recursos adicionarmos, mais complexa ela vai ficar.
@@ -214,7 +214,7 @@ Ou seja, se uma classe está aberta para modificação, quanto mais recursos adi
 O ideal é adaptar o código não para alterar a classe, mas para estendê-la. Em geral, isso é feito quando abstraímos um código para uma interface.
 
 Aplicando o Open-Closed, é possível deixar o nosso código semelhante ao mundo real, praticando de maneira sólida a orientação a objetos.
-**** Vantagens de aplicar o Princípio Aberto-Fechado
+***** Vantagens de aplicar o Princípio Aberto-Fechado
 Ao aplicar esse princípio, é possível tornar o projeto muito mais flexível. Adicionar novas funcionalidades torna-se uma tarefa mais fácil.
 
 Além disso, os códigos ficam mais simples de ler. Com isso tudo, o risco de introduzir bugs diminui de forma significativa.
@@ -222,16 +222,705 @@ Além disso, os códigos ficam mais simples de ler. Com isso tudo, o risco de in
 Além disso, esse princípio nos faz caminhar diretamente para a aplicação de alguns padrões de projeto, como o Strategy.
 
 Assim, alinhamos várias boas práticas de desenvolvimento. O resultado disso é um código cada vez mais limpo e organizado.
-*** L (continuar aqui)
+**** L
+***** Cenário
+Para entender o Princípio de Substituição de Liskov (a letra L da sigla), vamos pensar no seguinte cenário: o desenvolvimento de um sistema de uma faculdade.
 
-** SOLID (continuar aqui - texto depois do último video) reler texto (Refatoração) acima e acertar pontos
-*** S do acrônimo SOLID significa Single Responsability Principle
+Dentro do sistema, há uma classe-mãe Estudante, que representa um estudante de graduação, e a filha dela, EstudantePosGraduacao, tendo o seguinte código:
+
+public class Estudante {
+    String nome;
+
+    public Estudante(String nome) {
+        this.nome = nome;
+    }
+
+    public void estudar() {
+        System.out.println(nome + " está estudando.");
+    }
+}
+
+
+
+public class EstudanteDePosGraduacao extends Estudante {
+
+    @Override
+    public void estudar() {
+        System.out.println(nome + " está estudando e pesquisando.");
+    }
+}
+
+Para adicionar a funcionalidade entregarTCC() ao sistema, basta colocar esse método na classe Estudante O código fica assim:
+
+
+class Estudante {
+    String nome;
+
+    public Estudante(String nome) {
+        this.nome = nome;
+    }
+
+    public void estudar() {
+        System.out.println(nome + " está estudando.");
+    }
+
+    public void entregarTCC(){
+    //…
+    }
+
+}
+***** Problemática
+Você provavelmente já percebeu algo errado no código. Normalmente, estudantes de pós-graduação não entregam TCCs.
+
+Só que a classe EstudanteDePosGraduacao é filha de Estudante, e portanto, deve apresentar todos os comportamentos dela.
+
+Uma alternativa seria sobrescrever o método entregarTCC na classe EstudanteDePosGraduacao lançando uma exceção.
+
+No entanto, continuaria sendo problemático: a classe EstudanteDePosGraduacao ainda não teria os comportamentos iguais aos de Estudante.
+
+O ideal é que, nos lugares que estiver a classe Estudante, seja possível usar uma classe EstudanteDePosGraduacao, já que, pela herança, um estudante de pós-graduação é um estudante.
+
+***** Solução
+A solução para este problema é modificar a nossa modelagem. Podemos criar uma nova classe EstudanteDeGraduacao, que também herdará de Estudante. Essa classe terá o método entregarTCC:
+
+public class EstudanteDeGraduacao {
+    public void estudar() {
+        System.out.println(nome + " está estudando na graduação.");
+    }
+
+    public void entregarTCC() {
+    //…
+    }
+}
+
+Repare que, dessa forma, nossas classes representam melhor o mundo real. Não estamos forçando uma classe a fazer algo que ela originalmente não faz.
+
+Além disso, se precisarmos utilizar uma instância de Estudante, podemos passar, sem medo, uma instância de EstudanteDeGraduacao ou de EstudanteDePosGraduacao.
+
+Afinal de contas, essas classes conseguem executar todas as funções de Estudante — mesmo tendo funções mais específicas.
+
+***** Definição do Princípio da Substituição de Liskov
+Quem propôs o Princípio da Substituição de Liskov, de maneira formal e matemática, foi Bárbara Loskov.
+
+No entanto, Robert Martin deu uma definição mais simples para ele: “Classes derivadas (ou classes-filhas) devem ser capazes de substituir suas classes-base (ou classes-mães)”.
+
+Ou seja, uma classe-filha deve ser capaz de executar tudo que sua classe-mãe faz. Esse princípio se conecta com o polimorfismo e reforça esse pilar da POO.
+
+É importante notar também que, ao entendermos esse princípio, passamos a nos atentar mais para o código: caso um método de uma classe-filha tenha um retorno muito diferente do da classe-mãe, ou lance uma exceção, por exemplo, já dá para perceber que algo está errado.
+
+Se no seu programa você tem uma abstração que se parece com um pato, faz o som de um pato, nada como um pato, mas precisa de baterias, sua abstração está equivocada.
+
+Imagine que, no seu projeto, você tem uma classe Pato, e uma classe filha dela, PatoBorracha. 
+
+Se em uma parte do código você precisar usar um objeto Pato, mas usar um PatoBorracha no seu lugar, pode ter problemas.
+
+Isso fere o princípio de substituição de Liskov, já que não conseguimos substituir um pai por um filho completamente.
+***** Vantagens de aplicar o Princípio da Substituição de Liskov
+Aplicar esse princípio nos traz diversos benefícios, especialmente para ter uma modelagem mais fiel à realidade, reduzir erros inesperados no programa e simplificar a manutenção do código.
+**** I
+Princípio de Segregação de Interface (I - Interface Segregation Principle)
+***** Cenário
+Para entender o Princípio de Segregação da Interface, imagine que estamos trabalhando com um sistema de gerenciamento de funcionários de uma empresa.
+
+Vamos criar uma interface, conforme o código abaixo:
+
+Interface Funcionário
+public interface Funcionario {
+
+    public BigDecimal salario();
+    public BigDecimal gerarComissao();
+
+}
+
+Repare que criamos a interface para estabelecer um “contrato” com as pessoas que são funcionárias dessa empresa. Nesse contexto, o código a seguir descreve duas classes que fazem referências a duas profissões nessa empresa: Vendedor e Recepcionista.
+
+Ambas usam a interface Funcionario e, portanto, devem implementar os métodos salario() e gerarComissao().
+****** Classe Vendedor
+import java.math.BigDecimal;
+
+public class Vendedor implements Funcionario {
+
+    @Override
+    public BigDecimal salario() {
+    }
+
+    @Override
+    public BigDecimal gerarComissao() {
+    }
+
+}
+****** Classe Recepcionista
+import java.math.BigDecimal;
+
+public class Recepcionista implements Funcionario{
+
+    @Override
+    public BigDecimal salario() {
+    }
+
+    @Override
+    public BigDecimal gerarComissao() {
+    }
+
+}
+***** Problemática
+Analisando o código acima, faz sentido uma pessoa que possui o cargo de vendedora ou recepcionista ter salário? Sim! Afinal, todos nós temos boletos para pagar.
+
+Seguindo esta mesma linha, faz sentido uma pessoa com cargo de vendedor ou recepcionista ter comissão? Não!.
+
+Para uma pessoa que tem o cargo de vendedora, faz sentido. Mas para a pessoa que tem o cargo de recepcionista, não faz sentido.
+
+Ou seja, a classe Recepcionista foi forçada a implementar um método que não faz sentido para ela. Embora ela seja funcionária dessa empresa, esse cargo não recebe comissão.
+
+Portanto, podemos perceber que este problema foi gerado por temos uma interface genérica.
+
+***** Solução
+Para resolver isso, é possível criar Interfaces específicas. Ao invés de ter uma única interface Funcionário, podemos ter duas: Funcionario e Comissionavel.
+
+****** Interface Funcionário
+import java.math.BigDecimal;
+
+public interface Funcionario {
+    public BigDecimal salario();
+}
+Repare que mantemos a interface Funcionario, mas retiramos o método gerarComissao() a qual é específico de algumas pessoas, para adicioná-lo em uma nova interface FuncionarioComissionavel:
+
+****** Interface Comissionável
+import java.math.BigDecimal;
+
+public interface Comissionavel{
+    public BigDecimal gerarComissao();
+}
+Agora, a pessoa que possui o direito de ter comissão irá implementar a interface Comissionavel, um exemplo disso é a classe Vendedor:
+
+****** Vendedor
+import java.math.BigDecimal;
+
+public class Vendedor implements Funcionario, Comissionavel{
+
+    @Override
+    public BigDecimal salario() {
+    }
+
+    @Override
+    public BigDecimal gerarComissao() {
+    }
+
+}
+
+****** Recepcionista
+Agora, a classe Recepcionista pode implementar a interface Funcionario sem ter a obrigação de criar o método gerarComissao():
+
+import java.math.BigDecimal;
+
+public class Recepcionista implements Funcionario{
+    @Override
+    public BigDecimal salario() {
+    }
+}
+***** Definição do Princípio da Segregação da Interface
+Conforme analisamos o código acima, podemos perceber que:
+
+**Devemos criar interfaces específicas ao invés de termos uma única interface genérica.*
+
+**E é justamente isto que Princípio da Segregação da Interface diz: “Uma classe não deve ser forçada a implementar interfaces e métodos que não serão utilizados”.*
+
+É possível que você já tenha comprado um adaptador com várias entradas (ou uma fonte de alimentação com várias saídas). Na maioria das vezes, as pessoas não sabem a utilidade de todas as conexões.
+
+Imagem de um dispositivo eletrônico multifuncional em cor preta, destacando suas seis conexões, incluindo portas USB e tipo C.
+Seguindo essa analogia, se não precisamos de um conector ou de uma entrada específica, não faz sentido incluí-los — assim como comprar um conector sob medida para um aparelho específico.
+
+Ou seja, uma classe também não deve ser obrigada a implementar métodos que não serão utilizados.
+***** Vantagens de aplicar o Princípio da Segregação da Interface
+Seguir o Princípio da Segregação da Interface ajuda a promover a coesão e a flexibilidade em nossos sistemas, tornando-os fáceis de manter e estender.
+**** D
+Princípio da Inversão de Dependência (D - Dependency Inversion Principle)
+Para compreender o Princípio da Inversão de Dependência (letra D da sigla) imagine que estamos trabalhando em uma startup de e-commerce e precisamos desenvolver o sistema de gerenciamento de pedidos.
+
+Sem conhecer o Princípio da Inversão de Dependência, é bem provável que vamos desenvolver uma classe PedidoService semelhante ao código abaixo:
+
+Classe PedidoService
+public class PedidoService {
+    private PedidoRepository repository;
+
+    public PedidoService() {
+        this.repository = new PedidoRepository();
+    }
+
+    public void processarPedido(Pedido pedido) {
+        // Lógica de processamento do pedido
+        repository.salvarPedido(pedido);
+    }
+}
+***** Problemática
+Aparentemente, o código parece estar certo. No entanto, se um dia precisar alterar o armazenamento deste pedido para um outro lugar (por exemplo, uma API externa), vai precisar de mais de uma classe para resolver o problema.
+
+Afinal, a classe PedidoService está diretamente acoplada à implementação concreta da classe PedidoRepository.
+
+***** Solução
+Para resolver este problema, podemos criar uma interface para a classe de acesso ao banco de dados e injetá-la na classe `PedidoService´.
+
+Dessa forma, nós estamos dependendo de abstrações e não de implementações concretas.
+
+****** Interface PedidoRepository
+public interface PedidoRepository {
+    void salvarPedido(Pedido pedido);
+}
+
+****** Classe PedidoService
+public class PedidoService {
+    private PedidoRepository repository;
+
+    public PedidoService(PedidoRepository repository) {
+        this.repository = repository;
+    }
+
+    public void processarPedido(Pedido pedido) {
+        // Lógica de processamento do pedido
+        repository.salvarPedido(pedido);
+    }
+}
+Deste modo, conseguimos fazer com que a classe de alto nível (PedidoService) seja independente dos detalhes de implementação da classe de baixo nível (PedidoRepository).
+
+***** Definição do Princípio da Inversão de Dependência
+O Princípio da Inversão de Dependência diz: “dependa de abstrações e não de implementações concretas”.
+
+Assim, é recomendado que os módulos de alto nível não dependam diretamente dos detalhes de implementação de módulos de baixo nível.
+
+Em vez disso, eles devem depender de abstrações ou interfaces que definem contratos de funcionamento. Isso promove maior flexibilidade e facilita a manutenção do sistema.
+
+Por exemplo, a funcionalidade de um equipamento eletrônico qualquer é garantida pela conexão adequada entre o plug e a tomada, não é mesmo?
+
+(Imagem)
+Representação visual de uma pessoa conectando um equipamento à tomada. O ambiente é composto por uma parede branca com um interruptor visível, destacando a ação prática de plugar o dispositivo.
+Nessa analogia, os módulos de alto nível representam o plug, enquanto os módulos de baixo nível correspondem à tomada.
+
+Da mesma forma que um plug se conecta à tomada independentemente de seus detalhes internos, os módulos de alto nível devem se vincular a abstrações ou interfaces, estabelecendo contratos de funcionamento.
+
+Essa abordagem assemelha-se a usar um plug padronizado, garantindo uma conexão flexível e fácil manutenção.
+***** Vantagens de aplicar o Princípio da Inversão de Dependência
+A adesão ao Princípio de Inversão de Dependência promove a flexibilidade e a extensibilidade dos nossos sistemas.
+
+Isso faz com que seja mais fácil fazer testes de unidade e construir códigos mais robustos e duradouros.
+*** Artigo Clean Code
+(Mais da metade do artigo pra frente)
+https://www.alura.com.br/artigos/solid?_gl=1*jvikqg*_ga*MTg2NzM1MzI3Ny4xNzAyNDM1NDg1*_ga_1EPWSW3PCS*MTcwODEwMTUxOC40My4xLjE3MDgxMDE5OTQuMC4wLjA.*_fplc*RTJVRWp0ZjZpYlZiOEt5MTRrdGJkdkVKa3hWb0olMkJhY3FUVE9CZzc2blRUS3UxZXZXOHR3WWglMkJnaVFBeFl1VFJaJTJGclJrbG9aWlpjcHdNT3VHOFVCa2lWTkU4b2ExWjkwTlRiSEdnSjdBeUhEdmNqJTJGeUcxclRPOUpRcFg4TFElM0QlM0Q
+
+No universo da programação, frequentemente nos deparamos com o termo: Clean Code ou Código Limpo.
+
+Mas o que exatamente é um “código limpo”? Quais características são necessárias para obtê-lo?
+
+Escrever um código limpo significa escrever códigos de um jeito que conseguimos entendê-lo sem complicação.
+
+Isso não apenas simplifica a manipulação do código, mas também facilita a colaboração entre o time. No fim das contas, todo desenvolvimento e manutenção do sistema também se torna mais fácil.
+
+De acordo com "Uncle Bob", em seu livro “Código Limpo: Habilidades Práticas do Software Ágil”, existem algumas boas práticas fundamentais para alcançar a clareza do código.
+
+Vamos conhecê-las, a seguir:
+
+**** Utilizar os princípios SOLID
+O Clean Code e os princípios SOLID compartilham o objetivo de melhorar a qualidade do software, tornando-o legível, organizado, extensível e fácil de manter.
+**** Possuir nomes significativos
+Nomes descritivos ajudam a entender a finalidade de uma parte do código sem a necessidade de comentários explicativos.
+
+Para ilustrar, considere o código a seguir:
+
+#+BEGIN_SRC java
+public static double conv(double tC) {
+    double tF = (tC * 9 / 5) + 32;
+    return tF;
+}
+#+END_SRC
+
+Temos que nos esforçar para entender o que o código acima faz. Podemos melhorar o entendimento apenas adicionando nomes significativos para as variáveis e para o método:
+
+#+BEGIN_SRC java
+public static double converterCelsiusParaFahrenheit(double temperaturaCelsius) {
+    double temperaturaFahrenheit = (temperaturaCelsius * 9 / 5) + 32;
+    return temperaturaFahrenheit;
+}
+#+END_SRC
+
+Agora, fica claro qual é o propósito do código, sem a necessidade de se lembrar de fórmulas ou realizar pesquisas adicionais. Isso economiza tempo e evita confusões desnecessárias.
+
+**** Priorizar o uso de funções pequenas
+Escrever métodos ou funções pequenas e focadas em uma única tarefa é fundamental para manter o código claro e seguir o princípio da responsabilidade única (SRP).
+
+Para ilustrar, considere o código a seguir:
+
+#+BEGIN_SRC java
+public class Main {
+
+    public static void main(String[] args) {
+        int[] numeros = {1, 2, 3, 4, 5};
+
+        int soma = 0;
+        for (int numero : numeros) {
+            soma += numero;
+        }
+
+        double media = (double) soma / numeros.length;
+
+        if (media > 3) {
+            System.out.println("A média é maior que 3");
+        } else {
+            System.out.println("A média é menor ou igual a 3");
+        }
+    }
+}
+#+END_SRC
+
+Apesar do uso de nomes descritivos, a legibilidade poderia ser melhorada dividindo as tarefas em funções distintas, cada uma com sua descrição. Por exemplo:
+
+#+BEGIN_SRC java
+public class Main {
+
+    public static void main(String[] args) {
+        int[] numeros = {1, 2, 3, 4, 5};
+
+        int soma = calcularSoma(numeros);
+        double media = calcularMedia(numeros);
+        verificarEMostrarResultado(media);
+    }
+
+    public static int calcularSoma(int[] numeros) {
+        int soma = 0;
+        for (int numero : numeros) {
+            soma += numero;
+        }
+        return soma;
+    }
+
+    public static double calcularMedia(int[] numeros) {
+        return (double) calcularSoma(numeros) / numeros.length;
+    }
+
+    public static void verificarEMostrarResultado(double media) {
+        if (media > 3) {
+            System.out.println("A média é maior que 3");
+        } else {
+            System.out.println("A média é menor ou igual a 3");
+        }
+    }
+}
+#+END_SRC
+
+Embora o código tenha ficado maior, ganhamos em legibilidade e segmentação. Qualquer pessoa que precise alterar a maneira como a média é exibida à pessoa usuária, só precisa modificar o método verificarEMostrarResultado.
+
+Isso demonstra como funções pequenas podem facilitar a manutenção e a compreensão do código.
+**** Evitar comentários desnecessários
+O código deve ser autoexplicativo, com nomes significativos e estrutura lógica clara. Comentários excessivos podem tornar o código poluído e difícil de manter.
+
+Para ilustrar, considere o código a seguir:
+
+#+BEGIN_SRC java
+public class R {
+    private double w;
+    private double h;
+
+
+    // Método para calcular a área
+    public double calc() {
+        return w * h;
+    }
+}
+#+END_SRC
+
+Os nomes curtos para as variáveis dificultam o entendimento, fazendo necessário o uso de comentários no nosso código, deixando o nosso código sujo. Então, podemos resolver isso adicionando nomes descritivos e removendo os comentários:
+
+#+BEGIN_SRC java
+public class Retangulo {
+    private double largura;
+    private double altura;
+
+    public Retangulo(double largura, double altura) {
+        this.largura = largura;
+        this.altura = altura;
+    }
+
+    public double calcularArea() {
+        return largura * altura;
+    }
+}
+#+END_SRC
+
+Pronto, perceba como facilitou o entendimento. Qualquer pessoa desenvolvedora que ler este código consegue assimilar o que cada parte faz.
+**** Evitar complexidade
+A complexidade desnecessária pode aumentar a chance de erros e tornar o código difícil de manter. Um exemplo de código complexo para fazer algo simples, como somar dois números, seria:
+
+#+BEGIN_SRC java
+public void soma() {
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.print("Digite o primeiro número: ");
+        String num1String = scanner.nextLine();
+
+        System.out.print("Digite o segundo número: ");
+        String num2String = scanner.nextLine();
+
+        boolean validInput = false;
+        double num1 = 0;
+        double num2 = 0;
+
+        while (!validInput) {
+            num1 = Double.parseDouble(num1String);
+            num2 = Double.parseDouble(num2String);
+            validInput = true;
+        }
+
+        double soma = num1 + num2;
+
+        System.out.println("A soma dos números é: " + soma);
+
+        scanner.close();
+    }
+#+END_SRC
+
+Repare que é feita uma verificação da entrada, para só depois convertê-la em double.
+
+Poderíamos simplesmente considerar que é esperado que o usuário digite um double e fazer o tratamento de exceções relacionado a isso:
+
+#+BEGIN_SRC java
+import java.util.InputMismatchException;
+import java.util.Scanner;
+
+public class SimpleSumWithErrorHandling {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        try {
+            System.out.print("Digite o primeiro número: ");
+            double num1 = scanner.nextDouble();
+
+            System.out.print("Digite o segundo número: ");
+            double num2 = scanner.nextDouble();
+
+            double soma = num1 + num2;
+
+            System.out.println("A soma dos números é: " + soma);
+        } catch (InputMismatchException e) {
+            System.out.println("Erro: Por favor, digite números válidos.");
+        } finally {
+            scanner.close();
+        }
+    }
+}
+#+END_SRC
+
+Executamos a lógica desejada de forma rápida e fácil de compreender. Imagine que precisamos somar agora 3 variáveis, ao invés de duas.
+
+É mais fácil modificar o segundo código do que o primeiro. O segundo código é um exemplo de código limpo.
+
+**** Fazer o mínimo de argumentos
+Funções e métodos devem ter o mínimo possível de argumentos. Isso melhora a legibilidade e a facilidade de uso.
+
+No exemplo a seguir, note como cadastrar uma pessoa colaboradora é complexo ao passar muitos parâmetros:
+
+#+BEGIN_SRC java
+public static void cadastrarFuncionario(String nome, int idade, String cargo, double salario, String endereco, String cidade, String cep, String telefone, String email) {
+        // Lógica de cadastro do funcionário aqui...
+
+    }
+#+END_SRC
+
+Ao chamar esse método, é difícil entender qual parâmetro utilizar em que lugar, podendo confundi-los, por exemplo.
+
+Uma boa alternativa seria criar uma classe para representar o funcionário, outra para o endereço, e mais uma para o contato. Assim, faremos a divisão:
+
+#+BEGIN_SRC java
+public static void cadastrarFuncionario(Funcionario funcionario, Endereco endereco, Contato contato){
+}
+#+END_SRC
+
+Dessa forma, conseguimos agrupar as informações para que seja possível usar menos argumentos. Essa é uma boa prática
+**** Evitar código com repetição
+A repetição torna o código difícil de manter, pois quando há mudanças necessárias elas precisam ser aplicadas em múltiplos lugares.
+
+Então, extraia código repetido em funções ou métodos para promover a reutilização e a manutenção eficiente.
+
+Um exemplo disso:
+
+#+BEGIN_SRC java
+public static void main(String[] args) {
+        int numero1 = 5;
+        int numero2 = 7;
+
+        // Cálculo do fatorial para o primeiro número
+        int resultado1 = 1;
+        for (int i = 1; i <= numero1; i++) {
+            resultado1 *= i;
+        }
+        System.out.println("Fatorial de " + numero1 + ": " + resultado1);
+
+        // Cálculo do fatorial para o segundo número
+        int resultado2 = 1;
+        for (int i = 1; i <= numero2; i++) {
+            resultado2 *= i;
+        }
+        System.out.println("Fatorial de " + numero2 + ": " + resultado2);
+    }
+#+END_SRC
+
+Como calculamos o fatorial mais de uma vez, extraímos o código para uma função, evitando repetições de cálculo no código:
+
+#+BEGIN_SRC java
+public static void main(String[] args) {
+        int numero1 = 5;
+        int numero2 = 7;
+
+        // Cálculo e impressão do fatorial para o primeiro número
+        calcularEImprimirFatorial(numero1);
+
+        // Cálculo e impressão do fatorial para o segundo número
+        calcularEImprimirFatorial(numero2);
+    }
+
+    // Função para calcular e imprimir o fatorial de um número
+    public static void calcularEImprimirFatorial(int numero) {
+        int resultado = 1;
+        for (int i = 1; i <= numero; i++) {
+            resultado *= i;
+        }
+        System.out.println("Fatorial de " + numero + ": " + resultado);
+    }
+#+END_SRC
+Dessa forma, se precisarmos calcular novamente o fatorial de outro número, não precisaremos repetir código. Basta chamar a função de calcular fatorial novamente. Isso facilita o desenvolvimento.
+**** Vantagens de deixar o código limpo
+Ao implementar cada um desses princípios e práticas, você não apenas irá melhorar a qualidade do seu código, mas também facilitará a compreensão, a manutenção e a colaboração no desenvolvimento de software. Tudo isso que discutimos aqui resume uma frase dita por Martin Fowler:
+
+“Qualquer tolo pode escrever código que um computador pode entender. Bons programadores escrevem código que humanos podem entender”.
+
+A programação não se trata apenas de fazer a máquina funcionar, mas também de criar soluções que sejam compreensíveis e colaborativas.
+*** SOLID (continuar aqui - texto depois do último video) reler texto (Refatoração) acima e acertar pontos
+**** S do acrônimo SOLID significa Single Responsability Principle
 Em português, princípio da responsabilidade única, ou seja, uma classe deve ter um, e somente um, motivo para mudar;
 
 Separamos nosso código em classes para que ficassem coesas e com apenas uma responsabilidade;
 
 Criamos classes de configurações para reaproveitá-las nas classes de serviço, evitando assim código duplicado.
-* Melhorando código de uma API com refatoração, SOLID e Design Patterns
+*** Jackson precisa de um construtor padrão
+A biblioteca Jackson auxilia na serialização e deserialização de objetos fornecendo recursos para transformar um objeto Json em um objeto Java e vice-versa.
+
+Ao ser adicionado num objeto da classe domain um construtor com argumentos, o construtor padrão passa a não existir mais - sendo preciso adicioná-lo - ou seja: não tendo um construtor padrão, mas sim apenas algum(ns) construtor(es) que recebem argumentos, é preciso adicionar o construtor padrão também para que o Jackson saiba deserializar o objeto. (AP: Caso não seja fornecido nenhum construtor para a entidade da domain, o Jackson subtentende que o construtor padrão (mesmo que não declarado). Declarando algum construtor, o construtor padrão desaparece e o Jackson passa a requere-lo como acréscimo também).
+*** Aplicação do Design Pattern Command (ver antes: 3149-boas-praticas-java-aula_4  -     ver depois: 3149-boas-praticas-java-aula_5)
+**** antes
+***** main
+    public static void main(String[] args) {
+        ClientHttpConfiguration client = new ClientHttpConfiguration();
+        AbrigoService abrigoService = new AbrigoService(client);
+        PetService petService = new PetService(client);
+        System.out.println("##### BOAS VINDAS AO SISTEMA ADOPET CONSOLE #####");
+        try {
+            int opcaoEscolhida = 0;
+            while (opcaoEscolhida != 5) {
+                System.out.println("\nDIGITE O NÚMERO DA OPERAÇÃO DESEJADA:");
+                System.out.println("1 -> Listar abrigos cadastrados");
+                System.out.println("2 -> Cadastrar novo abrigo");
+                System.out.println("3 -> Listar pets do abrigo");
+                System.out.println("4 -> Importar pets do abrigo");
+                System.out.println("5 -> Sair");
+
+                String textoDigitado = new Scanner(System.in).nextLine();
+                opcaoEscolhida = Integer.parseInt(textoDigitado);
+
+                if (opcaoEscolhida == 1) {
+                    abrigoService.listarAbrigo();
+                } else if (opcaoEscolhida == 2) {
+                    abrigoService.cadastrarAbrigo();
+                } else if (opcaoEscolhida == 3) {
+                    petService.listarPetsDoAbrigo();
+                } else if (opcaoEscolhida == 4) {
+                    petService.importarPetsDoAbrigo();
+                } else if (opcaoEscolhida == 5) {
+                    break;
+                } else {
+                    System.out.println("NÚMERO INVÁLIDO!");
+                    opcaoEscolhida = 0;
+                }
+           }
+**** depois
+***** main
+    public static void main(String[] args) {
+        CommandExecutor executor = new CommandExecutor();
+        System.out.println("##### BOAS VINDAS AO SISTEMA ADOPET CONSOLE #####");
+        try {
+            int opcaoEscolhida = 0;
+            while (opcaoEscolhida != 5) {
+                exibirMenu();
+
+                String textoDigitado = new Scanner(System.in).nextLine();
+                opcaoEscolhida = Integer.parseInt(textoDigitado);
+
+                switch (opcaoEscolhida) {
+                    case 1 -> executor.executeCommand(new ListarAbrigoCommand());
+                    case 2 -> executor.executeCommand(new CadastrarAbrigoCommand());
+                    case 3 -> executor.executeCommand(new ListarPetsDoAbrigoCommand());
+                    case 4 -> executor.executeCommand(new ImportarPetsDoAbrigoCommand());
+                    case 5 -> System.exit(0);
+                    default -> opcaoEscolhida = 0;
+                }
+            }
+***** Command
+package br.com.alura;
+
+public interface Command {
+
+    void execute();
+}
+***** CommandExecutor
+package br.com.alura;
+
+public class CommandExecutor {
+
+    public void executeCommand(Command command) {
+        command.execute();
+    }
+} 	
+***** CadastrarAbrigoCommand
+package br.com.alura;
+
+import br.com.alura.client.ClientHttpConfiguration;
+import br.com.alura.service.AbrigoService;
+
+import java.io.IOException;
+
+public class CadastrarAbrigoCommand implements Command {
+
+    @Override
+    public void execute() {
+        try {
+            ClientHttpConfiguration client = new ClientHttpConfiguration();
+            AbrigoService abrigoService = new AbrigoService(client);
+
+            abrigoService.cadastrarAbrigo();
+        } catch (IOException | InterruptedException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+}
+***** ImportarPetsAbrigoCommand
+package br.com.alura;
+
+import br.com.alura.client.ClientHttpConfiguration;
+import br.com.alura.service.PetService;
+
+import java.io.IOException;
+
+public class ImportarPetsDoAbrigoCommand implements Command {
+
+    @Override
+    public void execute() {
+        try {
+            ClientHttpConfiguration client = new ClientHttpConfiguration();
+            PetService petService = new PetService(client);
+
+            petService.importarPetsDoAbrigo();
+        } catch (IOException | InterruptedException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+}
+** Melhorando código de uma API com refatoração, SOLID e Design Patterns
 SOLID: é um acrônimo que representa cinco princípios de design de software orientado a objetos que visam criar sistemas mais flexíveis, extensíveis e fáceis de manter. Cada letra corresponde a um princípio específico:
 
 S (Single Responsibility Principle - Princípio da Responsabilidade Única): Cada classe deve ter uma única razão para mudar, ou seja, deve ter uma única responsabilidade.
@@ -242,7 +931,149 @@ D (Dependency Inversion Principle - Princípio da Inversão de Dependência): M�
 Resumindo, SOLID promove a modularidade e facilita a manutenção do código. Ajuda a evitar acoplamento excessivo e torna os sistemas mais flexíveis para mudanças.
 
 Design Patterns: são soluções reutilizáveis para problemas comuns de design de software. São abordagens e estruturas que foram testadas e documentadas para resolver desafios específicos de programação. Esses padrões ajudam a melhorar a organização do código, a modularidade e a manutenibilidade do sistema.
-* Testes automatizados
+** Testes automatizados
+*** Pegando stream de saída do System.out.println
+Durante os vídeos, vimos como criar testes de unidade usando jUnit e mockito. Com os recursos dessas bibliotecas, conseguimos criar os testes deveVerificarQuandoHaAbrigo e deveVerificarQuandoNaoHaAbrigo. Uma característica desses testes, é que fomos capazes de validar se a String retornada pelo System.out.println da classe era correta. Aprendemos a pegar essas Strings nos testes, através de um objeto do tipo ByteArrayOutputStream. 
+**** código 
+
+public class AbrigoServiceTest {
+
+    private ClientHttpConfiguration client = mock(ClientHttpConfiguration.class);
+    private AbrigoService abrigoService = new AbrigoService(client);
+    private HttpResponse<String> response = mock(HttpResponse.class);
+    private Abrigo abrigo = new Abrigo("Teste", "61981880392", "abrigo_alura@gmail.com");
+
+    @Test
+    public void deveVerificarQuandoHaAbrigo() throws IOException, InterruptedException {
+        abrigo.setId(0L);
+        String expectedAbrigosCadastrados = "Abrigos cadastrados:";
+        String expectedIdENome = "0 - Teste";
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        PrintStream printStream = new PrintStream(baos);
+        System.setOut(printStream);
+
+        when(response.body()).thenReturn("[{"+abrigo.toString()+"}]");
+        when(client.dispararRequisicaoGet(anyString())).thenReturn(response);
+
+        abrigoService.listarAbrigo();
+
+        String[] lines = baos.toString().split(System.lineSeparator());
+        String actualAbrigosCadastrados = lines[0];
+        String actualIdENome = lines[1];
+
+        Assertions.assertEquals(expectedAbrigosCadastrados, actualAbrigosCadastrados);
+        Assertions.assertEquals(expectedIdENome, actualIdENome);
+    }
+
+    @Test
+    public void deveVerificarQuandoNaoHaAbrigo() throws IOException, InterruptedException {
+        abrigo.setId(0L);
+        String expected = "Não há abrigos cadastrados";
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        PrintStream printStream = new PrintStream(baos);
+        System.setOut(printStream);
+
+        when(response.body()).thenReturn("[]");
+        when(client.dispararRequisicaoGet(anyString())).thenReturn(response);
+
+        abrigoService.listarAbrigo();
+
+        String[] lines = baos.toString().split(System.lineSeparator());
+        String actual = lines[0];
+
+        Assertions.assertEquals(expected, actual);
+    }
+}
+
+*** Pegando entrada de stream do input do usuário
+Se olharmos como para outros métodos, como o importarPetsDoAbrigo da classe PetService, que tem uma entrada de dados, com o Scanner, como faríamos para para passar essas Strings através do nosso teste? Veja a solução na Opinião do Instrutor
+**** código
+Para criar este tipo de teste, precisamos usar um objeto do tipo ByteArrayInputStream, ficando com um código semelhante a esse.
+
+@Test
+    public void deveVerificarSeDispararRequisicaoPostSeraChamado() throws IOException, InterruptedException {
+        String userInput = String.format("Teste%spets.csv",
+                System.lineSeparator());
+        ByteArrayInputStream bais = new ByteArrayInputStream(userInput.getBytes());
+        System.setIn(bais);
+
+        when(client.dispararRequisicaoPost(anyString(), any())).thenReturn(response);
+
+        petService.importarPetsDoAbrigo();
+        verify(client.dispararRequisicaoPost(anyString(), anyString()), atLeast(1));
+    }
+**** explicação
+Como podemos ver, foi simulado as Strings que serão passadas para o Scanner, as separando em Teste, que será a primeira entrada e pets.csv, que será a segunda entrada. Após isso, adicionamos o objeto como byte em um ByteArrayInputStream e fazemos o System.setIn. A partir deste momento, podemos criar a lógica do que queremos validar do método, pois quando executarmos o teste, as informações de entrada que simulamos, serão enviadas e o teste funcionará. Para testar, você pode tentar executar o teste sem as 3 primeiras linhas e observar o resultado.
+
+** Padrões de projeto (continuar aqui)
+*** Diferenças entre Command e Strategy
+Durante a refatoração do nosso código, utilizamos o padrão de projeto Command. Este padrão é comumente confundido com outro padrão de projeto: o Strategy. Apesar de ambos serem padrões comportamentais, eles possuem diferenças e servem para casos diferentes. Que tal conhecer as diferenças e prós e contras de cada um?
+
+Tanto o padrão de projeto Command quanto o Strategy são padrões comportamentais, isso significa que eles se concentram na forma como as classes interagem e delegam responsabilidades. No entanto, eles têm propósitos diferentes e são usados em contextos diferentes.
+
+Padrão Command
+O padrão Command é usado para encapsular uma solicitação como um objeto, permitindo parametrizar clientes com diferentes solicitações, enfileirar solicitações, registrar o log de solicitações e até mesmo desfazer as operações. Ele separa o remetente (quem faz a solicitação) do receptor (quem executa a ação), permitindo flexibilidade em adicionar novos comandos e mantendo o acoplamento baixo.
+
+Exemplo em Java:
+Um sistema de controle remoto possui botões que podem executar diferentes ações, como ligar a TV, ligar o som, aumentar o volume etc. Cada botão é um comando encapsulado.
+
+interface Command {
+    void execute();
+}
+
+class TVOnCommand implements Command {
+    private TV tv;
+
+    public TVOnCommand(TV tv) {
+        this.tv = tv;
+    }
+
+    public void execute() {
+        tv.turnOn();
+    }
+}
+
+
+
+
+Padrão Strategy:
+O padrão Strategy é usado para definir uma família de algoritmos, encapsulá-los e torná-los intercambiáveis. Isso permite que os algoritmos variem independentemente dos clientes que os usam. Ele é particularmente útil quando você tem várias estratégias ou formas de realizar uma tarefa e deseja escolher dinamicamente a estratégia correta.
+
+Exemplo em Java:
+Um sistema de pagamentos aceita diferentes formas de pagamento, como cartão de crédito, PayPal, transferência bancária etc. Cada forma de pagamento é uma estratégia encapsulada.
+
+interface PaymentStrategy {
+    void pay(int amount);
+}
+
+class CreditCardPayment implements PaymentStrategy {
+    private String cardNumber;
+
+    public CreditCardPayment(String cardNumber) {
+        this.cardNumber = cardNumber;
+    }
+
+    public void pay(int amount) {
+        // Process credit card payment
+    }
+}
+
+Propósitos
+O Command é usado para encapsular solicitações como objetos, permitindo controle e gerenciamento de ações.
+O Strategy é usado para definir algoritmos intercambiáveis, permitindo escolher a estratégia certa em tempo de execução.
+Usos
+Command é frequentemente usado para históricos, filas de comandos e operações desfazer/refazer.
+
+Strategy é usado para escolher entre diferentes algoritmos ou estratégias de execução.
+
+Flexibilidade
+Command tem flexibilidade na execução de ações e histórico de comandos.
+
+Strategy tem flexibilidade na escolha de algoritmos.
+
+Ambos os padrões podem ser úteis em diferentes situações e contextos. A escolha entre eles depende da natureza do problema que você está resolvendo e das necessidades do seu design.
 * NOTAS refinadas
 
-SRP: *Uma dica para aplicar o princípio na prática é tentar nomear suas classes ou métodos com tudo que eles são capazes de fazer.*
+SRP: *Uma dica para aplicar o princípio (SRP) na prática é tentar nomear suas classes ou métodos com tudo que eles são capazes de fazer.*

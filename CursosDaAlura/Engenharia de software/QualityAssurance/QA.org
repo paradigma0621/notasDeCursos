@@ -11,6 +11,7 @@ Quando - Qual ação será executada no sistema que fornecerá o resultado valid
 Então: - De acordo com a ação disparada, qual será o resultado esperado?
 ** Cenário de testes x Casos de Testes
 Conceitos de Cenários de testes definem “O que” deve ser testado, enquanto os Casos de Testes definem “Como”, ou seja, o passo a passo. O caso de teste é mais detalhado;
+
 ** Aprofundando nos tipos de testes
 *** Testes de regressão
 Teste de regressão é uma técnica de teste a ser aplicada quando surgem novas versões mais recentes do software e garante que não surjam novos defeitos em componentes já analisados;
@@ -147,3 +148,47 @@ O teste de caixa preta é usado para testar a funcionalidade do sistema, indepen
 [03:37] É importante fazer esses dois tipos de teste no nosso sistema, tanto testes de caixa branca quanto testes de caixa preta, porque assim ele fica mais completo e garantimos que vários pontos estão funcionando. 
 ** Evidências de testes
 Evidência de testes são imagens e/ou vídeos que comprovam que um determinado teste foi executado e o resultado esperado foi obtido. Podem ser screenshots de uma determinada tela ou o vídeo de um software em funcionamento. São importantes para documentar os testes realizados, servindo de insumos e métricas.
+
+** Definição de pronto
+[00:00] Estamos quase chegando ao fim dos nossos testes e quase prontos para lançar finalmente o AluraPic para o mundo.
+
+[00:07] Mas que outras perguntas precisamos fazer antes disso? O que precisamos para fazer esse lançamento?
+
+[00:14] Precisamos, por exemplo, de um pré-lançamento para alguns usuários Beta que se inscreveram ou para algumas pessoas a mais testarem antes de colocarmos para o mundo inteiro? Sim, podemos definir que sim.
+
+[00:31] Nós testamos esse sistema, e precisamos definir: ele pode apresentar bugs? Por exemplo, podemos lançá-lo com algum bug menor, alguma coisa que seja mais visual, mas que não impacte a funcionalidade? Podemos definir que sim ou que não.
+
+[00:51] Nesse caso eu vou colocar que não. Esse sistema não pode apresentar bugs, pelo menos não bugs tão graves.
+
+[00:57] Precisamos passar por alguma outra validação além do QA? Por exemplo, passar para algum time de segurança que vai garantir que o nosso login é seguro; ou de repente alguma atividade além de quando lançarmos, como um time de marketing que vai fazer um grande comercial sobre o AluraPic?
+
+[01:15] Precisamos saber e fazer algum teste para ver quantos usuários aguentamos no nosso sistema? Ou seja, algum outro tipo de validação, além da nossa validação precisa ser feita?
+
+[01:29] *Isso tudo que eu falei é o Definition of Done, que é a definição de pronto, conhecido popularmente como DOD, porque vem dessa sigla em inglês.*
+
+[01:41] Ele define se uma atividade foi concluída ou não, de acordo com os critérios que estabelecemos. Ele tem que valer para todas as funcionalidades, então tem que ser uma coisa genérica, não pode ser como os critérios de aceite, que têm uma grande diferença.
+
+[01:58] O critério de aceite eu faço para cada funcionalidade. Eu tenho os critérios de aceite para a funcionalidade de login do AluraPic, que definimos anteriormente. E eu tenho, por exemplo, outros critérios de aceite para uma funcionalidade de cadastro.
+
+[02:11] Mas a definição de pronto tem que ser para tudo, para todo o nosso sistema. O que consideramos como pronto para todas as nossas atividades?
+
+[02:20] Essa definição de pronto é utilizada por vários times ágeis, então pode ser revisada e atualizada conforme o sistema for crescendo.
+
+[02:28] Por exemplo, um sistema pequeno pode ter uma definição de pronto diferente de quando o sistema já está com várias funcionalidades. É sempre importante revisar e atualizar. E não esquecer de que isso tem que ser feito para o sistema como um todo.
+
+[02:41] Pode parecer um pouco óbvio termos que definir o que é o pronto e porque o sistema está pronto para ser lançado, mas isso garante que todo mundo do time saiba quando o sistema está pronto. Ele serve para alinhar as expectativas e é por isso que é sempre bom manter isso revisado e atualizado.
+
+[03:01] E agora que definimos, e se todos esses critérios de prontos forem atingidos, estamos prontos para lançar o sistema.
+
+** Definições
+*** Ambiente de homologação
+Ambiente de desenvolvimento/testes, e não de produção.
+Contém as mesmas configurações do ambiente de produção.
+*** Escopo de testes
+Temos que definir um escopo de testes, já que nem todos os testes serão responsabilidade da pessoa de QA;
+Constrói-se um escopo respondendo a perguntas importantes como: o que ele deixa de fora? Quais níveis de teste vão ser executados? De quem será a responsabilidade de cada teste? Haverá testes automatizados? Quais serão as ferramentas usadas e como será feito o lançamento desse sistema?
+** Aula 05
+Um bug é tudo que acontece no sistema diferentemente do que foi especificado como o ideal. 
+Um defeito é um erro encontrado num código ou num documento.
+Uma falha é o resultado ou manifestação de um ou mais defeitos;
+

@@ -1,0 +1,9 @@
+* TODO 02 - Aprofunde em Java com arquitetura e padrões de projeto
+https://cursos.alura.com.br/formacao-arquitetura-design-projetos-java-v142135
+
+* TODO 03 - Spring Framework
+Conforme atualizado em EOS do dia 14/02/2024 a referência ao curso foi atualizada para: https://cursos.alura.com.br/formacao-spring-boot-3
+
+* TODO https://cursos.alura.com.br/formacao-engenharia-software
+
+* TODO Noções de Kubernets
