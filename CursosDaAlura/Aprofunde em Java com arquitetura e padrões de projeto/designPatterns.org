@@ -1,0 +1,15 @@
+Obs: rever o video de Command da alura
+* State
+Ver código em "2056-design-patterns-java-1-aula_6/src/br/com/alura/loja/orcamento"
+** Nesta aula, aprendemos
+Que é possível que um objeto se comporte de formas diferentes, dependendo do seu estado;
+Que, se o resultado de uma chamada de método depende do estado, podemos delegar esta ação para uma classe específica do estado atual.
+
+** "irmão gêmeo do Strategy" - pode ser usado quando ocorre vários if's.
+Esse padrão é utilizado quando temos uma transição de estados ou quando precisamos aplicar alguma regra ou algum algoritmo baseado em um estado de um objeto de uma classe. Ele é parecido com o Strategy.
+
+[00:30] E nós tínhamos aqueles ifs e elses. If está na situação tal faz algo desse jeito. Else e if está na situação outra faz algo desse outro jeito. Então ele tem esses ifs e elses que fazem alguma coisa baseado no estado. Só que é justamente baseado no estado. E eu tenho também essa questão da transição de estados. Dado um estado eu posso transitar (pedido estando: ex: EM_ANALISE, REPROVADO, FINALIZADO)
+
+[00:53] Só que eu só posso transitar para o estado B, C ou D. Se eu estiver no C eu só posso ir para o D. Se eu estiver no D eu não posso ir para mais nenhum estado. Então existe uma regra de transição de estados. Aí entra o padrão Strategy. Então aplicamos aqui. No caso tínhamos essa regra de aplicar um desconto extra. Então um orçamento já tem o desconto natural de acordo com a quantidade de itens ou com o valor do orçamento.
+
+
