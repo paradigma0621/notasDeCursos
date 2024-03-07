@@ -3,6 +3,6 @@ kind: ConfigMap
 metadata:
   name: portal-configmap
 data:
-  IP_SISTEMA: http://192.168.59.100:30001
+  IP_SISTEMA: http://192.168.0.44:30001
   # IP_SISTEMA: http://localhost:30001
-  URL_NOTICIAS: http://192.168.59.100:30001
+  URL_NOTICIAS: http://192.168.0.44:30001

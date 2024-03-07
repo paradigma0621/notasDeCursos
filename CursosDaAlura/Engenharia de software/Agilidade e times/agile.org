@@ -207,6 +207,7 @@ Isso pode variar, pois as metodologias ágeis são indicadas para diferentes cas
 Não. A metodologia cascata e a metodologia ágil se diferenciam pela sua abordagem. Os métodos ágeis têm um enfoque iterativo e incremental no desenvolvimento de projetos, valorizam a entrega contínua de valor com foco na colaboração entre a equipe de desenvolvimento e o cliente. Por outro lado, o método cascata segue uma abordagem linear, em que cada fase do projeto é concluída antes de passar para a próxima fase. Além disso, o escopo, os requisitos e as etapas do projeto são definidos no início do processo e seguidos rigidamente até a entrega final, o que significa que é menos adaptável às mudanças, ao contrário da metodologia ágil.
 
 ** Curso: Scrum: agilidade em seu projeto
+AP: pronúncia: "íscrãm"
 *** O que é Scrum
 Nesta aula, você pôde:
 Reconhecer a origem do conceito de Scrum, uma analogia criada na década de 1980 por Nonaka e Takeuchi que se referia à formação chamada "scrum" do esporte Rugby e a relacionava a projetos de desenvolvimento de produtos que usavam equipes pequenas, colaborativas e multidisciplinares que eram altamente eficazes em suas entregas.
@@ -510,3 +511,319 @@ Por exemplo, "a tarefa 1 deve ser desenvolvido por integrante X. Essa pessoa tem
 Ao final da Sprint Planning, todo o time de Scrum deve estar comprometido com o objetivo da Sprint e também com o plano de ação. O comprometimento é um dos valores do Scrum.
 
 Além disso, ao final da reunião, cada integrante do time deve estar ciente do que é esperado dele, ou seja, qual trabalho que deve executar e a forma de fazê-lo.
+**** Sprint
+A sprint é um período de tempo fixo, geralmente de 1 a 4 semanas, durante o qual a equipe de projeto desenvolve o produto.
+
+No período, normalmente com duração de 1 a 4 semanas, a equipe de projeto se concentra em desenvolver um incremento de produto funcional. Durante a sprint, a equipe trabalha nas tarefas do backlog da sprint, que são as tarefas selecionadas pelo time para serem concluídas durante a sprint.
+
+
+Incremento do produto
+As Sprints permitem que o time de desenvolvimento entreguem um trabalho de alta qualidade de forma iterativa e incremental.
+
+O objetivo da Sprint é que o time entregue uma parte do produto potencialmente utilizável e que possa ser plenamente avaliada pelo Product Owner e demais partes interessadas.
+
+A cada final de Sprint, tanto o Product Owner quanto a clientela, vão poder dar um feedback que vai fazer com que a equipe de desenvolvimento melhore o produto. Isso permite que esse produto seja desenvolvido com uma participação ativa da pessoa usuária.
+
+(...)
+Essas pequenas partes que vão ser entregues a cada Sprint são consideradas um artefato Scrum chamado *incremento do produto*.
+
+Ao longo do processo de projeto, o time Scrum se reúne diariamente no evento de *Daily Scrum*.
+
+A Daily Scrum sempre ocorre durante as Sprints e tem uma duração de 15 minutos, onde a equipe se reúne para falar das tarefas que estão colocando em prática durante o seu trabalho.
+**** Sprint Review e Sprint Retrospective
+***** Sprint review
+O primeiro evento que acontece após o final da sprint é a sprint review ou reunião de revisão da sprint. *Seu principal objetivo é apresentar o produto entregue na sprint em questão, o "incremento".*
+
+A reunião costuma durar em torno de 4 horas, se consideramos uma sprint de um mês. No caso de sprints menores, talvez a duração também seja menor. Depende muito do contexto e tipo de projeto.
+
+Na reunião de revisão da sprint, esperamos que o time Scrum apresente para os stakeholders (clientes, usuários, acionistas ou mesmo alguém do negócio) o incremento que é resultado da sprint em questão. Assim, os stakeholders poderão passar um feedback sobre o que foi entregue.
+
+Na apresentação, podem ser demonstradas as funcionalidades de um produto, por exemplo, um produto digital, ou demais elementos, a depender do tipo de solução que está sendo desenvolvida.
+
+Além do incremento, o time deve apresentar os objetivos estabelecidos para a sprint em questão e quais deles foram atendidos ou não. A partir disso, a audiência conseguirá passar um feedback sobre o incremento de produto, dar sugestões e alinhar as expectativas em relação aos próximos ciclos de trabalho, ou seja, as próximas sprints.
+***** Sprint Retrospective
+Após a sprint review, acontece outro evento chamado sprint retrospective. *Se trata de uma reunião com o objetivo de avaliar, de forma geral, o processo de trabalho do time Scrum.*
+
+Nesta reunião, o time discute o que foi feito na sprint e começa a tentar identificar melhorias para o que foi ruim. O Scrum guide orienta que, quando trabalhamos com uma sprint de um mês, a duração dessa reunião deve ser até 3 horas.
+
+Neste encontro, o time deve discutir e analisar o que foi feito na última sprint e entender como foi a dinâmica de trabalho: o que funcionou, o que não funcionou e o que pode ser melhorado.
+
+Além do processo de desenvolvimento do produto, analisa-se também as dinâmicas internas do time, por exemplo, a comunicação. Outro ponto importante discutido nesse tipo de evento é a identificação de obstáculos durante o processo de trabalho e exemplificação de como eles foram contornados.
+
+***** Sprint Review vs Sprint Retrospective
+Para que fique mais fácil identificar as principais diferenças entre as sprint review e a sprint retrospective, vamos analisar por partes cada um desses eventos.
+
+****** Objetivos
+Em relação aos objetivos, na sprint review, busca-se fazer uma revisão do produto/incremento e ter um feedback do que foi entregue. Já na sprint retrospective, o objetivo é a avaliação do processo de trabalho.
+
+Isso não quer dizer que, por exemplo, em uma sprint retrospective, não surgirá algum assunto relacionado ao produto ou ao próprio processo de desenvolvimento do produto, mas, o objetivo final dessa reunião é avaliar o processo de trabalho e não o produto.
+
+****** Pessoas
+Sobre as pessoas que participam desses dois eventos, na sprint review, temos todo o time Scrum e Stakeholders, ou seja, todas as pessoas interessadas no projeto em questão. Já na sprint retrospective, somente o time Scrum participa.
+
+****** Resultado
+Quanto ao resultado esperado no final de cada um desses eventos, na sprint review, esperamos apenas um feedback sobre o produto. Já na sprint retrospective, a ideia é desenvolver um pano de ação, algo bem mais detalhado e direcionado, que fará com que o time consiga, de fato, melhorar suas práticas de trabalho.
+
+****** Momento
+Por fim, embora ambos aconteçam ao final da sprint, a sprint review vem primeiro, seguida da conclusão do trabalho do produto. Já a sprint retrospective, sempre vai acontecer após a review.
+
+
+
+**** Obs: artefatos
+Artefatos = Product backlog, Sprint backlog, Incremento
+*** Scrum na prática
+** Curso de Equipes ágeis: organizando os papéis em uma equipe
+Duas das metodologias ágeis mais populares são o Scrum e o Kanban.
+*** Falando sobre ágil
+Você provavelmente já encontrou pessoas que afirmam: "Eu apenas trabalho aqui". Essas pessoas existem. Às vezes, elas camuflam suas motivações, seja por preferirem manter em segredo que estão ali somente pelo salário ou pelo status associado à empresa. Se a equipe não demonstra comprometimento, é difícil alcançar uma efetiva adoção do ágil.
+
+*Quando falamos sobre ágil, perceba que não estamos falando de metodologias ou práticas ágeis, mas sim de uma entidade, o ágil, que é um conjunto um pouco abstrato*. Estamos nos referindo a todo o mindset ágil (mentalidade ágil), toda a forma de pensar com as práticas e com a melhoria contínua que ele deve trazer.
+
+O comprometimento é necessário, porém, ele varia em níveis. Em uma equipe, encontramos pessoas com diferentes graus de compromisso, mas é fundamental ter um nível mínimo de comprometimento para que uma equipe opere eficientemente no modelo ágil.
+*** Confira algumas características de duas das metodologias ágeis mais utilizadas corporativamente:
+**** Scrum
+Divide o trabalho em iterações chamadas Sprints, geralmente de 2 a 4 semanas.
+Tem papéis definidos, como Scrum Master, Product Owner e equipe de desenvolvimento.
+Possui reuniões específicas, como Daily Scrum, Sprint Planning, Sprint Review e Sprint Retrospectiva.
+**** Kanban
+Oferece um fluxo contínuo de trabalho, sem iterações fixas.
+Não impõe papéis específicos, permitindo maior flexibilidade nas responsabilidades.
+Foca na visualização do fluxo de trabalho por meio de um quadro Kanban, com colunas representando os estágios do processo.
+Para implementar agilidade nas empresas, é crucial entender os princípios fundamentais de Scrum e Kanban, adaptando-os conforme as necessidades e contextos específicos da organização. Além dos guias mencionados, também é benéfico participar de treinamentos, workshops e contar com a orientação de profissionais experientes na área ágil.
+:LOGBOOK:
+CLOCK: [2024-02-13 ter 09:57]
+:END:
+*** Revisão e práticas de agilidade
+O Scrum é, na verdade, um framework, enquanto o Kanban é um método, e o Extreme Programming é uma metodologia. É por isso que preferimos falar em práticas ágeis, embora, em termos técnicos, uma prática possa ser algo mais simples do que um framework. De qualquer forma, não há problema em chamar de metodologias ágeis, frameworks ágeis ou métodos ágeis. O importante é que sabemos a quê as pessoas estão se referindo.
+**** Scrum
+Scrum
+Entre o Scrum e o Kanban, é provável que o Scrum seja mais conhecido. Trata-se de um framework, uma estrutura organizacional para o modelo de trabalho. O Scrum orienta principalmente sobre os papéis, responsabilidades das pessoas e o que devem fazer, deixando em segundo plano o modo como executam essas tarefas, intervindo apenas quando necessário. Sua abordagem é iterativa e incremental devido à sua ideia de sprint, permitindo vários incrementos no produto de forma iterativa. Além disso, o Scrum é prescritivo quanto ao modelo de trabalho, estabelecendo de forma definida os papéis, cerimônias e artefatos a serem utilizados
+**** Kanban
+O Kanban é um método baseado no fluxo contínuo que prioriza a entrega contínua de valor ao cliente. Uma das premissas do Kanban é o learning by doing (aprendizado pela prática). Sendo assim, não é necessário dominar completamente o método antes de começar a implementá-lo. O processo começa gradualmente, à medida que se trabalha, aprende, melhora e evolui, resultando em um sistema Kanban cada vez mais eficiente. Essa é a essência e o valor do Kanban que apreciamos.
+
+O Kanban possui práticas que favorecem a visualização do trabalho e aprimoram a eficiência do processo. Algumas delas são:
+
+- Visualizar: visualizar o fluxo de trabalho;
+- Regrar: tornar as políticas do processo explícitas, definir as regras e o funcionamento do trabalho para que todos entendam como o  processo opera;
+- Entregar: limitar o trabalho em progresso, evitando iniciar muitas tarefas ao mesmo tempo, para focar em completar as iniciadas. Isso ajuda a evitar sobrecarga e a manter o foco na conclusão;
+- Medir: medir e gerenciar o fluxo de trabalho, monitorando como o trabalho avança no sistema, identificando gargalos e oportunidades para otimizar o fluxo;
+- Comunicar: estabelecer cadências de comunicação, que podem funcionar como um ciclo, mas não necessariamente de entrega. É um ciclo de como você está acompanhando a entrega de serviços.
+
+Usar o quadro Kanban é uma das práticas mais utilizadas em todas as formas, frameworks e métodos de agilidade. Além disso, temos dentro do Kanban a possibilidade de usá-lo com o Scrum.
+--------------
+Kanban:
+- Oferece um fluxo contínuo de trabalho, sem iterações fixas.
+- Não impõe papéis específicos, permitindo maior flexibilidade nas responsabilidades.
+- Foca na visualização do fluxo de trabalho por meio de um quadro Kanban, com colunas representando os estágios do processo.
+*** Alterações: Scrum Guide 2020
+O tamanho da equipe também foi ajustado. Agora, a equipe pode ter no máximo 10 pessoas, incluindo o P.O e o Scrum Master. Logo, são 8 desenvolvedores e mais 2. Essa é uma diretriz interessante que começa a trazer informações importantes sobre a organização de equipes ágeis.
+**** Papel do Product Owner
+O que faz um Product Owner?
+
+Desenvolve e comunica explicitamente o Product Goal;
+Cria e comunica claramente os itens do Product Backlog;
+Mantém a comunicação eficaz, de forma que a gestão de stakeholders e tomada de decisões sejam respeitadas.
+
+**** Papel do Scrum Master
+O papel do Scrum Master sofreu uma alteração no Scrum Guide. Anteriormente, ele era descrito como um Leader Servant (Líder Servidor), mas na realidade, em inglês, era referido como um Servant Leader (Líder Servo).
+
+Houve uma mudança de Servant Leader para Leader Who Serves (Líder que Serve). Essa alteração enfatiza a importância do líder; o Scrum Master é considerado um líder. Em muitas empresas, o Product Owner era visto como um coordenador e o Scrum Master estava abaixo dessa posição.
+
+Com essa alteração, o Scrum afirma que o Product Owner faz uma liderança, e o Scrum Master também. Ou seja, cada um faz a sua liderança dentro do seu papel. Então, Leader Who Serves foi uma das mudanças do Scrum Guide 2020.
+
+Além disso, o Scrum Master passou de ser um gerente ou facilitador para ser um líder que apoia a equipe no seu desenvolvimento e na entrega de valor ao cliente. Ou seja, o Scrum Master tem um papel importante de liderança.
+
+O que faz um Scrum Master?
+- Garante a implementação do Scrum conforme definido no Scrum Guide
+- Capacita a equipe Scrum a aprimorar suas práticas dentro do framework Scrum
+- Atua como líder, treinador e facilitador, orientando a equipe em autogerenciamento.
+- Garante a remoção de impedimentos que possam prejudicar o progresso da equipe Scrum
+- Assegura a realização dos eventos Scrum
+- Apoia o Product Owner
+
+
+Scrum Guide: O Scrum Master deve facilitar a autogestão da equipe
+Scrum Guide: O Scrum Master é responsável por remover os impedimentos que a equipe possa enfrentar.
+Scrum Guide: O Scrum Master facilita as cerimônias do Scrum para garantir que sejam eficazes.
+Scrum Guide: O Scrum Master auxilia na melhoria contínua da equipe.
+Scrum Guide: O Scrum Master ajuda a equipe a resolver conflitos internos.
+Scrum Guide: O Scrum Master ajuda a superar a resistência à mudança.
+Scrum Guide: O Scrum Master não é o gerente de projeto; seu papel é de liderança de equipe.
+
+**** Papeis dos desenvolvedores
+Mudança Cultural
+Desafio: A transição de uma cultura organizacional tradicional para uma cultura ágil pode ser difícil.
+
+Adaptação a mudança
+Desafio: Aceitar e abraçar mudanças frequentes nos requisitos e nas prioridades.
+
+
+Foco no valor do cliente
+Desafio: Manter um foco constante no valor entregue ao cliente.
+
+Trabalho em equipe
+Desafio: Desenvolver uma mentalidade colaborativa, trabalhando efetivamente com outros membros da equipe.
+
+Responsabilidade Coletiva
+Desafio: Assumir responsabilidade coletiva pelos resultados da equipe, independentemente das tarefas específicas.
+
+Feedback construtivo
+Desafio: Aceitar e fornecer feedback construtivo de forma aberta e contínua.
+	Feedback é bom quando a pessoa sabe dar e receber feedback construtivo.
+
+Ritmo Acelerado
+Desafio: Trabalhar em sprints curtos e manter um ritmo acelerado de entrega.
+
+Flexibilidade na abordagem
+Desafio: Adotar uma abordagem mais flexível e iterativa em vez de seguir um plano rígido.
+
+Envolvimento do cliente
+Desafio: Garantir o envolvimento contínuo do cliente ao longo do processo de desenvolvimento.
+
+
+É responsável por transformar os itens do backlog do produto em incrementos potencialmente entregáveis;
+*É autogerenciada, o que significa que ela tem a responsabilidade e a autonomia para organizar e gerenciar seu próprio trabalho;*
+Participa ativamente das cerimônias do Scrum, como a reunião de planejamento da sprint, a revisão da sprint e a retrospectiva da sprint;
+A equipe de desenvolvimento está pronta para se adaptar a mudanças nos requisitos do produto.
+*** Papéis além do Scrum
+**** Existem papéis no Kanban? A resposta para essa pergunta pode ser tanto sim quanto não.
+Agora, vamos discutir propriamente sobre os papéis no Kanban. O Kanban indica que inicialmente ninguém recebe novos papéis. No entanto, existem dois papéis que surgiram durante a prática dessa metodologia: o SRM (Service Request Manager) e o SDM (Service Delivery Manager).
+
+***** SRM (Service Request Manager)
+O SRM, ou Gerente de Requisições de Serviço, é responsável por receber as requisições e compreender as necessidades e expectativas do cliente — papel similar ao de Product Owner no Scrum.
+
+O SRM facilita a seleção e solicitação de itens de trabalho na Reunião de Reabastecimento, uma reunião semelhante à Planning no Scrum (sem sprint, sem a necessidade de um tempo fixo, mas com entregas contínuas repensadas com certa frequência).
+
+O título SRM faz referência aos serviços, diferente do Scrum, em que o título de Product Manager ou Owner faz referência ao produto. Para entender essa diferença, é necessário estudar mais a fundo o método Kanban, estruturado inteiramente sob uma visão de serviço (que não antagoniza com a visão de produto do Scrum, afinal, o Scrum Guide mesmo afirma que um produto pode ser um serviço).
+
+Não nos aprofundaremos nessas questões neste curso. Podemos entender os conceitos de serviço e produto como sendo correlatos entre as duas metodologias ágeis.
+
+Por fim, o Kanban Essencial Condensado afirma que podemos entender o SRM como sendo o Product Manager, Product Owner ou Service Manager. Ou seja, se você tiver um Product Owner definido no seu método de trabalho atual e incorporar o Kanban, não é necessário criar um novo papel, mas apenas estabelecer que quem desempenha as funções de SRM é o Product Owner.
+
+***** SDM (Service Delivery Manager)
+O segundo papel é o SDM, ou Gerente de Entrega de Serviço, desempenhado pela pessoa responsável pelo fluxo de trabalho na entrega de itens para o cliente — semelhante ao Scrum Master.
+
+Para isso, essa pessoa rege as etapas do trabalho, ajudando o time a trabalhar no dia a dia, removendo impedimentos e facilitando a Kanban Meeting (a "Daily" do Kanban) e elaborando o Delivery Planning, que é o plano de entregas de valor para o cliente. Ele é também conhecido como Gestor de Fluxo ou Gerente de Entrega.
+
+***** Considerações finais
+Esses papéis não são cópias dos papéis Scrum, pois têm suas próprias razões de ser. Eles são necessários porque o Kanban, que é uma prática estritamente Lean, precisa ter um fluxo contínuo de valor. Portanto, é necessário ter um Service Delivery Manager para organizar o desenvolvimento e manter as entregas de itens ao longo do tempo.
+
+Da mesma forma, é necessário ter um papel similar ao de Product Owner em qualquer framework, metodologia ou prática de agilidade para receber e organizar as requisições da equipe. Isso não é uma cópia, mas uma necessidade.
+**** ScrumBan altera os papéis
+O ScrumBan realmente existe? O ScrumBan é bom?
+
+Diríamos que sim, o ScrumBan existe. Atualmente, tanto o Scrum quanto o Kanban mencionam essa união do ScrumBan. Enquanto na internet e nas redes sociais temos discussões de Scrum versus Kanban, o framework e o método estão cada vez mais unidos, até com conteúdos sobre o assunto nas plataformas oficiais de cada um deles.
+
+A ideia do ScrumBan é interessante e o instrutor afirma ser grande fã dela. Após estudar o Kanban de forma mais aprofundada e entender um pouco mais sua filosofia, o Kanban pode ser preferível. Porém, em alguns momentos, o Scrum é melhor — como quando, por exemplo, é necessário organizar a equipe de uma maneira mais rígida.
+
+Mas, após usar o Scrum, você pode aplicar o Kanban por cima, e então terá o ScrumBan.
+
+***** O que é ScrumBan?
+Considere que você começou a usar Scrum, identificou todos os papéis, cerimônias e este método está estabelecido no trabalho da sua equipe. Então, aplicamos as práticas e os princípios do Kanban por cima, e isso se torna um ScrumBan.
+
+E, sim, essa sobreposição altera um pouco os papéis das equipes. Vamos falar especificamente sobre isso.
+
+***** Scrum Master
+O Scrum Master desempenha um papel fundamental na remoção de impedimentos, o que já sabemos, mas também deve se concentrar na melhoria contínua do processo no contexto do ScrumBan.
+
+Aqui há algo que no Scrum está um pouco mais escondido: a adaptação, melhorar o método. O Scrum foca um pouco menos nisso do que o Kanban, embora esse fator esteja entre seus pilares.
+
+Quando aplicamos o ScrumBan, o Scrum Master passa a ter um foco na melhoria contínua do processo em si, incorporando princípios do Kanban, como, por exemplo, a limitação do Work in Progress (WIP).
+
+Isso significa, basicamente: pare de começar e comece a terminar. Não comece muitas coisas de uma vez, comece e termine tarefas, pois assim a produtividade será melhor.
+
+Ele também terá que dar ênfase na eficiência, pois o Kanban trata muito de produtividade, algo que o Scrum não aborda tão fortemente.
+
+Então, o Scrum Master terá que se concentrar na eficiência do fluxo de trabalho e na identificação de oportunidades para otimizar o processo. Ou seja, essa pessoa precisa observar redução de gargalos, de desperdício, melhoria de entrega, fluidez no trabalho e assim por diante.
+
+***** Product Owner
+Mencionamos que o Service Request Manager tem um papel muito semelhante ao do Product Owner, e sabemos que o Product Owner é responsável pela priorização do backlog. Mas, no ScrumBan, essa priorização ocorre de forma mais contínua e não restrita ao início de cada sprint.
+
+Afinal, no Kanban não temos a visão da sprint como algo tão fixo, importante ou relevante. Mesmo que tenhamos o ciclo de tempo, a entrega será mais contínua. É como se em todos os dias da sprint ele tivesse que refinar o backlog e fazer algo para melhorá-lo.
+
+O PO no ScrumBan também aplica o ajuste dinâmico, ou seja, deve estar aberto aos ajustes nas prioridades à medida que as novas demandas surgem ou mudanças no contexto do projeto ocorrem.
+
+Afinal, o ScrumBan prega a entrega contínua de valor. Então, não se aplica a ideia de encapsular a equipe dentro da sprint e não mudar mais nada. Aqui temos uma certa adaptação, talvez o ponto mais difícil de ajustar o ScrumBan, porque o ScrumBan prega o oposto do Scrum nesse sentido.
+
+Essa é, possivelmente, a única rusga que ainda existe entre Scrum e ScrumBan, que ainda precisa ser determinado se no ScrumBan realmente podemos eliminar a ideia da sprint. Diríamos que sim, do ponto de vista de quem está aplicando. Mas se quisermos continuar dizendo que estamos seguindo o Scrum, não podemos tirar a sprint. São pequenas questões a resolver nessa sobreposição entre Scrum e Kanban.
+
+***** Time de desenvolvimento
+E para a equipe de desenvolvimento, faz diferença usar o ScrumBan? Sim, devido ao fluxo contínuo novamente!
+
+Ao contrário do Scrum, onde o desenvolvimento ocorre em sprints, no ScrumBan o trabalho pode fluir de forma mais contínua e flexível. Novamente, essa é uma visão — precisamos ter cuidado, porque o ScrumBan acaba mudando um pouco o Scrum e o Kanban simultaneamente. Aqui estamos falando de uma visão de entrega mais contínua de valor.
+
+A entrega contínua de valor pode ser preferível numa visão pessoal, mas em alguns momentos, dependendo da complexidade do produto, é melhor ter o time box da sprint.
+
+No ScrumBan, temos foco em WIP. Portanto, as pessoas desenvolvedoras devem ter cuidado para não começar muitas coisas, concentrando-se em entregar o mais rápido possível cada uma das partes do produto. Ou seja, os membros da equipe precisam se acostumar a gerenciar seu trabalho em progresso, respeitando limites de work in progress, um princípio central do Kanban.
+
+***** Limites de WIP
+Mas, o que é limite de work in progress? Implementar limites, literalmente. No ScrumBan, a equipe pode adotar explicitamente limites do tipo: "na fase de análise, só podemos ter três trabalhos em aberto, não podemos abrir um quarto trabalho". Limites de WIP são aplicados a cada fase do processo, o que ajuda a evitar gargalos e manter um fluxo de trabalho mais suave.
+
+O ScrumBan enfatiza também a visibilidade melhorada do trabalho em andamento, com limites de work in progress claramente definidos, permitindo uma gestão mais eficaz do fluxo de trabalho.
+
+Temos o costume de usar quadros Kanban no Scrum — no Trello ou no Jira, por exemplo, ou em qualquer outra ferramenta. No entanto, o Kanban coloca essa gestão visual como algo fundamental. E, no ScrumBan, devemos trazer a ideia do Kanban. Se ainda não usa uma gestão visual bem forte e organizada, você precisará fazer isso ao adotar essa metodologia.
+
+
+*** Papéis comuns na agilidade
+
+Então, vamos passar por alguns papéis da agilidade comumente existentes em várias empresas, e talvez descrevamos algum papel que você conhece por outro nome.
+
+**** Product Manager (PM)
+Começamos com o Product Manager (Gerente de Produto). Há algum tempo, o termo Product Manager se tornou uma febre. Algumas empresas mudaram o nome de PO (Product Owner) para PM (Product Manager) para indicar que o papel é mais estratégico, mas em algumas empresas, a função é exatamente a mesma.
+
+No entanto, a pessoa Product Manager é responsável pela visão de produto, estratégia e sucesso geral do produto. Ou seja, trata-se realmente de uma visão mais estratégica, de alto nível. Então, o PM tem uma visão diferente da do PO.
+
+O PO lida com o dia-a-dia, trabalhando junto com a equipe para fornecer tudo que o produto precisa para ser desenvolvido e agregar valor ao cliente. O Product Manager olha para a estratégia do produto a longo prazo.
+
+O PM trabalha em estreita colaboração com o Product Owner para garantir que as atividades de desenvolvimento estejam alinhadas com os objetivos de negócio e as necessidades dos clientes.
+
+Agora, se em sua empresa só tem Product Manager, é provável que o Product Manager seja na verdade um PO. Nesse caso, é importante verificar se essa pessoa está realmente assumindo as responsabilidades de um PO. Se estiver, então pode assumir algumas tarefas mais estratégicas para se tornar Product Manager.
+
+Não é errado ter somente um Product Manager, mas é preciso saber que se essa pessoa não estiver cumprindo minimamente as tarefas de um Product Owner, ela não pode ser Product Manager. Como se pode olhar para a estratégia se não consegue lidar com o dia a dia, com o operacional?
+
+Portanto, podemos ter apenas um PM que cumpra também o papel do PO, ou ter outra pessoa que realize o papel estrito do PO. Não é uma boa ideia, por exemplo, ter um PM e colocar o Scrum Master, por exemplo, para desempenhar o papel do PO.
+
+**** Stakeholders (partes interessadas)
+Outro papel importante é o dos Stakeholders (partes interessadas), indivíduos ou grupos que têm interesse no produto ou projeto. Eles podem incluir clientes, usuários finais, patrocinadores e outros. As partes interessadas fornecem feedback, prioridades e requisitos ao Product Owner.
+
+Adotamos essa nomenclatura da visão de Scrum, mas pode ser um Product Manager ou qualquer outro papel que desempenhe a função de receber demandas e entender as necessidades do cliente. Não estamos mais nos prendendo a um framework, e a ideia de stakeholder é bem clara desde a gestão de projetos.
+
+**** Tech Lead
+O Tech Lead, ou Liderança Técnica, é um membro da equipe de desenvolvimento com experiência técnica, que fornece orientação técnica para a equipe, que mostra o caminho, mas não necessariamente desempenha o papel de líder (AP/Pro: Esse último seria o Tech Leader) no dia a dia. Esse papel é especialmente forte e necessária em empresas com negócios mais complexos.
+
+Essa pessoa ajuda a tomar decisões relacionadas à arquitetura, design e implementação técnica do produto. Esse produto pode ser software ou outro tipo de produto, como um produto de educação, por exemplo. É um papel sempre desafiador e difícil de desempenhar, independentemente da área!
+
+**** Equipe de Operações (OPS)
+Resumidamente, essa equipe é responsável por garantir que a infraestrutura de TI (no caso de uma equipe de tecnologia) e os sistemas estejam operacionais. Em uma abordagem ágil, a colaboração entre desenvolvimento e operações (DevOps) é incentivada para promover uma entrega contínua e confiável.
+
+**** Agilista
+Um papel que encontramos em algumas empresas é o Agilista, um defensor ou praticante da agilidade. É alguém que acredita nos valores e princípios ágeis, promove práticas ágeis e trabalha para criar uma cultura organizacional mais ágil. O Agilista precisa incorporar essa visão de agilidade e conhecer a fundo as metodologias ágeis.
+
+**** Agile Coach (Coach Ágil)
+Já o Agile Coach fornece orientações e treinamento para as equipes e a organização como um todo, para melhorar a agilidade. O Agile Coach ajuda na implementação de práticas ágeis, identifica áreas de melhoria e promove uma cultura ágil.
+
+Diferente do Agilista, pessoa que está mais inserida nos projetos e trabalha com a equipe no dia a dia, desenvolvendo tarefas e realizando entregas, o Coach Ágil é alguém que treina as pessoas e traz conhecimento sobre agilidade, mas não está envolvido com os projetos.
+
+Esse papel pode ser um pouco solto ou vazio, mas, em empresas grandes, a figura do Coach Ágil é necessária. O instrutor dá um conselho:
+
+Se você é Coach Ágil, cuidado para não ficar muito à margem do projeto, pensando na agilidade apenas teoricamente. É necessário entender a prática também, estudando como a agilidade se aplica à equipe que você treina no dia a dia de trabalho. Se na empresa em que você trabalha há também Agilistas, trabalhe próximo deles. Se não, seja um pouco Agilista também! Isso com certeza dará bons resultados.
+
+**** Líder de Release / Release Train Engineer (RTE)
+Em contextos de ágil em escala, esse papel é bastante comum. Ágil em escala trata-se de trabalhar com várias equipes organizadas, orientadas, e há diferentes formas de fazer isso. Uma delas é realizando as release trains e, para isso, temos o Líder de Release, especialmente em frameworks como o SAFe (Scaled Agile Framework).
+
+Esse profissional desempenha um papel fundamental coordenando várias equipes ágeis que trabalham em conjunto para entregar soluções integradas.
+
+Digamos, por exemplo, que você está numa empresa que possui cinco times com dez pessoas, conforme o limite estabelecido pelo time Scrum. Ou seja, temos 50 pessoas. Dessas 50, temos 30 (três times) que trabalham em entregas muito interconectadas. Essas 30 pessoas podem ser um recorte, um release train.
+
+Nesse caso, o Release Train Engineer é a pessoa responsável por fazer que essas entregas interconectadas caminhem organizadamente, garantindo que as necessidades de uma equipe sejam supridas pelas outras. Esse é um trabalho muito importante e difícil de fazer!
+
+**** Equipe de Suporte ou Operações de Serviço (Service Operations)
+Essa equipe é responsável por oferecer suporte contínuo aos produtos e serviços após as implementações. Em ambientes ágeis, a colaboração entre desenvolvimento e operações (DevOps) é importante para garantir uma entrega contínua e estável.
+
+**** Scrum of Scrums Master
+Em ambientes onde várias equipes Scrum precisam coordenar seu trabalho, o Scrum of Scrums Master (Mestre do Scrum de Scrums) facilita a comunicação e a colaboração entre as equipes, ajudando a identificar e resolver impedimentos que afetam várias equipes. Ou seja, é um Scrum Master de várias equipes!
+
+**** Analista de negócios Ágil
+Por fim, nas equipes de desenvolvimento, pode haver o Business Analyst (Analista de Negócios). Em um ambiente ágil, dentro do time Scrum, esse profissional colabora com o Product Owner na elaboração e refinamento dos requisitos do produto, além de ajudar a garantir que as histórias de usuário estejam bem definidas e alinhadas com os objetivos de negócio.
+** AP: coisas mais importantes do curso
+Papel do desenvolvedor: *É autogerenciado, o que significa que ele tem a responsabilidade e a autonomia para organizar e gerenciar seu próprio trabalho;*
