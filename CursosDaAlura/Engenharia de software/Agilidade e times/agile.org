@@ -1,4 +1,3 @@
-
 * Material da Alura
 ** Agile x Waterfall (cascata)
 Em seu início, a Engenharia de Software utilizava um modelo sequencial, o cascata ou Waterfall, em inglês. Mas, ao longo do tempo, devido ao fluxo de novas informações e mudanças no mercado, emerge a necessidade um novo modelo, daí surge o ágil ou Agile em inglês.
@@ -825,5 +824,595 @@ Em ambientes onde várias equipes Scrum precisam coordenar seu trabalho, o Scrum
 
 **** Analista de negócios Ágil
 Por fim, nas equipes de desenvolvimento, pode haver o Business Analyst (Analista de Negócios). Em um ambiente ágil, dentro do time Scrum, esse profissional colabora com o Product Owner na elaboração e refinamento dos requisitos do produto, além de ajudar a garantir que as histórias de usuário estejam bem definidas e alinhadas com os objetivos de negócio.
+*** Papéis "adicionais", na prática
+**** Agile Coach vs Agilista
+***** Agile Coach
+Agile Coach é fundamentalmente uma pessoa preparadora de pessoas e de equipes. Atua como um guia, ou seja, oferece treinamento, facilitação e suporte para promover a autossuficiência da equipe.
+
+Esse seria um profissional especialista nas práticas ágeis utilizadas na empresa, sejam elas de Scrum, Kanban, de uma metodologia própria ou de um framework próprio. Essa abordagem é feita por meio de workshops, mentoria, aconselhamento, observação, feedback.
+****** Definição
+Um Agile Coach é definido por Jeff Sutherland, co-criador do Scrum, como "um mentor que ensina as equipes a implementar o Scrum, o qual proporciona um ambiente seguro para aprender, falhar e se tornar mais eficaz" ("Scrum: A Arte de Fazer o Dobro do Trabalho na Metade do Tempo").
+****** Papel
+O Agile Coach atua como um facilitador, mentor e treinador, auxiliando as equipes a entender e incorporar os princípios ágeis em suas práticas diárias.
+****** Envolvimento
+Segundo Mike Cohn, autor de "Agile Estimating and Planning", o Agile Coach pode trabalhar em diversos níveis, desde equipes individuais até níveis organizacionais mais amplos, proporcionando suporte contínuo durante a jornada ágil.
+****** Foco
+O Agile Coach concentra-se não apenas em processos, mas também em aspectos culturais e comportamentais, promovendo uma mentalidade ágil em toda a organização.
+***** Agilista
+Já quando há uma pessoa com um perfil semelhante a esse, mesmo que não conheça tão a fundo várias práticas ágeis, mas consegue atuar no dia a dia da equipe, você tem uma pessoa Agilista.
+
+Essa pessoa se envolve mais diretamente no projeto, participa de reuniões, colabora com a equipe e fornece suporte prático durante as mudanças. Além disso, pode ter um papel ativo na equipe.
+
+Por exemplo, em uma equipe de Scrum com 10 pessoas desenvolvedoras, pode haver um Agilista. Claro, se for Scrum puro, o Agilista é o próprio Scrum Master. Em ambientes complexos, se não houver uma metodologia própria, quem assume este papel de Agilista é o próprio Scrum Master.
+****** Definição 
+O termo "agilista" é mais amplo e pode se referir a qualquer pessoa envolvida com a agilidade, conforme define Jonathan Rasmusson em "The Agile Samurai: How Agile Masters Deliver Great Software".
+****** Papel 
+Um agilista é alguém que pratica ou apoia os valores e princípios ágeis, independentemente do papel específico. Pode ser um membro da equipe ou qualquer pessoa envolvida no processo ágil.
+****** Envolvimento 
+Pode estar envolvido em diferentes capacidades, desde o desenvolvimento de software até áreas como gerenciamento de projetos, marketing, recursos humanos, etc.
+****** Foco
+O foco principal do agilista está nas práticas e princípios ágeis, podendo desempenhar vários papéis em uma equipe ágil.
+***** Diferenças
+O Agile Coach é um papel mais especializado, centrado na orientação e coaching, enquanto o termo "agilista" é mais amplo e abrange qualquer pessoa comprometida com a agilidade.
+
+Conforme destaca Jeff Sutherland, o Agile Coach geralmente atua como um profissional dedicado a orientar a organização na adoção ágil, enquanto um agilista pode ocupar vários papéis em uma equipe ágil.
+***** Semelhanças
+Ambos compartilham o compromisso com os valores e princípios ágeis.
+
+Tanto Agile Coaches quanto agilistas estão envolvidos na promoção de práticas ágeis e na construção de uma cultura ágil em uma organização ou equipe.
+** Curso de Extreme Programming: metodologia de desenvolvimento ágil de software
+XP é uma metodologia ágil.
+*** O que XP resolve?
+**** XP é uma das metodologias ágil
+A ideia do XP, é fazer com que de forma ágil você consiga desenvolver software com qualidade, se comunicando bem e seguindo vários valores, princípios e práticas.
+
+*Programação extrema, eXtreme Programming ou simplesmente XP, é considerado uma metodologia ágil pois se ajusta bem as pequenas e médias equipes em desenvolvimento de software com requisitos vagos e em constante mudança.*
+
+[01:02] Mas vamos para uma definição prática, o que que é XP realmente, XP, como está escrito aqui, uma metodologia ágil e basicamente, a ideia de XP é te prover ferramentas necessárias, é te ensinar a usar ferramentas necessárias para que você consiga desenvolver software se adaptando a mudanças de forma muito tranquila e se você conhece metodologias ágeis sabe que esse é um dos pontos do manifesto ágil, que é se adaptar a mudanças mais do que seguir um plano.
+
+[01:31] Então nós vamos falar bastante sobre planejamento também, mas toda a ideia por trás do XP é desenvolver software com muita qualidade se adaptando muito bem as mudanças, essa é a ideia do eXtreme Programming.
+
+XP basicamente é uma metodologia que fornece, que te traz um conjunto de valores, princípios e práticas e vamos focar bastante na parte das práticas.
+
+[02:22] Mas então como será que surgiu esse tal de XP, de onde que veio isso? Eu vou supersimplificar a história e vou deixar um para saber mais com um referência ou duas para você dar uma lida sobre a história do XP.
+
+[02:34] Mas basicamente quatro feras, Kent Beck, Ron Jeffries, Ward Cunningham e Martin Fowler, eles participaram de um projeto que tinha alta complexidade, era algo bastante complexo de desenvolver e tinha muito risco, tinha muita coisa em jogo lá, dinheiro, muito dinheiro rolando, enfim, era um projeto arriscado, vamos dizer assim.
+
+[02:56] E para garantir que tudo ia dar certo, que tudo ia correr bem eles seguiram, eles concordaram entre si em seguir uma série de práticas e sugestões que já tinham se provadas de sucesso anteriormente.
+
+[03:10] Então um exemplo aqui e eu já vou te dar um spoiler de uma das práticas, teste antes mesmo do desenvolvimento, criar um teste antes de criar funcionalidade ou bug, já era sabido naquela época e já existiam especificações, já existiam documentos falando sobre isso, estudos sobre isso de que criar o teste antes mesmo da funcionalidade trazia vantagens.
+
+[03:32] Então o que eles fizeram? Pegaram essa prática e aplicaram ao extremo, daí o nome eXtreme Programming, o que que eles faziam? Todas as funcionalidades e correções de bugs iam ter o teste criado antes.
+
+[03:44] Então essa é uma só das práticas que nós vamos ver, mas eles pegaram várias práticas e aplicaram ao extremo, eles realmente seguiram aquilo a risca e no final desse projeto tudo deu certo realmente, ele foi entregue dentro do prazo, os clientes ficaram bastante satisfeitos e com isso surgiu o primeiro livro sobre XP.
+**** Valores, princípios e práticas
+[04:35] Então voltando para aquela ideia do conjunto do que é o XP, XP possuí cinco valores, alguns princípios e várias práticas.
+
+[04:43] Vinícius, por que que o cinco tem o número ali e os princípios e práticas não? A metodologia como qualquer metodologia ágil sofre mudanças ao longo do tempo, então em algumas literaturas você vai ver 14 princípios e 17 práticas, em outras tiram uma prática, adiciona outra, mudam o princípio, então eu preferi não colocar um número aqui mas basicamente, em várias literaturas você vai encontrar 14 princípios, 17 práticas.
+***** Valores
+[05:09] Então vamos dar uma olhada aqui no que que eu quero dizer com isso, primeiro, os valores, eu não vou entrar em detalhes porque nós vamos ter um capítulo só sobre isso, mas basicamente os valores do XP são:
+****** comunicação
+Embora existam inúmeras formas de comunicar ideias, algumas são mais eficazes do que as outras.
+
+[00:50] Então a ideia é que uma equipe extrema, uma equipe que esteja aplicando o XP preze o tempo inteiro pela comunicação da forma mais clara e eficaz possível para que o mínimo de atrito na comunicação aconteça, para que não role aquele famoso telefone sem fio, eu falo uma coisa, você entende outra e repassa isso como outra coisa, enfim, a comunicação tem que ser o mais clara p
+
+[02:57] Mas o que tem que ficar muito fixado na nossa mente, o que tem que estar muito enraizado, é que comunicação é um dos principais valores do XP e nós temos que buscar o tempo todo inclusive, como é um dos princípios a melhoria, nós temos que buscar o tempo todo melhorar a comunicação, para que nós saibamos transmitir ideias e principalmente receber as ideias transmitidas por outras pessoas.
+
+[03:20] Eu, falando como desenvolvedor preciso o tempo todo receber informação e interpretar aquilo da forma correta, então se comunicar não é só saber falar bem, por exemplo, mas também saber absorver informações.
+****** simplicidade
+[00:48] E a parte de simplicidade no XP como o décimo princípio do manifesto ágil já diz que simplicidade é a arte de maximizar a quantidade de trabalho não realizado e que isso é essencial, então a simplicidade nos evita, nos previne de implementar algo que não vai ser necessário.
+
+[01:07] Então, de novo vão existir algumas práticas que o XP sugere para nós atingirmos a simplicidade, mas basicamente o conceito por trás desse valor é que nós devemos manter tudo tão simples quando aquilo pode ser.
+
+[01:22] Como já dizia Leonardo da Vinci, a simplicidade é o mais alto nível de sofisticação.
+
+[01:40] Então a simplicidade vai desde a comunicação de como nós transmitimos a informação até como nós escrevemos código, por exemplo, existe uma máxima no desenvolvimento de software e quem é desenvolvedor talvez já conheça essa, que explícito é melhor do que implícito, dessa forma nós tornamos mais simples a leitura de uma pessoa do código, por exemplo.
+
+[02:27] Então simplicidade não é só na implementação, eu vou fazer essa funcionalidade simples, esse botão sem estilo ou algo assim, não, a simplicidade permeia tudo de uma equipe extrema, desde a comunicação até o produto em si, até a implementação, então a simplicidade ajuda na produtividade e nos ajuda a simplesmente não realizar trabalho que não era necessário.
+****** feedback
+ [00:15] E feedback não é algo exclusivo do XP, qualquer metodologia ágil precisa de feedback, inclusive o segundo princípio do manifesto ágil é mudanças nos requisitos são bem-vindas mesmo tardiamente no desenvolvimento.
+
+[01:39] Quando a equipe de desenvolvimento realiza uma implementação através da ideia de ciclos de desenvolvimento e interativos e incrementais, nós recebemos um feedback para saber se aquilo que foi implementado é o que era esperado e inclusive, não só requisitos e a parte de negócio, mas o código em si pode trazer feedback para nós, através de testes automatizados nós sabemos se o nosso código pode estar funcionando ou não, isso é um feedback muito valioso.
+
+[02:05] Através de técnicas de integração contínua que nós vamos falar, nós podemos saber se o nosso código está pronto ou não para ir para o ambiente de produção, para ser testado pelo cliente, por exemplo.
+
+[02:15] Então feedback, assim como todos os valores, permeia todo o desenvolvimento de uma equipe extrema, todas as práticas dependem de feedback, todos os princípios visam o feedback e como melhorar a forma como nós damos feedback.'
+
+[04:04] Então feedback nem sempre é negativo e inclusive feedback positivo deve ser reforçado, deve ser incentivado.
+****** coragem
+[00:31] Na sua opinião, você que está assistindo, uma pessoa que é uma desenvolvedora júnior deve refatorar o código escrito por uma pessoa que é desenvolvedora sênior?
+
+[00:42] Você acha que isso faz sentido? E uma equipe extrema que que exerce as práticas do eXtreme Programming, existem diversas práticas que fornecem os meios para que sim, uma pessoa júnior consiga refatorar o código por uma pessoa sênior, qual o problema? Se existe espaço para melhoria, se existe motivo para refatoração, por que não?
+
+[01:05] E as práticas que o XP fornece, te entrega segurança e as ferramentas necessárias para que nós tenhamos segurança, para que a única coisa necessária, para que tudo que nós precisemos, para que tudo que falte, para que essa pessoa júnior vá lá e implemente essa refatoração seja coragem.
+
+[01:24] Então a coragem é esse ponto, é esse valor que nos motiva, que faz com que nós implementemos o que nós temos que implementar.
+
+[01:31] E a coragem é ainda mais necessária em momentos de crise, o que que isso quer dizer? Recebemos um feedback negativo, nós precisamos ter coragem de assumir o erro, nós precisamos ter coragem de tentar de uma forma nova solucionar aquele problema.
+
+[01:45] Então coragem quando nós falamos de eXtreme Programming, quando nós falamos de times que seguem as práticas do XP é a coragem e a atitude de implementar o que tem que ser implementado, de fazer o que tem que ser feito.
+ 
+[01:58] E isso vem muito junto com a confiança, nós precisamos ter coragem de fazer algo e precisa existir confiança de que nós vamos fazer da melhor forma possível, de que nós vamos entregar da melhor forma que nós conseguimos.
+
+[02:12] E isso só é possível se o time tiver uma boa comunicação, se tudo que for feito for feito de forma simples para que todos consigam entender e interagir em cima disso.
+
+[02:23] E obviamente é muito importante para a equipe que haja feedback, porque dessa forma, com esses três valores, nós conseguimos ter a coragem para implementar uma tecnologia nova, para sugerir uma melhoria, para receber aquele feedback negativo que ninguém gosta mas nós temos a coragem de assumir a responsabilidade, para dar um feedback negativo que é uma tarefa desconfortável mas é necessária, infelizmente.
+
+[02:49] Nós precisamos nos comunicar de forma simples mas dar esse feedback para que outras pessoas entendam o que pode ser melhorado ou que não está legal, então por isso coragem é um dos valores do XP.
+****** respeito
+[00:25] Uma pessoa que é respeitada ela tende a se sentir mais valorizada, se o seu gerente te trata com respeito ou com cordialidade, você se sente um desenvolvedor mais valorizado, você se sente respeitado naquele ambiente, você se sente motivado a fazer o que você tem que fazer, porque você é respeitado, você é alguém visto como uma pessoa, como um ser humano.
+
+[01:41] Quando nós respeitamos uma outra pessoa, a comunicação se torna mais fácil, nós conseguimos nos dirigir a essa pessoa com cordialidade de forma que a comunicação seja fácil, seja simples.
+
+[01:53] Quando nós respeitamos outra pessoa, nós simplificamos as coisas de forma a não tomar o tempo dela de forma desnecessária, de não subestimar ela e de manter tudo da forma mais simples possível evitando ruídos, evitando assuntos desnecessários, nós nos comunicamos de forma mais simples quando nós temos respeito.
+
+[02:13] E o respeito é essencial para que bons feedbacks sejam entregues e para que nós recebamos feedbacks de forma correta.
+
+[03:13] Então o respeito é fundamental para que um projeto ande de forma saudável e equipes extremas levam respeito ao extremo também, então esses são os cinco valores de um time é extremo, de uma da metodologia XP.
+***** Princípios
+****** Humanidade
+[05:56] Mas, falando sobre os princípios que o XP preza, que são alguns, nós vamos prezar sempre pela humanidade, todas as pessoas em uma equipe de desenvolvimento XP, são humanas, são pessoas, elas têm os seus problemas e nós precisamos entender, nós não podemos exigir mais do que o possível.
+****** Economia
+[06:13] Nós prezamos pela economia, o que isso quer dizer? Utilizar da melhor forma possível os recursos disponíveis para entregar o maior valor possível, se nós só temos uma equipe de quatro pessoas desenvolvendo, essa equipe de quatro pessoas desenvolvendo vai ser econômica, vai entregar só o que é necessário, vai entregar o que gera mais valor para que todo mundo seja beneficiado.
+****** Benefício mútuo
+[06:34] E falando nessa parte de todo mundo ser beneficiado, outro princípio é o de benefício mútuo, todo mundo precisa ser beneficiado, o cliente precisa receber a solução para o problema dele, o desenvolvedor precisa utilizar as tecnologias necessárias, inclusive aprender receber a gratificação por isso, a bonificação, todo mundo precisa ser beneficiado num projeto.
+****** Auto semelhança
+[06:56] O princípio de auto semelhança basicamente diz que se algo já funcionou nós vamos implementar de forma semelhante, nós não vamos reinventar a roda, vamos dizer assim, mantendo simplicidade, então se algo funciona vamos com os devidas adaptações fazer de forma semelhante.
+
+[07:10] E trazendo isso não só para o código mas para nós, se alguém realiza determinada prática que eu sei que funciona, eu vou trazer para mim e tentar aplicar isso e se eu sei que algo funciona para mim, eu mantenho fazendo isso de forma a sempre buscar a melhoria.
+****** Melhoria
+A busca pela melhoria é constante quando nós falamos de equipes extremas, de equipes que seguem o eXtreme Programming, o XP.
+
+[07:35] Nós precisamos sempre melhorar, seja em quesitos técnicos ou em quesitos pessoais mesmo, como pessoa, para que nós estejamos de novo ligado com aquele primeiro princípio como humanos, como pessoas que nós estejamos em conexão com o nosso time.
+****** Diversidade - Reflexão
+[07:48] Esses dois pontos, diversidade e reflexão são bem conceituais, onde, através da diversidade nós conseguimos trazer pessoas com backgrounds diferentes, com conhecimentos diferentes para uma equipe e cada um vai poder agregar de uma forma diferente, isso é muito rico, isso é muito enriquecedor para a equipe.
+
+[08:04] E reflexão, nós sempre precisamos botar a mão na consciência e analisar os resultados para entender o que deu certo, como nós podemos melhorar o que deu certo, o que não deu certo, porque não deu certo, então isso é um princípio do XP, nós sempre precisamos refletir sobre o que está acontecendo.
+****** Fluxo
+[08:21] Um dos princípios é seguir um fluxo, nós vamos falar sobre planejamento, mas através de um fluxo bem definido nós conseguimos entregar mais valor com menos recursos, atendendo aquela economia.
+****** Oportunidade
+[08:33] E toda a diversidade deve ser vista como uma oportunidade, seja de aprender, de melhorar o projeto, enfim, de corrigir um problema que nós não sabíamos que existia, então nós sempre devemos ver os problemas como oportunidades.
+****** Redundância - Falha
+[08:47] Redundância é o fato de nós estarmos pronto para algum tipo de problema que está diretamente ligado ao princípio de falha, nós precisamos estar preparado para caso alguma falha aconteça nós reagirmos a isso.
+
+[08:59] Então quando nós falamos de redundância, pode ser na parte técnica, como por exemplo, ter backups ou na parte conceitual, nós nos adaptarmos, nos planejarmos de novo quando algo dá errado.
+
+[09:10] Então esse é um princípio que se junta muito com o princípio de estar preparado para falhas, falhas vão acontecer, nós temos que estar pronto para isso de forma técnica, como eu falei, tendo backups, tendo código versionado, enfim, mas também como pessoas, nos temos que estar pronto para falhar, para errar receber um feedback disso e entender como melhorar.
+****** Qualidade
+[09:34] Qualidade é um ponto que vai estar em praticamente todas as práticas do XP, qualidade é um ponto crucial, é um dos principais princípios do XP, então nós sempre vamos prezar pela qualidade, não só da equipe de desenvolvimento como pessoas, como equipe em si, mas também da parte técnica, do código, da nossa infraestrutura, qualidade é essencial.
+****** Passos pequenos
+[09:54] E nós vamos seguir o princípio de dar passos pequenos para ir melhorando e adicionando novas funcionalidades que nós, inclusive, quando falamos de práticas específicas esses passos pequenos são levados a sério.
+****** Aceitação
+[10:07] E aceitação da responsabilidade é um dos também principais princípios porque numa equipe XP não existe o erro da fulana, do ciclano, existe o erro da equipe, então se alguma coisa deu errada a equipe vai assumir a responsabilidade e resolver aquele problema, sem ficar apontando o dedo.
+
+***** Práticas
+****** Cliente presente 
+[00:25] Então antes de qualquer coisa, antes de nós pensarmos em desenvolver alguma coisa, é muito importante que nós tenhamos o cliente presente, existe uma frase muito interessante do vice-presidente da British Airways, na época o Donald Porter, ele falou uma vez que os clientes não esperam que você seja perfeito, ele espera apenas que você resolva as coisas que eles fizeram errado.
+
+[00:48] Então basicamente o cliente tem uma expectativa sobre nós, ele quer a nossa ajuda, ele quer que nós desenvolvedores resolvamos um problema para ele, que nós corrijamos o que ele errou, no projeto dele, na empresa dele, ou até que nós automatizemos algum processo que ele faz de forma manual, essa é a intenção do cliente.
+
+[01:11] Só que nós precisamos, para desenvolver isso, para resolver o problema dele, nós precisamos de uma contrapartida, o que que acontece? Nós precisamos saber o que desenvolver, como desenvolver, quando desenvolver, nós precisamos saber como priorizar e ninguém melhor para isso do que a própria pessoa que vai utilizar o sistema.
+****** Time Coeso
+[00:20] E falando sobre comunicação e proximidade entre membros de equipe, vamos falar sobre uma outra prática bastante simples de implementar no XP que é time coeso.
+
+[00:31] Então vamos falar aqui do primeiro valor do manifesto ágil que é indivíduos e interações, foco na palavra interações, mais do que processos e ferramentas.
+
+[00:41] Quando nós temos um time coeso nós queremos dizer ter um time junto, unido e que se complete e essas interações entre o time são essenciais para que nós mantenhamos uma base de conhecimento compartilhado, para que nós mantenhamos um ambiente saudável e que nós mantenhamos o projeto em si em um estado saudável.
+
+[01:01] No projeto todas as pessoas fazem parte de um time e o time tem que ser visto como uma unidade, como nós comentamos lá nos princípios, não existe culpa de fulano ou culpa da ciclana, o que acontece é o time errou, o time é culpado e o time vai resolver esse problema, o time vai descobrir formas para melhorar, para não repetir esse erro, então o time é uma unidade e deve ser visto assim.
+
+[01:27] E um grupo coeso ele vai ter todas as competências de negócio e técnicas para desenvolver um software, inclusive se você já ouviu falar sobre o termo Full Cycle Developer, isso esta muito ligado.
+
+[01:40] Full Cycle Developer é um termo bem recente e inclusive tem um vídeo da Alura mais falando sobre Full Cycle vale a pena dar uma olhada, mas basicamente aqui nós temos uma diferençazinha que o grupo em si, tem todas as competências necessárias para obter os requisitos e fazer análise de requisitos, priorizar as tarefas que devem ser feitas, organizar as tarefas, dividir cada parte desses requisitos em tarefas em si, isso também é uma parte, desenvolver, testar, enviar para a produção, garantir que tudo está funcionando.
+
+[02:20] Enfim, o time XP, o time extremo deve ser capaz de fazer isso tudo sem depender de times externos, sem depender de empresas externas, o time deve ter todas essas competências.
+
+[02:33] Quando nós falamos de Full Cycle Developer, é como se uma única pessoa tivesse a capacidade de participar de todas as etapas do desenvolvimento, quando nós falamos de um grupo, de uma equipe extrema, de uma equipe que segue as práticas XP, não é necessário que uma única pessoa faça todo o trabalho.
+
+[02:52] Mas uma pergunta muito importante que você deve se fazer quando estiver trabalhando com uma equipe é quantas pessoas precisam faltar para que o trabalho não possa ser entregue, para que o sistema não possa ir para o ar.
+
+[03:03] Se esse número for pequeno você tem um grande problema, não pode existir uma dependência muito grande de uma única pessoa, o time deve ser coeso, o time deve ser uma unidade e não uma pessoa deve se sobressair e ter todas as responsabilidades.
+
+[07:18] O XP não é uma bala de prata e nem pretende ser, ele não se propõe a ser, então como nós falamos naquele vídeo de XP e agilidade, nesse momento de melhoria contínua você pode, por exemplo, pegar emprestado a ideia do Kanban chamado de Kaisen que é implementar a melhoria contínua, você pode pegar emprestado a cerimônia chamada reunião de retrospectiva do Scrum, onde a equipe se reúne para discutir o que aconteceu.
+
+[07:44] Então é muito válido utilizar ferramentas de outras metodologias, mas o foco é, o time é uma unidade, deve estar coeso e ter essas características, agora que nós já começamos a entender mais dessas práticas de gestão, vamos avançar, falando ainda em práticas que estão relacionadas a gestão e projeto.
+****** Posse Coletiva
+[00:00] Bem-vindos de volta e vamos falar agora de uma prática também muito importante do XP, ainda na parte de gestão que é de posse coletiva.
+
+[00:10] E antes de falar da posse coletiva eu vou refazer uma pergunta que eu fiz, lá na parte da coragem, uma pessoa júnior deve refatorar o código escrito por uma pessoa sênior? E nós já trouxemos essa resposta, mas vamos discutir isso daqui.
+
+[00:25] Quando nós temos a posse coletiva, e o que quer dizer essa posse coletiva? Todo mundo é dono, simples assim, então quando nós temos qualquer membro ou par do time, grave esse termo par, qualquer membro ou par do time pode implementar em uma funcionalidade pode corrigir um problema, pode melhorar, refatorar uma parte do código qualquer momento, desde que obviamente aquilo tenha sido planejado, esteja dentro do planejamento do time qualquer pessoa pode fazer.
+
+[00:52] Então não existe um pedaço de código que é de fulano, aquele outro módulo é da ciclana, então não existe isso, o código é de todo mundo.
+
+[01:03] Então no XP todo mundo têm a responsabilidade pelo sistema, isso traz a coragem do time para que todo mundo se sinta responsável pela qualidade e que para todo mundo se sinta motivado a realizar as tarefas, a corrigir os problemas e implementar melhorias.
+
+[01:19] O termo original no eXtreme Programming é collective ownership, ou seja, é realmente posse coletiva, e não code ownership, não é só posse do código, porque todos os artefatos no desenvolvimento são de todo mundo, não só o código, a suíte de testes, as especificações e os testes de aceitação, os builds gerados pela nossa integração contínua, executável vamos chamar assim.
+
+[01:47] Então todo mundo é responsável por tudo isso, poxa, o build quebrou, não, tem que chamar o fulano porque só fulano que pode corrigir essa parte, tem um teste falhando, tem que chamar a ciclana porque é ela que cuida dos testes, não, isso não existe, a posse é coletiva em todos os artefatos, em tudo que faz parte do desenvolvimento.
+
+[02:10] E quando a posse não é coletiva, que só uma pessoa é dona do código e tem aquele cenário onde programador tem que mandar o código para aprovação, as vezes o Code Review não é uma prática que eu, Vinícius abomino, é você mandar um código para Code Review, isso não é ruim, só que, dois pontos, um, ter que passar um código por aprovação pode ser um sinal de desconfiança entre o time e nos cursos de entrega e integração contínua aqui da Alura, esse assunto é abordado com mais detalhes.
+
+[02:42] Mas dois, o XP possui uma outra pratica para facilitar isso que nós vamos falar mais lá na frente quando nós estivermos falando de código mesmo.
+
+[02:50] Mas basicamente, aqui nós temos, claro, um problema e mais uma vez eu faço aquela pergunta, quantas pessoas precisam faltar para que o sistema não possa ser desenvolvido.
+
+[03:02] Se você tem um número pequeno de pessoas que precisa faltar para dar problema significa que a sua posse não é coletiva, aquela pessoa que faltou e que é muito importante é dona de uma grande parte do código ou do sistema e isso precisa mudar.
+
+****** Ritmo sustentável
+[03:18] Agora, falando ainda sobre essa parte de gestão e como garantir que as entregas sejam feitas com qualidade e de forma sustentável, vamos falar sobre o ritmo sustentável do desenvolvimento.
+
+[03:30] *E aqui tem uma frase bem interessante que se eu não me engano é do Uncle Bob mas eu não achei essa referencia, que desenvolvimento de software é uma maratona, não uma corrida de 100 metros rasos.*
+
+[03:40] O que que isso quer dizer? Nós, quando estamos desenvolvendo, da mesma forma como uma maratona a pessoa começa correndo em um ritmo constante, ela não começa correndo desesperado para se cansar logo e depois todo mundo passar ela, então existe um ritmo constante, quando nós falamos de desenvolvimento, ritmo sustentável traz para nós a produtividade a longo prazo.
+
+[04:04] Então ao invés de você fazer várias horas extras logo na primeira semana para tentar entregar muita coisa, o ideal é que você mantenha um ritmo constante sustentável de trabalho para que a produtividade a longo prazo não seja prejudicada.
+
+[04:19] Porque pensa comigo, se toda semana você trabalha 60 horas, logo logo você vai ter um burnout, você não vai estar mais motivado, você vai trabalhar já cansado, então isso não é interessante, isso não traz produtividade.
+
+[04:33] E uma curiosidade, o conceito de ritmo sustentável começou lá nas práticas naquele projeto dos quatros pais fundadores do XP, com o termo quarenta horas semanais, o nome dessa prática era 40-hour week.
+
+[04:49] E o Ron Jeffries renomeou essa ideia para ritmo sustentável, para que essas quarenta horas por semana sejam um pouco mais flexíveis, para que nós não fixemos nesse número, quer dizer que se eu trabalhar 36 horas não vai funcionar? Se eu trabalhar 38 horas por semana eu não estou aplicando a prática?
+
+[05:06] Então a ideia é manter num ritmo sustentável de acordo com a produtividade da equipe e com quanto a equipe trabalha normalmente, mas tem que ser sustentável e esse é o ponto.
+***** Link para mais detalhes
+https://www.desenvolvimentoagil.com.br/xp/papeis/
+**** Projeto
+***** Metáfora de Sistema
+[00:10] E a primeira prática que eu vou citar é a de metáfora, então a Esther Derby que é uma das autoras o livro Agile Retrospectives, é um nome difícil, ela disse essa frase aqui: 
+	"98% do nosso pensamento está realmente acontecendo em um nível inconsciente, grande parte através de metáforas"
+e agora eu vou trazer uma reflexão para você, para que você imagine o quanto isso aqui pode ser verdade.
+
+[00:38] Você muito provavelmente está me assistindo em um computador, esse seu computador tem pastas, arquivos, uma área de trabalho, talvez você já tenha feito compras online através de um carrinho de compras.
+
+[00:50] Talvez você já tenha participado de um debate ou num formato de Fishbowl, então tudo isso que eu acabei de falar são metáforas, são coisas que nós atribuímos a outra que dá outro significado ao nome para facilitar o entendimento.
+
+[01:05] Você não tem realmente uma pasta dentro do seu comutador, existe uma organização e você também não tem um arquivo, uma folha, algo lá dentro, existe algo que o computador armazena, existem dados armazenados no HD ou em memória que nós chamamos de arquivos para facilitar o entendimento.
+
+[01:23] E uma metáfora do sistema traz uma visão comum e auxilia na comunicação para que nós entendamos determinados elementos.
+
+[01:32] E isso pode ser muito útil, durante, por exemplo, uma reunião onde nós estamos tentando entender o que o cliente quer ou nós estamos explicando para o cliente como algo vai ser implementado, então metáforas pode auxiliar bastante na comunicação entre equipe técnicas e não técnicas, por exemplo.
+
+[01:49] E falando em equipes técnicas e não técnicas, existe um conceito muito famoso na área de desenvolvimento chamado Demain-Driven Design ou DDD.
+
+[02:00] O DDD tentando resumir aqui, supersimplificar, é uma filosofia que tenta estreitar a comunicação entre equipes técnicas e não técnicas e traz uma linguagem comum que é chamado de linguagem onipresente, ou linguagem ubíqua, traz isso para o código.
+
+[02:18] Então uma metáfora, se ela for entendida por todas as pessoas, se for conhecida tanto pela equipe técnica quanto não técnica, ela pode ser utilizada no código e dessa forma nós podemos tornar o código mais expressivo e mais fácil de nós explicarmos.
+
+[02:34] Um cenário bem simples, imagina que eu tenho realmente um carrinho de compras no meu sistema, então eu vou utilizar a metáfora de carrinho de compra para me comunicar com a equipe de negócios e falar um cliente adiciona um produto no carrinho, quando o carrinho tiver cheio nós podemos fazer determinada coisa.
+
+[02:52] Então eu trago isso para o código, eu vou ter, por exemplo, uma classe "carrinho" e vou ter um método "adicionar produto", com isso, quando eu estiver falando com a equipe que não é técnica, eu ainda assim consigo usar termos que estão no código e isso facilita bastante a comunicação.
+
+***** Projeto Simples
+[03:34] Agora, ainda sobre projeto, vamos falar sobre projetos simples e eu já falei essa frase aqui, é uma frase que eu gosto bastante, 
+	"A simplicidade é o mais alto grau de sofisticação"
+ uma frase do Leonardo da Vinci e quando nós falamos de projetos obviamente isso não é diferente.
+
+[03:51] Nós temos que trazer a maior simplicidade possível na hora de projetar um sistema e tentar prever o futuro é anti-XP, se nós tentamos supercomplicar com aquela futurologia, tentando adivinhar o que vai ser necessário com a síndrome de Nostradamus, se nós tentamos prever o futuro nós muito provavelmente vamos implementar algo que não é necessário.
+
+[04:15] Então nenhuma funcionalidade adicional é implementada pois isso desvia do caminho da solução e claro, só aumenta a complexidade do software porque se nós estamos implementando mais coisa, mais complexidade é adicionada.
+
+[04:29] E um termo muito conhecido no meio de agilidade principalmente quando nós falamos de Lean é o MVP Minimum Viable Product, ou produto mínimo viável.
+
+[04:41] O que que acontece? Um MVP, o mínimo produto viável é o produto com o menor número de funcionalidades, mas que seja viável, que seja possível, que seja algo que agregue valor, então o ter um projeto simples, nós conseguirmos projetar algo de forma simples é essencial para nós termos um MVP.
+
+[05:00] E vou dar um exemplo muito simples de novo sobre um relatório, imagina que a equipe de negócios precisa muito de um relatório que é muito complexo e é interessante para eles personalizar, modificar vários campos.
+
+[05:13] O que que nós podemos fazer? Existe a forma mais utilizada desse relatório, entrega o relatório, sem possibilidade de personalização em uma sprint, em um ciclo de desenvolvimento, esse é o mínimo produto viável, é o que aquela equipe precisa da forma mais simples possível para atingir o objetivo.
+
+[05:30] Na próxima interação, na próxima sprint você adiciona filtros, na outra você coloca uma ordenação diferente.
+
+[05:38] Então você pode ir de forma interativa e incremental como as metodologias ágeis pregam, ir incrementando e adicionando funcionalidades, mas o foco é na simplicidade.
+
+*** Planejando o trabalho
+**** História do Usuário
+[00:34] Então vamos lá, a primeira prática sugerida é muito famosa e se você conhece metodologias ágeis muito provavelmente você já ouviu falar.
+
+[00:42] Que são as User stories ou histórias de usuários e um grande autor de livros sobre histórias de usuário, sim, existem livros sobre isso, então obviamente não dá para eu falar sobre tudo de histórias de usuário aqui, mas um grande autor, o Jeff Patton diz que histórias não são requisitos, elas são discussões sobre resolver problemas para a nossa organização, nossos clientes e nossos usuários que levam a acordos sobre o que construir.
+
+[01:08] Então é uma visão bem interessante, que as histórias não são requisitos em si, elas são uma conversa que levam a acordos sobre o que nós vamos construir.
+
+[01:17] Então é uma forma talvez de documentar os requisitos e não são os requisitos em si, os requisitos são obtidos através de conversa, comunicação direta e as histórias são uma forma de nós chegarmos a um acordo do que vai construir a partir do requisito.
+
+[01:34] Então, entrando um pouco mais a fundo, as histórias de usuários descrevem os requisitos de uma forma ágil, o que que isso quer dizer? É muito comum, outra forma muito comum de descrever requisitos é através de diagramas de casos de uso, ou use cases.
+
+[03:00] Então continuando na ideia de user stories, para escrever, para gerar uma história de usuário, é bastante comum o uso do modelo 3C, o modelo 3C envolve cartão, conversação e confirmação.
+
+***** Cartão 
+porque as histórias devem ser escritas ou em cartões ou em algo do tamanho de um cartão, Vinícius, o que que é um cartão? É bastante conhecido o modelo de cartão de história de usuário que é como se fosse um post-it um pouco maior, um cartãozinho, onde nós vamos ter que fazer a nossa história caber ali, para que ela seja sucinta, para que ela seja simples, voltando para o valor da simplicidade.
+
+***** Conversação 
+porque um requisito é comunicado do cliente ao time através de conversação direta, então nós, como desenvolvedores, não inventamos uma história de usuário, o cliente vai comunicar o requisito e nós documentamos esse requisito através de histórias de usuário.
+
+***** Confirmação
+normalmente é feita através de critérios de aceite, que nós vamos falar bastante mas não nesse vídeo, nós vamos falar um pouco mais para frente.
+
+***** Histórias de usuário (continuação...)
+[04:01] Mas continuando, histórias de usuário podem ter ciclos de vida, inclusive ciclos de vida diferentes, mas elas vão sendo refinadas, vão sendo uma história muito grande pode ser quebrado em várias menores histórias de usuário.
+
+[04:17] Então normalmente elas nascem como se fossem épicos, um épico é uma história de usuário muito abrangente, algo muito genérico, depois vira uma história de usuário, que pode ser quebrada em várias tarefas.
+
+[04:28] Então para nós termos um modelo de escrita nós podemos escrever história de usuário de várias formas, até por isso existem vários livros, mas para nós trazermos um modelo eu vou utilizar um modelo mais comum que é modelo Connextra.
+
+[04:42] Então nós precisamos ter na história de usuário quem vai ser beneficiado, qual vai ser o benefício e qual é a funcionalidade em si.
+
+[04:50] Então, 
+   - "Como um" (quem sou eu, que eu vou dizer quem vai ser beneficiado, então o meu papel na empresa, na organização, quem sou eu como usuário)
+   - "Eu quero" (a funcionalidade em si)
+   - "Para que" (e aqui nós descrevemos o benefício)
+
+[05:04] Então um exemplo simples de uma história bem genérica, isso pode ser considerado um épico:
+
+	"*Como um* repositor de estoques *eu quero* consultar os itens disponíveis *para que* eu possa verificar quais itens repor."
+
+[05:16] Então aqui eu estou dizendo quem vai ser beneficiado com a implementação dessa história, o que vai ser, qual é a funcionalidade que eu preciso implementar e qual o propósito dessa funcionalidade.
+
+[05:28] Para que isso? Para que eu tenha um pouco mais de contexto e para que os critérios de aceite, para que eu saiba como isso vai ser testado, como isso vai ser utilizado para garantir que o valor está realmente sendo entregue.
+
+[05:40] Então aqui nós temos um crash course, nós demos uma passada rápida sobre o que são histórias de usuário, existem outros cursos naquela formação de gerente ágil que entra em mais detalhes sobre histórias de usuário, existem livros de histórias de usuário, mas o básico que nós precisamos entender é isso, um modelinho de história de usuário.
+
+[06:00] Só que nós não vamos simplesmente ter uma lista enorme de histórias de usuário e ir implementando conforme dá, nós precisamos nos planejar, organizar o que vai ser feito quando, qual história de usuário vai ser pega agora para nós refinarmos, qual vai ser deixada para depois e quando nós falamos desses detalhes de planejamento, nós entramos num outro assunto que eu vou citar num próximo vídeo.
+**** Jogo do Planejamento (AP: seria nossa planning, inclusive com Planning poker)
+[00:00] Bem-vindos de volta e vamos falar sobre como planejar quais histórias de usuário nós vamos atacar, qual nós vamos implementar, uma frase muito interessante do Dwight é
+
+	"Planos não são nada, planejamento é tudo"
+
+[00:14] Isso está dentro daquele valor do manifesto ágil, reagir a mudanças mais do que seguir um plano, o que que isso quer dizer?
+
+[00:22] Nós fazermos um plano completo de como algo vai ser seguido daqui para frente, isso não quer dizer muita coisa, mudanças acontecem, o plano vai precisar mudar, agora o planejamento de como nós vamos reagir a essas mudanças, como nós vamos trabalhar agora, isso quer dizer muita coisa.
+
+[00:39] Então a ideia por trás, tanto de User stories quanto de todo esse jogo do planejamento é essa, nós sabermos, nós nos reunirmos e de alguma forma, através de regras bem definidas, por isso o nome jogo, nós decidirmos o que vai ser implementado nessa interação, quanto tempo isso vai levar para que nós implementemos.
+
+[00:59] Então a ideia do jogo do planejamento é uma reunião, pode ser semanal, pode ser uma reunião a cada ciclo, isso a sua equipe vai definir as regras do jogo e através de determinadas regras nós vamos sentar e definir algumas coisas.
+
+[01:15] Então, no jogo do planejamento o cliente pode, por exemplo, informar as histórias que ele quer que sejam implementadas e indicar as prioridades dessas histórias, olha, eu quero que essa história aqui seja implementado primeiro e essa história aqui pode ser deixada para depois, tudo bem e junto com a equipe através de regras bem definidas nós vamos definir o que que vai ser implementado.
+
+[01:37] E as regras podem variar, existem diversas sugestões de regras de jogo do planejamento, mas a ideia por trás é que o nome é jogo porque nós vamos definir regras para que todo mundo jogue e que todo mundo faça parte da definição do que vai ser implementado e quanto tempo vai levar.
+
+[01:56] Lembra lá daqueles motivos de motivos de falha de um projeto, onde nós temos um trabalho empurrado com prazo muito apertado, o jogo do planejamento é exatamente a prática que evita aquilo.
+
+[02:10] A equipe de desenvolvimento faz parte das estimativas de uma história de usuário, a equipe de desenvolvimento, quem vai desenvolver vai dizer, olha só, essa história vai levar em média tanto de tempo,
+
+[02:22] Então com isso nós evitamos aquele problema de exaustão de uma equipe tendo que desenvolver muito rápido porque algo não foi planejado e chegaram para nós estabelecendo prazo.
+
+[02:33] Uma das técnicas mais famosas e uma das regras mais famosas para o jogo do planejamento é o Planning poker, então através, baseado nas histórias de usuário uma equipe vai atribuir pontos a essa história, esses pontos querem dizer o custo da história de usuário.
+
+[02:49] E um custo da história de usuário é muito relativo, uma equipe pode entregar, por exemplo, trinta pontos por interação, por sprint a cada três semanas.
+
+[03:00] Então nós vamos dando pontos para a história de usuário e baseado nisso, com a somatória que a equipe pode entregar, supondo que a equipe entregue trinta pontos por interação, nós sabemos que vai priorizar as histórias até que nós somemos um total de 30 pontos e não pode passar daquilo porque nós não vamos entregar, a equipe não tem recursos suficiente para isso, então existem várias formas de você jogar o Planning poker, vale a pena dar uma lida mais a fundo sobre isso.
+
+[03:28] Uma das mais comuns é através de uma sequencia um pouco alterada da sequencia de Fibonacci, onde cada história de usuário vão ter storie points, esse pontos e os jogadores que são todos, baseado numa história de usuário eles vão dizer, eu acho que essa história de usuário aqui tem, por exemplo, vale três pontos, custa três pontos.
+
+[03:51] E se dois desenvolvedores ou mais entregarem, disserem que essa história tem pontos muito diferentes, o que vai acontecer? Essas discrepâncias vão ser justificadas.
+
+[04:04] Então por exemplo, imagina que eu e você estamos discutindo num Planning poker sobre uma história de usuário, eu digo que essa história de usuário custa dois pontos, é uma implementação relativamente simples, já você vai dizer que ela precisa de treze pontos, é mais complexa, vai levar tempo.
+
+[04:20] E nós dois vamos explicar nossos pontos de vista, eu vou falar olha, eu acho que ela custa dois pontos por causa disso, é uma tarefa que só vai precisar disso e está pronto, você vai apresentar o seu ponto de vista falando não, mas você está esquecendo desse detalhe que vai ser necessário daquele outro sistema, sempre mantendo a simplicidade.
+
+[04:38] E nós vamos tentar chegar num meio termo que faça sentido, então a partir disso, a partir desse jogo e da conversa entre toda a equipe, nós vamos chegar nos storie points em quanto cada história custa.
+
+[04:52] E baseado no custo nós conseguimos planejar o que vai ser entregue naquela sprint e naquela interação, naquela semana, como a sua equipe preferir.
+
+[05:02] Então com isso repara que nós já estamos resolvendo diversos daqueles pontos de falha, nós temos o cliente presente, nós não temos mais aquele problema de cereja do bolo, trabalho empurrado com Planning poker nós não vamos sofrer mais.
+**** Garantindo a qualidade - Testes de aceitação - Pequenas Entregas
+[00:15] E o XP prioriza sempre entregas muito pequenas, o sétimo princípio do manifesto ágil é
+ 	 "software funcionando é a medida primária de progresso"
+o que que isso quer dizer? Se não tem um código rodando em produção que o cliente possa utilizar, não tem progresso, é zero, nós estamos na estaca zero, então nós precisamos, sempre que possível entregar algo funcionando, software funcionando.
+
+[00:56] No eXtreme Programming, no XP, cada realese tem que ser o menor possível com o maior valor de negócio possível e por isso nós precisamos priorizar as histórias de usuário, então gerar um relatório muito importante precisa ser implementado antes e depois nós estilizamos o botãozinho que precisa ser estilizado, para isso nós vamos priorizar e nós temos que ter entregas pequenas.
+
+[01:20] Porque nós vamos ter entregas pequenas? Bom, primeiro as pequenas entregas vão ter aquelas histórias que nós já definimos, nós já priorizamos no jogo do planejamento.
+
+[01:28] E com pequenas entregas nós temos várias vantagens, nós entregamos valor de forma adiantada e de forma contínua, aquela ideia de metodologias ágeis, de ter um processo interativo e incremental, ou seja, nós vamos sempre adicionando de forma incremental.
+
+[01:48] E o processo é aprimorado mais rápido, nós, caso erremos na primeira release por exemplo, ou em alguma release, nós erramos alguma coisa? Nós falhamos rápido, é o conceito do fail fast e consegue aprender com esse erro de forma mais rápido e além de rápido nós falhamos de forma pequena, por ser uma entrega pequena nós conseguimos corrigir esse pequeno erro.
+
+[02:47] Existem técnicas que ajudam nessas pequenas entregas e nós vamos vendo, por exemplo, uma das mais importantes são os testes de aceitação.
+
+[05:37] Então, como está aqui, cada história de usuário vai possuir um ou mais, normalmente mais de um, critérios de aceitação, criado também pelo cliente e isso é importante, o analista de teste, o tester, vai lá conversar com o cliente e ele vai ajudar a pensar em bons cenários de teste e esses cenários vão ser escritos junto com o cliente pensando em automatização.
+
+[06:01] E como que nós podemos escrever? Como nós já vimos, para um modelo de escrita de histórias de usuário, vamos ver um modelo de escrita de testes de aceitação e um muito comum é a sintaxe chamado Gherkin que alguns conhecem como BDD.
+
+[06:17] E eu já vou falar desse termo também, mas basicamente, nós temos um pré-requisito então 
+   - dado que (algo está no estado necessário)
+   - quando (uma ação for executada)
+   - então (nós temos algum resultado esperado)
+esse é o modelo de escrita.
+
+[06:32] Então pensando naquela nossa história de usuário de reposição de estoque, 
+"*dado que* o usuário logado é um repositor de estoque, *quando* o item de menu consulta prateleiras para reposição for clicado, *então* a lista de todas as prateleiras para reposição é exibida.
+**** Spikes de Planejamento
+[00:11] Eu não conheço nenhuma tradução para spike, mas basicamente um spike de planejamento é uma prova de conceito, é algo mínimo que nós vamos fazer ali para ver a complexidade da implementação real.
+
+[00:22] Então tem uma frase muito interessante do Uncle Bob:
+	"Algumas vezes a melhor maneira de resolver um problema é ir para casa, jantar, assistir TV, ir para a cama, acordar na manhã seguinte, tomar banho, o problema pode estar resolvido."
+
+[00:35] Então a ideia do spike de planejamento é fazer alguns testes, praticar, mas sem tentar resolver o problema real da melhor forma possível pensando em qualidade é jogar um pedaço de código ali e ver se funciona, os spikes fazem parte de uma prática que ajuda o time no conhecimento, ou seja, adquirir o conhecimento e descobrir as dificuldades na hora de estimar as histórias de usuários de forma um pouco mais acertada.
+
+[01:00] O que acontece? Existe o que é conhecido como risco de planejamento, é muito comum nós estarmos planejando e fazendo estimativa nós podemos errar, acontece, é comum, por isso, lá no Planning poker existe um espaço.
+
+[01:15] Nós vemos os stories points vão aumentando o espaço entre um e outro conforme os storie points aumentam, então entre um e dois é só a diferença de um, entre 20 e 40 tem 20 pontos de diferença, porque quanto mais demorada a storie, maior o risco de nós errarmos na estimativa, então os spikes de planejamento podem nos ajudar a estimar de forma um pouco melhor.
+
+[01:41] O objetivo é aumentar um pouco a confiança, ter um pouco mais de conhecimento justamente para a hora do jogo do planejamento, para o Planning poker.
+
+[01:48] Então o spike é basicamente, como eu falei, uma prova de conceito, é um programinha muito simples para explorar algumas possíveis soluções, brincar um pouco e entender aquele problema um pouco melhor.
+
+[02:01] A ideia é que nós façamos spike arquitetural, por exemplo, para descobrir algumas dificuldades técnicas, para conhecer tecnologias novas e quando uma dificuldade importante surgir, é interessante deixar um par de desenvolvedores ali tentando resolver por alguns dias até que eles entendam, pelo menos tenham uma boa base de como vão poder resolver aquele problema.
+
+[02:22] E assim nós vamos ter um conhecimento maior para na hora do Planning poker, na hora do jogo do planejamento saber estimar a historia de usuário em questão.
+
+[02:32] Por uma tarefa ser realizada, para isso acontecer, os spikes podem ser estimados, eles devem ser estimados, eles devem fazer parte do planejamento de uma sprint, de uma interação.
+
+[02:44] Então, por exemplo, eu sei que nas próximas sprints vai ver uma tarefa muito complexa, uma história bastante difícil de implementar, seja por motivos técnicos, de uma tecnologia difícil que a equipe não conhece bem, ou até por motivos de negócio, é algo bastante complexo e que não consigo quebrar em pedaços menores.
+
+[03:02] Então nesse momento nós vamos dizer, olha, nós vamos colocar aqui uma história, nós vamos adicionar um tempo, vai reservar um tempo para um spike, para uma prova de conceito para nós conseguirmos planejar isso melhor e garantir que tudo vai correr conforme o planejado.
+
+[03:17] E o ideal, esse é o padrão, o correto, é que nós façamos esse spike de planejamento antes da interação onde nós vamos realmente refinar e priorizar a história de usuário em questão.
+
+[03:29] Então essa funcionalidade muito difícil nós deixamos para a interação seguinte, depois do spike de planejamento, depois dessa prova de conceito.
+
+[03:38] E tem que sempre lembrar que o spike serve para diminuir o risco da estimativa, para nós adquirirmos um pouco de conhecimento e nós *não* vamos aproveitar o código dessa prova de conceito.
+
+[03:50] Esse código vai ser descartado, por que? Nós vamos fazer correndo, nós vamos fazer sem se preocupar com a qualidade, talvez nem tenha testes, isso vai ser jogado fora, nada vai ser reaproveitado e nós vamos refazer o código pensando já em como resolver, nós já temos um conhecimento sobre a solução, mas pensando também na qualidade que é um ponto crucial quando nós falamos de XP.
+*** Práticas de Codificação
+**** Padrão de codificação
+[00:30] E a primeira prática que nós vamos falar é uma prática muito simples, muito tranquila de entender que é a de padrão de codificação, existe uma frase que eu já citei em algum momento desse treinamento do Uncle Bob que 
+
+	"A quantia de tempo gasto lendo código versus escrevendo e bem mais de 10 para 1"
+	
+então nós acabamos gastando dez vezes ou mais de tempo lendo o código do que escrevendo, então fazer o código mais fácil de ler torna ele mais fácil de escrever.
+
+[01:00] Então nós precisamos facilitar a leitura do código para que novo código seja escrito de forma simples também, seja feito de forma fácil.
+
+[01:08] Então, se um time XP, se em um time todo mundo está trabalhando junto, refatorando parte, adicionando nova funcionalidade, corrigindo bug, não pode ter padrão diferente.
+
+[01:21] Nesse pedaço de código eu abro as chaves embaixo da linha, nesse outro aqui eu abro do mesmo lado, essa variável está com letra maiúscula, essa outra aqui está com underline.
+
+[01:30] Então isso não faz bem, isso acaba tirando a atenção de quem está lendo o código e parece besteira mas realmente tira. Isso atrapalha muito na hora de nós lermos algo que nós vamos dar manutenção, vamos corrigir um bug, nós acabamos perdendo tempo, fica distraído com aquilo ao invés de focar no problema.
+
+[01:52] Então um padrão é necessário e ele deve facilitar a comunicação entre o time, sempre e inclusive isso ajuda muito na posse coletiva, porque se todo o código está escrito seguindo o mesmo padrão, todo mundo tem a coragem, todo mundo tem a vontade e a segurança para corrigir um problema em qualquer lugar e adicionar uma funcionalidade me qualquer luga, isso evita problemas com programação em par, que nós vamos falar mais para frente.
+
+[02:44] E é muito válido citar que diversas linguagens já sugerem um próprio padrão, o Java tem o Java Code Conventions, a Google fornece convenções e estilos de código para várias linguagens como C, C++, python, o PHP possui as PCR que são o grande padrão da comunidade, enfim, se a sua linguagem fornece um padrão siga o padrão da sua linguagem que é o melhor que você pode fazer.
+
+**** TDD
+[00:21] Primeiro uma frase do Kent Beck, 
+
+	"Eu não sou um excelente programador, sou apenas um bom programador com excelentes hábitos."
+
+[00:29] Talvez você esteja pensando, que cara prepotente dizendo que tem excelentes hábitos, quem é esse tal de Kent Beck? Ele não só é um dos criadores dessa metodologia XP, mas ele também é um criador de um dos primeiros, eu me arrisco a dizer, o primeiro framework de testes automatizados seguindo o padrão xUnit, que é o padrão mais famoso de criação de testes que nós temos hoje.
+
+[00:53] O que acontece? Esse cara bolou um framework para automatizar testes que pessoas faziam de forma mais rudimentar, então ele vive para criar testes, ele é uma pessoa muito influente na área de testes e ele também é o autor dessa metodologia de TDD, pelo menos um dos precursores e um dos grandes incentivadores e evangelistas dessa metodologia.
+
+[01:17] No que que consiste essa ideia de TDD? TDD é um técnica simples para construção de software, onde guia o desenvolvimento por meio da escrita de testes.
+
+[01:46] E o ciclo sugerido pela metodologia TDD, pela técnica TDD é, você primeiro escreve um teste, antes mesmo de ter o código, por exemplo, vou criar uma nova funcionalidade, cria um teste automatizado para ela, só que a funcionalidade ainda não existe, então esse teste vai falhar.
+
+[02:04] Depois de ter criado o teste, você cria o código real que vai fazer esse teste passar, só que você vai criar da forma mais simples possível, só garantindo que o teste passe, depois que o teste estiver passando você vai tomar o tempo para refatorar esse código e nós já já falamos mais sobre refatoração, mas basicamente você vai melhorar o código.
+
+[02:26] E feito isso, refatorado, parte para o próximo ciclo, escreve um teste para uma nova funcionalidade, implementa ela, refatora.
+**** Integração Contínua
+[00:10] E essa prática é a de integração contínua, então vamos dar uma olhada nessa frasezinha aqui do Martin Fowler que é outro grande gênio da tecnologia do desenvolvimento, 
+
+	"A integração contínua não livra os bugs mas os torna dramaticamente mais fáceis de encontrar e remover"
+
+então só dessa frase nós já entendemos que a integração contínua vai nos ajudar a encontrar possíveis problemas.
+
+[00:34] Então integração contínua ou IC é uma prática, basicamente é isso, como nós temos falado de várias outras práticas e onde o código que está sendo desenvolvido pelo time, ele é integrado, versionado, construído, verificado diversas vezes num dia, em um ambiente dedicado.
+
+[00:51] Então basicamente, eu Vinícius estou desenvolvendo, você que está assistindo está desenvolvendo também, nós estamos lá codificando, faz um commit, envia uma modificação, o que acontece?
+
+[01:01] Através da integração contínua essa modificação seja uma correção de bug ou uma nova feature vai gerar, vai desencadear um processo de verificação se os testes estão funcionando, se tem cobertura de código suficiente nos testes, verifica se o padrão de codificação está correto, verifica a qualidade de código no geral, faz o build, garante que a compilação está rodando, enfim, executa uma série de tarefas que garantem a qualidade do nosso sistema.
+
+[01:29] Então só programadores extremos, os programadores XP devem integrar e fazer commit em um só versão do repositório de código, ou seja, tem que existir um repositório onde todos os desenvolvedores fazem commit, então aquele repositório centralizado, um servidor de versionamento, por exemplo, um servido Git onde todo mundo vai fazer push, simples assim.
+
+[01:53] E cada integração vai ser verificada por um build, com testes automatizados, detectando erros o mais cedo possível e fazendo diversas outras verificações possíveis.
+**** Refatoração
+[00:13] Então essa está diretamente relacionada a codificação que é a refatoração e a refatoração é uma prática muito importante nessa metodologia e inclusive eu tenho sempre trazido algumas frases interessantes relacionadas a cada prática mas para essa eu trouxe duas.
+
+[00:28] A primeira é do Martin Fowler
+
+
+	"Qualquer tolo pode escrever código que o computador possa entender, mas bons programadores escrevem códigos que humanos possam entender."
+
+[00:39] E uma outra frase que é acho que é a minha preferida:
+
+	"Sempre deixe o código mais limpo do que quando você o encontrou"
+
+essa é basicamente a regra do bom escoteiro que o Uncle Bob trouxe para a área de desenvolvimento de software.
+
+[01:53] Então resumindo, refatoração é a técnica de pegar um código que já funciona, manter ele funcionando só que agora com design de código melhor, ou seja, melhorar o código, basicamente isso é refatoração.
+
+[02:06] E lembrando que isso faz parte do ciclo de TDD, nós escrevemos o teste falhando, implementa o código e depois refatora para que ele fique mais legível, mais fácil de manter e de evoluir.
+
+[02:20] Existe um gráfico bastante famoso, então tem várias versões, eu peguei esse aqui que tem cores mas basicamente isso mostra como a famosa dívida técnica pode afetar o nosso sistema.
+
+(AP: Ver image: "./refatoracao.jpg")
+[02:33] Deixa eu pegar o apontador e eu tenho aqui um gráfico onde no eixo Y é o custo e no eixo X é o tempo, então eixo horizontal tempo, eixo vertical é o custo, quanto custa para adicionar uma nova funcionalidade ao decorrer do tempo e aqui nessa linha verde é se eu escrever o meu código pensando em qualidade, boas práticas de programação e refatorando, o principal.
+
+[03:00] Então repara que inicialmente se eu estou me preocupando com a qualidade vai custar um pouco mais para desenvolver a mesma funcionalidade do que se eu escrever de qualquer jeito.
+
+[03:12] Mas com o passar do tempo como eu mantenho a qualidade, o custo vai se mantendo mais ou menos constante, ele não aumenta tanto, agora se eu faço o código de qualquer jeito, com o passar do tempo o custo de desenvolver uma nova funcionalidade aumenta muito e esse delta aqui, essa diferença é o que é conhecido como *dívida técnica*.
+
+[03:33] Então basicamente *uma dívida técnica é algo que poderia ter sido melhorado no seu software mas não foi*, uma melhoria que você poderia ter implementado que facilitaria evolução do código ou inclusive auxiliaria na atualização de tecnologias por exemplo.
+
+[03:50] Se você trabalha com PHP e PHP está na versão, no momento da gravação desse vídeo 7.4, se você trabalha na versão 5.6 do PHP, você tem uma dívida técnica enorme, então se você está trabalhando com Java numa versão antiga, também é uma dívida técnica, se o código não foi bem escrito, você tem muita dívida técnica e isso vai ser cobrado aqui com o custo de evolução de sistema.
+
+[04:14] Então basicamente refatoração é isso, é essa técnica de tornar o código mais legível e obviamente nós temos vários cursos aqui na Alura que podem te ajudar com isso.
+
+**** Daily
+[00:00] Bem-vindos de volta e vamos lá falar de uma prática que está naquela seção de codificação da big picture do XP, mas não é diretamente ligado a como nós escrevemos código, então vamos falar sobre a reunião diária em pé, ou se você já conhece Scrum, a famosa Daily Scrum, vamos lá.
+
+[00:20] Uma frase bem interessante aqui, 
+
+	"Ter as melhores ideias do código mais afinado, ou o pensamento mais pragmático é em última instancia, estéril, a menos que você possa se comunicar com outras pessoas."
+
+[00:31] O que que essa frase pesada aqui quer dizer, esse tapa na cara? Quer dizer que não adianta nada você ser uma pessoa que desenvolve muito bem com ótimas qualidades técnicas se você não souber se comunicar, reportar seu status, deixar com que a equipe saiba o que você está fazendo para que todos possam trabalhar como equipe propriamente dito.
+
+[00:52] Então a reunião diária em pé vem justamente para preencher esse gap de comunicação, para garantir que o time se mantenha coeso como é uma prática e que tenha posse coletiva, que todo mundo saiba o que está acontecendo com o sistema.
+
+Pro/AP: Há 3 perguntas a serem respondidas na Daily: O que fiz ontem? O que pretendo fazer hoje? Existe algum impedimento?
+**** Pair programming
+[00:08] Então o que que é a programação em par, antes de nós falarmos da prática, vamos dar uma olhada nessa frase bem interessante:
+
+	"Dados olhos suficientes, todos os erros são óbvios."
+
+[00:18] Então isso quer dizer que o conhecimento compartilhado, existe uma teoria do conhecimento compartilhado que diz que nenhuma pessoa pode possuir tanto conhecimento quanto todas as pessoas juntas, então é mais ou menos o que isso quer dizer.
+
+[00:31] Mas vamos para prática, está muito filosófico isso aqui, nós conhecemos o processo de peer review, que inclusive é muito utilizado em meios acadêmicos, revisão de papers acadêmicos.
+
+[00:43] Então nós já sabemos que isso é uma boa prática e foi trazido para o mundo de desenvolvimento, então é muito comum que quando você termina de desenvolver você chama um par, chama um colega para que ele revise o código que você acabou de implementar, te dê sugestões, etc.
+
+[00:57] Isso e um pouco diferente do code review onde você envia o código para um revisor, no peer review é uma pessoa do seu lado ou mais de uma pessoa olhando com você na hora.
+
+[01:08] Então já que nós sabemos que isso é uma boa prática, inclusive é produtivo, traz códigos melhores, por que não programar e revisar em pares o tempo todo?
+
+[01:18] Na ideia do XP, uma equipe XP, um equipe extrema produz todo o código de produção em par utilizando o que é conhecido como pair programming, ou programação em par.
+
+[01:30] Isso significa literalmente ter duas pessoas programando, uma chamada de piloto e a outra chamada de copiloto, pela analogia de aviação onde o piloto controla realmente os controles do avião e o copiloto cuida da navegação e passa informações extra.
+
+[01:46] E o que o XP indica é programar em par quando o código for criado, agora outras tarefas não necessariamente precisam ser feitas em par, por exemplo, pesquisar uma solução, fazer leituras de código, leituras de soluções, de novas tecnologias, isso não tem necessidade de fazer em par, mas quando código de produção for escrito incluindo os testes, obviamente, nesses momentos a recomendação é programar em par.
+
+[02:14] Alguns pontos interessantes a citar são que trabalhar em par obviamente exige algumas habilidades sociais, nem todo mundo é extrovertido ou vai se sentir bem no início, só que isso aumenta a cooperação do time, mantém de novo o time mais coeso, a posse coletiva tem mais de uma pessoa trabalhando naquele código ao mesmo tempo, melhora a comunicação e inclusive o respeito.
+
+[02:36] Então é muito interessante essa prática independentemente da função de cada um dos integrantes, pode ser dois sêniores, dois júniores, um sênior e um júnior, isso não interfere.
+
+[02:47] E é importante citar que programar em par não é mentoria, é um trabalho colaborativo, os dois estão ali em pé de igualdade, então nunca vai acontecer de uma solução que foi implementada e um dos dois não gostou não pode chegar e falar, aquele código que você fez não está legal não, não, é o código que nós fizemos, é um trabalho colaborativo, aquele código é do par, é dos dois.
+***** vantagens do pair programming
+****** revisão de código contínua
+[03:10] Então vamos falar de algumas vantagens porque obviamente tem vantagens trabalhar em par, revisão de código contínua tem sempre uma outra pessoa olhando o código ali e entendendo a linha de raciocínio,
+****** discussão também contínua da solução
+então existe a possibilidade de atingir uma solução um pouco melhor do que com uma pessoa só, 
+****** afinamento do par
+nós acabamos tendo mais intimidade com o colega e ganhando mais sinergia entre as pessoas.
+****** aprendizagem
+[03:37] Aprendizagem obviamente, com outra pessoa você vai conseguir aprender, não só sobre o sistema em si mas talvez até sobre tecnologias, engenharias de software.
+****** gestão do conhecimento
+[03:47] A gestão do conhecimento que é justamente esse ponto que eu comentei, as vezes uma pessoa conhece muito do sistema pode parear com outra que não entende tanto para que outra aprenda, 
+****** trabalho colaborativo 
+o trabalho colaborativo que incentiva o respeito e a comunicação e motivação.
+****** motivação
+[04:02] Eu quando trabalhei utilizando pair programming, infelizmente não é o cenário mais hoje, quando eu trabalhei com isso era realmente bastante motivador porque nós sempre tentávamos melhorar, porque nós aprendíamos bastante e ensinava bastante e se mantinha bastante motivado então é bem interessante.
+***** Preocupações geradas
+[04:18] Só que algumas preocupações são levantadas, 
+	"o que? Dois programadores fazendo o trabalho de um? Sem condições, nem rola"
+isso normalmente é dito por um gerente que não conhece a produtividade de benefícios de pair programming, ou pessoas que ainda pensam naquele processo clássico de uma pessoa por estação de trabalho, vamos dizer assim, só que desenvolver software é uma atividade complexa, não é para nós tentarmos aplicar processos fabris nisso.
+
+[04:47] Então a pessoa que é responsável pelo processo de agilidade, o coach, é interessante que ele fique atento a organização do ambiente, que ele deixe com que as pessoas estejam cientes das vantagens.
+
+[05:00] Duas pessoas trabalhando no mesmo computador geralmente elas tendem a produzir mais e melhor do que elas trabalhando separadas, então isso é bastante interessante porque aumenta o foco, aumenta a troca de conhecimento o que faz com que no longo prazo as funcionalidades sejam desenvolvidas de forma mais rápida, então, teoricamente, no longo prazo as vantagens começam a aparecer.
+
+[05:23] Segundo algumas literaturas no curto prazo as vantagens já aparecem e foi minha realidade, com pouco tempo em pair programming nós já vimos uma boa melhoria no desenvolvimento do projeto onde eu trabalhei, então é realmente bem interessante.
+***** Trabalho em equipe
+[05:37] E quando nós falamos de pair programming é trabalho em equipe, então existem algumas dicas para que nós façamos isso de forma mais agradável, por exemplo:
+****** Sua ideia primeiro
+sugerir no início de uma programação em par que a ideia do seu colega seja o ponto inicial, então, "sua ideia é primeiro, pode começar", isso mostra respeito e faz com que aquela seção de pair programming flua de forma mais suave.
+****** Pensar alto
+[05:59] Pensar alto, então ao invés de ficar só olhando para o código enquanto pensa, fala o que você está pensando para que o copiloto, para a pessoa que está acompanhando consiga entender a sua linha de raciocínio.
+****** Regra de dez segundos
+[06:09] Existe uma regra de dez segundos, quando o piloto, quando a pessoa que está digitando o código parece estar concentrada numa linha de raciocínio não muito linear, espera dez segundos para tentar entender aquela linha de raciocínio antes de intervir e dar a sua opinião para não desviar o pensamento.
+****** Ciclo de tempo
+[06:27] E revezar é muito importante, não pode ser uma pessoa escrevendo e a outra olhando o tempo todo, precisa acontecer um revezamento, isso pode ser, por exemplo, por tempo, então você define um alarme e a cada quinze minutos vocês revezam, a cada meia hora você revezam, 
+****** Ciclo de TDD
+pode ser por ciclo do TDD, uma pessoa escreve o código de testes, a outra implementa, depois volta mais uma e refatora, então existem várias formas de revezar.
 ** AP: coisas mais importantes do curso
 Papel do desenvolvedor: *É autogerenciado, o que significa que ele tem a responsabilidade e a autonomia para organizar e gerenciar seu próprio trabalho;*

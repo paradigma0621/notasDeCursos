@@ -1,15 +1,76 @@
-Obs: rever o video de Command da alura
-* State
+curso de: https://cursos.alura.com.br/formacao-arquitetura-design-projetos-java-v142135
+
+Deixei os códigos iniciais de cada aula na pasta "./projetosDisponíveisParaSeImplementarOsDesignPatterns" para me desafiar a implementá-los.
+Dica: Os design patterns são implementados onde aparecem os "if's"
+
+traz visão geral com detalhes de cada padrão de projeto:
+https://refactoring.guru/design-patterns/strategy
+* Curso de Design Patterns em Java I: boas práticas de programação
+https://cursos.alura.com.br/course/introducao-design-patterns-java	
+** Command
+Nesta aula, aprendemos:
+
+Que um caso de uso em nossa aplicação pode ter várias ações (salvar no banco, enviar e-mail, etc);
+Que um caso de uso deve ser extraído para uma classe específica, ao invés de estar no arquivo da CLI, controller ou algo do tipo;
+Que a técnica de extração do caso de uso para uma classe específica pode ser chamada de padrão Command;
+A diferença do padrão Command da GoF para o padrão que utiliza Command Handler (muito utilizado no padrão de arquitetura Domain Driven Design).
+** State
 Ver código em "2056-design-patterns-java-1-aula_6/src/br/com/alura/loja/orcamento"
-** Nesta aula, aprendemos
+*** Nesta aula, aprendemos
 Que é possível que um objeto se comporte de formas diferentes, dependendo do seu estado;
 Que, se o resultado de uma chamada de método depende do estado, podemos delegar esta ação para uma classe específica do estado atual.
 
-** "irmão gêmeo do Strategy" - pode ser usado quando ocorre vários if's.
+*** "irmão gêmeo do Strategy" - pode ser usado quando ocorre vários if's.
 Esse padrão é utilizado quando temos uma transição de estados ou quando precisamos aplicar alguma regra ou algum algoritmo baseado em um estado de um objeto de uma classe. Ele é parecido com o Strategy.
 
 [00:30] E nós tínhamos aqueles ifs e elses. If está na situação tal faz algo desse jeito. Else e if está na situação outra faz algo desse outro jeito. Então ele tem esses ifs e elses que fazem alguma coisa baseado no estado. Só que é justamente baseado no estado. E eu tenho também essa questão da transição de estados. Dado um estado eu posso transitar (pedido estando: ex: EM_ANALISE, REPROVADO, FINALIZADO)
 
 [00:53] Só que eu só posso transitar para o estado B, C ou D. Se eu estiver no C eu só posso ir para o D. Se eu estiver no D eu não posso ir para mais nenhum estado. Então existe uma regra de transição de estados. Aí entra o padrão Strategy. Então aplicamos aqui. No caso tínhamos essa regra de aplicar um desconto extra. Então um orçamento já tem o desconto natural de acordo com a quantidade de itens ou com o valor do orçamento.
 
+** Template Method
+Tem-se um modelo (template) de processo que é igual para cada uma das classes filhas - então extraímos ele para a classe mãe, e o que é específico para cada caso implementamos nas classes filhas. 
+** Observer
+*** Command Handler (veio do código do padrão Command)
+Um Command Handler (método "execute(GeraPedido dados)") tem como responsabilidade, normalmente, apenas orquestrar as tarefas a serem executadas, ou seja, chamar as classes necessárias que realizam as tarefas desejadas. No nosso caso, o Command Handler tinha todo o código do fluxo em seu corpo.
 
+Por quais motivos separar cada uma das tarefas em classes distintas é benéfico?
+
+Porque, com classes menores e mais concisas, é mais fácil encontrar possíveis problemas. Se em algum momento uma das tarefas parar de funcionar, nós sabemos que há uma classe específica para este propósito e podemos começar a depuração por ela.
+
+Porque a implementação de cada tarefa pode mudar com o tempo e o Command Handler não deve precisar saber disso. Imagine que a ferramenta utilizada para enviar e-mails mude depois de alguns anos. O nosso Command Handler não precisa saber deste detalhe específico, então é interessante que cada classe seja responsável apenas por uma pequena tarefa.
+*** Teoria da aula
+Ver código em "2056-design-patterns-java-1-aula_6/br/com/alura/loja/pedido"
+
+[06:13] Então a ideia do Observer é, eu tenho ouvintes observadores, classes que estão observando um determinado evento, uma determinada ação. No caso seria a classe "EnviarEmailPedido". Ela é um observador. Ela está observando alguma coisa e quando ela for chamada ela vai executar esse código. No nosso exemplo um "System.out".
+
+[06:38] A classe de salvar pedido no bando também é um ouvinte, também é um observador. Ela está observando uma ação e quando ela for chamada ela vai fazer esse "System.out". E aqui é a classe que está disparando esse evento. Então o Observer é quando temos essa questão. Você tem um evento e você tem ouvintes ou observadores desses eventos. Esse Observer também é conhecido como listener. Você tem um listener, um ouvinte.
+
+[07:02] Então tem essa diferença na nomenclatura, mas a ideia é a mesma. Eu tenho um evento que quando for disparado eu vou ter vários ouvintes que se inscreveram e estão observando esse evento e eles vão ser notificados. Essa que é a ideia. Em vez de você ter que sair correndo e chamando ouvinte por ouvinte, "Ouvinte 1 faz isso. Ouvinte 2 faz aquilo. Ouvinte 3 faz aquilo", você simplesmente notifica.
+
+[07:25] Acabei de disparar o evento. Quem estiver interessado, quem estiver observando vai ser notificado e vai executar a sua própria ação. Então essa é que é a ideia. Nós estamos invertendo o controle. *É um exemplo de inversão de controle* quando utilizamos o padrão Observer.
+
+[07:39] Em vez de chamarmos classe por classe, nós disparamos o evento e cada uma das classes vão ser notificadas e elas é que vão reagir a esse evento. Essa é a ideia para você diminuir o acoplamento. Então esse foi mais um padrão de projeto, o padrão Observer. 
+
+[08:01] Se tem uma classe que precisa chamar manualmente várias outras classes quando um método é executado. Pensa se você não pode aplicar esse padrão Observer para diminuir esse acoplamento e aplicar inversão de controle. Talvez utilizando injeção de dependências será a maneira apropriada. 
+	
+** Strategy
+Evita sequências de IF-ELSE.
+Faz uso de polimorfismo onde cada classe tem sua estratégia específica.
+
+Como diminuir a complexidade do nosso código, trocando múltiplas condicionais por classes:
+Esta técnica é chamada de Strategy, que é um dos padrões de projeto
+
+Usado quando já sabemos previamente qual regra deve ser usada para aquele parâmetro.
+
+** Chain of Responsability
+Evita sequências de IF-ELSE.
+Diferente do Strategy, eu não sei qual regra deve ser aplicada. Deve verificar para cada um dos tipos se ele é aplicado ou não.
+* Curso de Design Patterns em Java II: avançando nas boas práticas de programação
+https://cursos.alura.com.br/course/avancando-design-patterns-java
+
+
+Isole o código de bibliotecas com o pattern Adapter
+Torne flexível a mudança de um método com o pattern Decorator
+Simplifique a interface de uso de uma classe com o pattern Facade
+Aprenda a compor comportamentos com o pattern Composite
+Utilize o pattern Proxy para implementar um mecanismo de cache
