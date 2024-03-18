@@ -412,3 +412,5 @@ Outra estratégia com o mesmo objetivo é o Feature Toggles, também um dark lau
 Um exemplo é quando é oferecida a consdição de "beta tester" para o usuário de alguma aplicação, caso a resposta seja positiva, alguma configuração no cadastro possibilitará o acesso à nova feature. Mas temos a mesma base de código, não são duas versões blue ou green.
 
 Esta estratégia pode ser combinada ao Canary Release: uma parcela dos usuários que será direcionado para a versão nova utilizará o Feature Toggles habilitado. Há pessoas que defendem que toda a nova funcionalidade deve ser um Feature Toggles, mas para isso ser implementado de maneira correta deve-se elaborar uma estratégia para lidar com essa proposta.
+* Ferramentas 
+De monitoramento: netdata (para o linux) - monitora status (cpu, memória, ...) da máquina em que está instalado.

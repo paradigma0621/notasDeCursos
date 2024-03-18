@@ -1,0 +1,178 @@
+* pacote selecionado no start.spring.io
+** Spring DevTools
+Permite recarregar automaticamente o projeto quando o mesmo é salvo com alterações.
+Para isso, além de adicionar a biblioteca é preciso deixar ativas as checkboxes mostradas em AutoReload1.jpg e AutoReload2.jpg (ver pasta "./Imagens").
+* pom.xml
+** importação das bibliotecas do spring boot
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>1.4.1.RELEASE</version>
+		<relativePath/>
+	</parent>
+
+esse <parent> diz para o spring anexar um "pom parent" que declara o springboot 1.4.1 padrão. (Ver que não há imports direto de spring boot nas dependencies - ele é feito nesse parent).
+* DAO
+Em alguns projetos em Java, dependendo da tecnologia escolhida, é comum encontrarmos classes que seguem o padrão DAO, utilizado para isolar o acesso aos dados. Entretanto, neste curso utilizaremos um outro padrão, conhecido como Repository (AP: Junto com repository foi usado JPA)
+
+Mas aí podem surgir algumas dúvidas: qual a diferença entre as duas abordagens e o porquê dessa escolha?
+
+** Padrão DAO
+O padrão de projeto DAO, conhecido também por Data Access Object, é utilizado para persistência de dados, onde seu principal objetivo é separar regras de negócio de regras de acesso a banco de dados. Nas classes que seguem esse padrão, isolamos todos os códigos que lidam com conexões, comandos SQLs e funções diretas ao banco de dados, para que assim tais códigos não se espalhem por outros pontos da aplicação, algo que dificultaria a manutenção do código e também a troca das tecnologias e do mecanismo de persistência.
+
+*** Implementação
+Vamos supor que temos uma tabela de produtos em nosso banco de dados. A implementação do padrão DAO seria o seguinte:
+
+Primeiro, seria necessário criar uma classe básica de domínio Produto:
+
+public class Produto {
+   private Long id;
+   private String nome;
+   private BigDecimal preco;
+   private String descricao;
+
+   // construtores, getters e setters
+}
+
+Em seguida, precisaríamos criar a classe ProdutoDao, que fornece operações de persistência para a classe de domínio Produto:
+
+public class ProdutoDao {
+
+    private final EntityManager entityManager;
+
+    public ProdutoDao(EntityManager entityManager) {
+        this.entityManager = entityManager;
+    }
+    
+    public void create(Produto produto) {
+        entityManager.persist(produto);
+    }
+
+    public Produto read(Long id) {
+        return entityManager.find(Produto.class, id);
+    }
+
+    public void update(Produto produto) {
+        entityManger.merge(produto);
+    }
+
+    public void remove(Produto produto) {
+        entityManger.remove(produto);
+   }
+
+}
+
+No exemplo anterior foi utilizado a JPA como tecnologia de persistência dos dados da aplicação.
+
+** Padrão Repository
+De acordo com o famoso livro Domain-Driven Design, de Eric Evans:
+
+O repositório é um mecanismo para encapsular armazenamento, recuperação e comportamento de pesquisa, que emula uma coleção de objetos.
+
+Simplificando, um repositório também lida com dados e oculta consultas semelhantes ao DAO. No entanto, ele fica em um nível mais alto, mais próximo da lógica de negócios de uma aplicação. Um repositório está vinculado à regra de negócio da aplicação e está associado ao agregado dos seus objetos de negócio, retornando-os quando preciso.
+
+Só que devemos ficar atentos, pois assim como no padrão DAO, regras de negócio que estão envolvidas com processamento de informações não devem estar presentes nos repositórios. Os repositórios não devem ter a responsabilidade de tomar decisões, aplicar algoritmos de transformação de dados ou prover serviços diretamente a outras camadas ou módulos da aplicação. Mapear entidades de domínio e prover as funcionalidades da aplicação são responsabilidades muito distintas.
+
+Um repositório fica entre as regras de negócio e a camada de persistência:
+
+Ele provê uma interface para as regras de negócio onde os objetos são acessados como em uma coleção;
+Ele usa a camada de persistência para gravar e recuperar os dados necessários para persistir e recuperar os objetos de negócio.
+** Por que o padrão repository ao invés do DAO utilizando Spring?
+O padrão de repositório incentiva um design orientado a domínio, fornecendo uma compreensão mais fácil do domínio e da estrutura de dados. Além disso, utilizando o repository do Spring não temos que nos preocupar em utilizar diretamente a API da JPA, bastando apenas criar os métodos que o Spring cria a implementação em tempo de execução, deixando o código muito mais simples, menor e legível.
+* Flyway
+** É uma boa prática criar o flyway
+Padrão de nomeação:
+V1__createTables.sql
+dentro de resources/db/migrations
+
+após criado o migration da 1a vez não é recriado a cada start da aplicação - ele verifica até qual já foi criada e se tem alguma nova apenas.
+
+** Ao fazer a adição de uma nova coluna em uma tabela
+Criar um arquivo de uma migração à frente da última Vxy (Ex: existe V1__createX.sql - criar a V2__add-columnX.sql - e não simplesmente editar a V1__createX.sql).
+** Caso ocorra erro na execução de uma migration
+Eventualmente pode acontecer de esquecermos de parar o projeto e algum erro acontecer ao tentar inicializar a aplicação. Nesse caso será exibido o seguinte erro ao tentar inicializar a aplicação:
+
+	Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'flywayInitializer' defined in class path resource [org/springframework/boot/autoconfigure/flyway/FlywayAutoConfiguration$FlywayConfiguration.class]: Validate failed: Migrations have failed validation
+
+Perceba na mensagem de erro que é indicado que alguma migration falhou, impedindo assim que o projeto seja inicializado corretamente. Esse erro também pode acontecer se o código da migration estiver inválido, contendo algum trecho de SQL digitado de maneira incorreta.
+
+Para resolver esse problema será necessário acessar o banco de dados da aplicação e executar o seguinte comando sql:
+
+	delete from flyway_schema_history where success = 0;
+	
+O comando anterior serve para apagar na tabela do Flyway todas as migrations cuja execução falhou. Após isso, basta corrigir o código da migration e executar novamente o projeto.
+
+Obs: Pode acontecer de alguma migration ter criado uma tabela e/ou colunas e com isso o problema vai persistir, pois o flyway não vai apagar as tabelas/colunas criadas em migrations que falharam. Nesse caso você pode apagar o banco de dados e criá-lo novamente:
+
+drop database vollmed_api;
+create database vollmed_api;
+* @Repository do JPA
+public interface MedicoRepository extends JpaRepository<Medico, Long> {
+}
+
+O primeiro será o tipo da entidade trabalhada pelo repository, Medico, e o tipo do atributo da chave primária da entidade, Long.
+* Validação de campos (annotations) passados no Request Body
+Como usamos as validações que já adicionamos ao nosso artigo "pom.xml"? No caso, spring-boot-starter-validation:
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-validation</artifactId>
+		</dependency>
+
+Eexistem dezenas de outras anotações que podemos utilizar em nosso projeto, para os mais diversos tipos de atributos. Você pode conferir uma lista com as principais anotações do Bean Validation na:
+https://jakarta.ee/specifications/bean-validation/3.0/jakarta-bean-validation-spec-3.0.html#builtinconstraints
+** @NotNull
+verifica se não é nulo
+se for preciso não ser vazio, usar apeans @NotBlank abaixo
+** @NotBlank
+verifica se não é nulo e se não é vazio
+Vamos adicionar uma anotação a cada um dos atributos, começando pelo atributo nome, que é obrigatório e não pode ser nulo e que, também, não pode ser vazio: precisa de um texto. Para informar isso ao Bean Validation, passaremos a anotação @NotBlank.
+** @Email
+Também passaremos a anotação @NotBlank acima de String email. Para dar a formatação de e-mail, passaremos também a anotação @Email.
+** @Pattern
+Acima de String crm, vamos passar @NotBlank e @Pattern, porque ele é um número de 4 a 6 dígitos. Dentro da segunda anotação, para esclarecer a quantidade de dígitos passaremos a expressão regular (regexp = "\\d{4,6}").
+
+Vamos passar @Pattern e a expressão regular (regexp = "\\d{8}") acima de String cep (ex: 86070070)
+
+public record DadosEndereco(
+        @NotBlank
+        String logradouro,
+        @NotBlank
+        String bairro,
+        @NotBlank
+        @Pattern(regexp = "\\d{8}")
+        String cep,
+        @NotBlank
+        String cidade,
+        @NotBlank
+        String uf,
+        String complemento,
+        String numero) {
+** @Valid 
+Agora vamos acessar "MedicoController.java". Lá, adicionaremos @Valid, para solicitar queo Spring se integre ao Bean Validation e execute as validações. Agora só precisamos salvar.
+ex:
+    @PostMapping(path = "/create")
+    public ResponseEntity<AssetPackDto> create(@Valid @RequestBody AssetPackDto dto) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(service.create(dto));
+    }
+
+Obs: Ver item abaixo ** Exemplo - para quando se aplica essa annotation para um objeto
+
+** Exemplo
+Obs: o @Valid em DadosEndereco diz pra olhar dentro da classe DadosEndereco e olhar as annotations do objeto também.
+public record DadosCadastroMedico(
+        @NotBlank
+        String nome,
+        @NotBlank
+        @Email
+        String email,
+
+        @NotBlank
+        String telefone,
+        @NotBlank
+        @Pattern(regexp = "\\d{4,6}")
+        String crm,
+        @NotNull
+        Especialidade especialidade,
+
+        @NotNull @Valid DadosEndereco endereco) {
+}
