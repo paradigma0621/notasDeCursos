@@ -393,6 +393,7 @@ git clone --recursive https://github.com/CViniciusSDias/alura-ms.git
 Para saber mais sobre submódulos do git, ver arquivo notasDeCursos/CursosDaAlura/Infraestrutura-DevOps/GitHub/git.org
  na seção: ** Aula do curso de Microsserviços: (Git) Prática - Submódulos 
 ** Infraestrutura
+"Só é possível automatizar o que eu posso fazer de forma manual."
 *** AP: arquivo docker-compose.yml que sobe todos os microsserviços dos submódulos com um único comando: docker composer up
 repetindo: o git usado é esse: https://github.com/CViniciusSDias/alura-ms
 		para baixar tudo: git clone --recursive https://github.com/CViniciusSDias/alura-ms.git
@@ -527,3 +528,26 @@ services:
       - 8080:8080
     depends_on:
       - postgre-academico
+*** Github Actions (Abrindo um repositório: ver guia dentro do Github)
+O GitHub Actions é uma plataforma de automação e CI/CD (Integração Contínua e Entrega Contínua) integrada ao GitHub, permitindo aos desenvolvedores automatizar workflows diretamente dentro de seus repositórios GitHub. Com o GitHub Actions, você pode escrever instruções individuais, chamadas de "ações", que podem ser combinadas para criar um workflow. Esses workflows podem ser acionados por eventos específicos no GitHub, como push, pull requests, criação de tags, entre outros.
+
+Utilizando o GitHub Actions, é possível automatizar uma ampla gama de tarefas, incluindo testes de código, construção e implantação de aplicações, e até mesmo tarefas administrativas, como triagem de issues e pull requests
+** Front-end
+*** Optimistic and Pessimistic UI Rendering
+Otimismo e pessimismo no contexto de renderização de UI (User Interface) referem-se a duas abordagens distintas sobre como aplicativos manipulam operações assíncronas, especialmente aquelas que envolvem interações com uma base de dados ou chamadas a APIs externas. Essas estratégias impactam diretamente na experiência do usuário, oferecendo trade-offs entre a sensação de rapidez e a precisão dos dados apresentados.
+
+****  Renderização Otimista (Optimistic UI)
+
+A renderização otimista é uma abordagem onde o aplicativo assume que as operações assíncronas serão bem-sucedidas. Ao invés de esperar por uma resposta do servidor ou da conclusão de uma transação de dados, o aplicativo imediatamente reflete as mudanças propostas na UI como se elas já tivessem sido confirmadas. Esse método pode significativamente melhorar a percepção de rapidez e responsividade do aplicativo.
+
+Por exemplo, quando um usuário envia um formulário para criar um novo item, o item pode ser imediatamente adicionado à lista mostrada na UI, mesmo antes da confirmação do servidor. Se a operação falhar, o aplicativo deve então lidar com a situação, possivelmente revertendo a mudança e informando ao usuário.
+
+****  Renderização Pessimista (Pessimistic UI)
+
+Contrariamente, a renderização pessimista adota uma abordagem mais cautelosa. O aplicativo só reflete as mudanças na UI após receber uma confirmação bem-sucedida da operação assíncrona. Isso garante que a UI sempre represente o estado atual confirmado dos dados, evitando inconsistências ou a necessidade de reverter mudanças.
+
+Esse método pode ser preferível em situações onde a precisão dos dados é crítica, ou quando as operações têm alta probabilidade de falhar. No entanto, pode levar a uma experiência de usuário percebida como mais lenta, já que as mudanças na UI só ocorrem após a conclusão das operações de backend.
+
+**** Escolha entre Otimismo e Pessimismo
+
+A escolha entre renderização otimista e pessimista depende de vários fatores, incluindo a natureza da operação, a importância da precisão dos dados para a experiência do usuário, e a tolerância ao risco de ter que reverter mudanças na UI. Operações de baixo risco e alta frequência, onde a percepção de rapidez é crucial, podem se beneficiar da renderização otimista. Por outro lado, operações críticas, onde a confirmação de sucesso é fundamental, podem demandar uma abordagem pessimista.

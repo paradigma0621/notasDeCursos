@@ -1,9 +1,11 @@
-* pacote selecionado no start.spring.io
-** Spring DevTools
+https://cursos.alura.com.br/formacao-spring-boot-3
+* Curso de Spring Boot 3: desenvolva uma API Rest em Java
+** pacote selecionado no start.spring.io
+*** Spring DevTools
 Permite recarregar automaticamente o projeto quando o mesmo é salvo com alterações.
 Para isso, além de adicionar a biblioteca é preciso deixar ativas as checkboxes mostradas em AutoReload1.jpg e AutoReload2.jpg (ver pasta "./Imagens").
-* pom.xml
-** importação das bibliotecas do spring boot
+** pom.xml
+*** importação das bibliotecas do spring boot
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
@@ -12,15 +14,15 @@ Para isso, além de adicionar a biblioteca é preciso deixar ativas as checkboxe
 	</parent>
 
 esse <parent> diz para o spring anexar um "pom parent" que declara o springboot 1.4.1 padrão. (Ver que não há imports direto de spring boot nas dependencies - ele é feito nesse parent).
-* DAO
+** DAO
 Em alguns projetos em Java, dependendo da tecnologia escolhida, é comum encontrarmos classes que seguem o padrão DAO, utilizado para isolar o acesso aos dados. Entretanto, neste curso utilizaremos um outro padrão, conhecido como Repository (AP: Junto com repository foi usado JPA)
 
 Mas aí podem surgir algumas dúvidas: qual a diferença entre as duas abordagens e o porquê dessa escolha?
 
-** Padrão DAO
+*** Padrão DAO
 O padrão de projeto DAO, conhecido também por Data Access Object, é utilizado para persistência de dados, onde seu principal objetivo é separar regras de negócio de regras de acesso a banco de dados. Nas classes que seguem esse padrão, isolamos todos os códigos que lidam com conexões, comandos SQLs e funções diretas ao banco de dados, para que assim tais códigos não se espalhem por outros pontos da aplicação, algo que dificultaria a manutenção do código e também a troca das tecnologias e do mecanismo de persistência.
 
-*** Implementação
+**** Implementação
 Vamos supor que temos uma tabela de produtos em nosso banco de dados. A implementação do padrão DAO seria o seguinte:
 
 Primeiro, seria necessário criar uma classe básica de domínio Produto:
@@ -64,7 +66,7 @@ public class ProdutoDao {
 
 No exemplo anterior foi utilizado a JPA como tecnologia de persistência dos dados da aplicação.
 
-** Padrão Repository
+*** Padrão Repository
 De acordo com o famoso livro Domain-Driven Design, de Eric Evans:
 
 O repositório é um mecanismo para encapsular armazenamento, recuperação e comportamento de pesquisa, que emula uma coleção de objetos.
@@ -77,19 +79,19 @@ Um repositório fica entre as regras de negócio e a camada de persistência:
 
 Ele provê uma interface para as regras de negócio onde os objetos são acessados como em uma coleção;
 Ele usa a camada de persistência para gravar e recuperar os dados necessários para persistir e recuperar os objetos de negócio.
-** Por que o padrão repository ao invés do DAO utilizando Spring?
+*** Por que o padrão repository ao invés do DAO utilizando Spring?
 O padrão de repositório incentiva um design orientado a domínio, fornecendo uma compreensão mais fácil do domínio e da estrutura de dados. Além disso, utilizando o repository do Spring não temos que nos preocupar em utilizar diretamente a API da JPA, bastando apenas criar os métodos que o Spring cria a implementação em tempo de execução, deixando o código muito mais simples, menor e legível.
-* Flyway
-** É uma boa prática criar o flyway
+** Flyway
+*** É uma boa prática criar o flyway
 Padrão de nomeação:
 V1__createTables.sql
 dentro de resources/db/migrations
 
 após criado o migration da 1a vez não é recriado a cada start da aplicação - ele verifica até qual já foi criada e se tem alguma nova apenas.
 
-** Ao fazer a adição de uma nova coluna em uma tabela
+*** Ao fazer a adição de uma nova coluna em uma tabela
 Criar um arquivo de uma migração à frente da última Vxy (Ex: existe V1__createX.sql - criar a V2__add-columnX.sql - e não simplesmente editar a V1__createX.sql).
-** Caso ocorra erro na execução de uma migration
+*** Caso ocorra erro na execução de uma migration
 Eventualmente pode acontecer de esquecermos de parar o projeto e algum erro acontecer ao tentar inicializar a aplicação. Nesse caso será exibido o seguinte erro ao tentar inicializar a aplicação:
 
 	Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'flywayInitializer' defined in class path resource [org/springframework/boot/autoconfigure/flyway/FlywayAutoConfiguration$FlywayConfiguration.class]: Validate failed: Migrations have failed validation
@@ -106,12 +108,12 @@ Obs: Pode acontecer de alguma migration ter criado uma tabela e/ou colunas e com
 
 drop database vollmed_api;
 create database vollmed_api;
-* @Repository do JPA
+** @Repository do JPA
 public interface MedicoRepository extends JpaRepository<Medico, Long> {
 }
 
 O primeiro será o tipo da entidade trabalhada pelo repository, Medico, e o tipo do atributo da chave primária da entidade, Long.
-* Validação de campos (annotations) passados no Request Body
+** Validação de campos (annotations) passados no Request Body
 Como usamos as validações que já adicionamos ao nosso artigo "pom.xml"? No caso, spring-boot-starter-validation:
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -120,15 +122,15 @@ Como usamos as validações que já adicionamos ao nosso artigo "pom.xml"? No ca
 
 Eexistem dezenas de outras anotações que podemos utilizar em nosso projeto, para os mais diversos tipos de atributos. Você pode conferir uma lista com as principais anotações do Bean Validation na:
 https://jakarta.ee/specifications/bean-validation/3.0/jakarta-bean-validation-spec-3.0.html#builtinconstraints
-** @NotNull
+*** @NotNull
 verifica se não é nulo
 se for preciso não ser vazio, usar apeans @NotBlank abaixo
-** @NotBlank
+*** @NotBlank
 verifica se não é nulo e se não é vazio
 Vamos adicionar uma anotação a cada um dos atributos, começando pelo atributo nome, que é obrigatório e não pode ser nulo e que, também, não pode ser vazio: precisa de um texto. Para informar isso ao Bean Validation, passaremos a anotação @NotBlank.
-** @Email
+*** @Email
 Também passaremos a anotação @NotBlank acima de String email. Para dar a formatação de e-mail, passaremos também a anotação @Email.
-** @Pattern
+*** @Pattern
 Acima de String crm, vamos passar @NotBlank e @Pattern, porque ele é um número de 4 a 6 dígitos. Dentro da segunda anotação, para esclarecer a quantidade de dígitos passaremos a expressão regular (regexp = "\\d{4,6}").
 
 Vamos passar @Pattern e a expressão regular (regexp = "\\d{8}") acima de String cep (ex: 86070070)
@@ -147,7 +149,7 @@ public record DadosEndereco(
         String uf,
         String complemento,
         String numero) {
-** @Valid 
+*** @Valid 
 Agora vamos acessar "MedicoController.java". Lá, adicionaremos @Valid, para solicitar queo Spring se integre ao Bean Validation e execute as validações. Agora só precisamos salvar.
 ex:
     @PostMapping(path = "/create")
@@ -157,7 +159,7 @@ ex:
 
 Obs: Ver item abaixo ** Exemplo - para quando se aplica essa annotation para um objeto
 
-** Exemplo
+*** Exemplo
 Obs: o @Valid em DadosEndereco diz pra olhar dentro da classe DadosEndereco e olhar as annotations do objeto também.
 public record DadosCadastroMedico(
         @NotBlank
@@ -176,3 +178,840 @@ public record DadosCadastroMedico(
 
         @NotNull @Valid DadosEndereco endereco) {
 }
+*** @JsonIgnore
+Nos ajuda a ignorar certas propriedades de uma classe Java quando ela for serializada para um objeto JSON.
+Sua utilização consiste em adicionar a anotação nos atributos que desejamos ignorar quando o JSON for gerado.
+
+**** Loop infinito causando StackOverflowError
+Outro problema muito recorrente ao se trabalhar diretamente com entidades JPA acontece quando uma entidade possui algum autorrelacionamento ou relacionamento bidirecional. 
+
+Exemplo:
+public class Produto {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+...
+    @ManyToOne
+    @JoinColumn(name = “id_categoria”)
+    private Categoria categoria;
+}
+
+public class Categoria {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+...
+    @OneToMany(mappedBy = “categoria”)
+    private List<Produto> produtos = new ArrayList<>();
+
+Ao retornar um objeto do tipo Produto no Controller, o Spring teria problemas para gerar o JSON desse objeto, causando uma exception do tipo StackOverflowError. Esse problema ocorre porque o objeto produto tem um atributo do tipo Categoria, que por sua vez tem um atributo do tipo List<Produto>, causando assim um loop infinito no processo de serialização para JSON.
+
+Tal problema pode ser resolvido com a utilização da anotação @JsonIgnore ou com a utilização das anotações @JsonBackReference e @JsonManagedReference, mas também poderia ser evitado com a utilização de um DTO que representa apenas os dados que devem ser devolvidos no JSON.
+** Usar paginação
+- Definir tipo de retorno na declaração do método como Page
+- Definir no parâmetro recebido pelo método um 'Pageable page'
+- Na requisição do JPA: passar o 'page' como argumento - ex: return repository.findAll(page).map...
+- retornar um Page no método
+*** Por padrão, os parâmetros utilizados para realizar a paginação e a ordenação devem se chamar page, size e sort. Entretanto, o Spring Boot permite que os nomes de tais parâmetros sejam modificados via configuração no arquivo application.properties.
+
+Por exemplo, poderíamos traduzir para português os nomes desses parâmetros com as seguintes propriedades:
+
+spring.data.web.pageable.page-parameter=pagina
+spring.data.web.pageable.size-parameter=tamanho
+spring.data.web.sort.sort-parameter=ordem
+
+Com isso, nas requisições que utilizam paginação, devemos utilizar esses nomes que foram definidos. Por exemplo, para listar os médicos de nossa API trazendo apenas 5 registros da página 2, ordenados pelo e-mail e de maneira decrescente, a URL da requisição deve ser:
+
+http://localhost:8080/medicos?tamanho=5&pagina=1&ordem=email,desc
+*** Caso queira ver os comandos SQL disparados no banco de dados, vai precisar adicionar as seguintes propriedades no arquivo application.properties
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.format_sql=true
+** Método PUT
+Para realizar um PUT de um(ou mais) campo(s) é preciso fazer a verificação de cada/todos campos da entidade.
+Obs: não é preciso rodar um "repository.save" ou algo similar, pois o JPA entende que houve modificação do(s) campo(s) da entidade e salva sozinho.
+Exemplo:
+*** controller
+    @PutMapping
+    @Transactional
+    public void atualizar(@RequestBody @Valid DadosAtualizacaoMedico dados) {
+        var medico = repository.getReferenceById(dados.id()); //Aqui são pegos todos os campos atuais
+        medico.atualizarInformacoes(dados);
+    }
+*** Medico.java
+    public void atualizarInformacoes(DadosAtualizacaoMedico dados) {
+        if (dados.nome() != null) {
+            this.nome = dados.nome();
+        }
+        if (dados.telefone() != null) {
+            this.telefone = dados.telefone();
+        }
+        if (dados.endereco() != null) {
+            this.endereco.atualizarInformacoes(dados.endereco());
+        }
+
+    }
+
+
+** PUT x PATCH
+Escolher entre o método HTTP PUT ou PATCH é uma dúvida comum que surge quando estamos desenvolvendo APIs e precisamos criar um endpoint para atualização de recursos. Vamos entender as diferenças entre as duas opções e quando utilizar cada uma.
+
+PUT
+O método PUT substitui todos os atuais dados de um recurso pelos dados passados na requisição, ou seja, estamos falando de uma atualização integral. Então, com ele, fazemos a atualização total de um recurso em apenas uma requisição.
+
+PATCH
+O método PATCH, por sua vez, aplica modificações parciais em um recurso. Logo, é possível modificar apenas uma parte de um recurso. Com o PATCH, então, realizamos atualizações parciais, o que torna as opções de atualização mais flexíveis.
+
+Qual escolher?
+Na prática, é difícil saber qual método utilizar, pois nem sempre saberemos se um recurso será atualizado parcialmente ou totalmente em uma requisição - a não ser que realizemos uma verificação quanto a isso, algo que não é recomendado.
+
+O mais comum então nas aplicações é utilizar o método PUT para requisições de atualização de recursos em uma API, 
+** Exclusão Lógica
+quando um registro não é apagado de fato do banco de dados (poderíamos ter problema de mysql constraint, por exemplo), mas setado apenas um campo (ex: active, removed, ...) para um valor boleano indicando a exclusção. 
+* Curso de Spring Boot 3: aplique boas práticas e proteja uma API Rest
+(Obs: ver código atualizado no projeto "./Curso2-aplique boas práticas e proteja uma API Rest-2770-spring-boot-aula_5")
+** Boas práticas na API
+*** Padronização retornos da API
+Retornar ResponseEntity	
+**** C
+// Não é recomendado devolver e receber intidades JPA no Controller - por isso foi retornado o Dto: new DadosDetalhamentoMedico() e não direto "medico". 
+
+//A classe UriComponentsBuilder, do Spring, cuida da criação da URI;
+
+@PostMapping
+@Transactional
+public ResponseEntity cadastrar(@RequestBody @Valid DadosCadastroMedico dados, UriComponentsBuilder uriBuilder) {
+    var medico = new Medico(dados);
+    repository.save(medico);
+
+    var uri = uriBuilder.path("/medicos/{id}").buildAndExpand(medico.getId()).toUri();
+
+    return ResponseEntity.created(uri).body(new DadosDetalhamentoMedico(medico));
+}
+**** R
+@GetMapping
+public ResponseEntity<Page<DadosListagemMedico>> listar(@PageableDefault(size = 10, sort = {"nome"}) Pageable paginacao) {
+    var page = repository.findAllByAtivoTrue(paginacao).map(DadosListagemMedico::new);
+    return ResponseEntity.ok(page);
+}
+
+
+// Não é recomendado devolver e receber intidades JPA no Controller - por isso foi retornado o Dto: new DadosDetalhamentoMedico() e não direto "medico"
+@GetMapping("/{id}")
+public ResponseEntity detalhar(@PathVariable Long id) {
+    var medico = repository.getReferenceById(id);
+    return ResponseEntity.ok(new DadosDetalhamentoMedico(medico));
+}
+**** U
+// Não é recomendado devolver e receber intidades JPA no Controller - por isso foi retornado o Dto: new DadosDetalhamentoMedico() e não direto "medico"
+
+@PutMapping
+@Transactional
+public ResponseEntity atualizar(@RequestBody @Valid DadosAtualizacaoMedico dados) {
+    var medico = repository.getReferenceById(dados.id());
+    medico.atualizarInformacoes(dados);
+
+    return ResponseEntity.ok(new DadosDetalhamentoMedico(medico));
+}
+**** D
+// DELETE: 204 (Requisição processada e sem conteúdo)
+@DeleteMapping("/{id}")
+@Transactional
+public ResponseEntity excluir(@PathVariable Long id) {
+   var medico = repository.getReferenceById(id);
+   medico.excluir();
+
+   return ResponseEntity.noContent().build();
+}
+*** HTTP Codes
+Categoria de códigos
+Os códigos HTTP (ou HTTPS) possuem três dígitos, sendo que o primeiro dígito significa a classificação dentro das possíveis cinco categorias.
+
+1XX: Informativo – a solicitação foi aceita ou o processo continua em andamento;
+
+2XX: Confirmação – a ação foi concluída ou entendida;
+
+3XX: Redirecionamento – indica que algo mais precisa ser feito ou precisou ser feito para completar a solicitação;
+
+4XX: Erro do cliente – indica que a solicitação não pode ser concluída ou contém a sintaxe incorreta;
+
+5XX: Erro no servidor – o servidor falhou ao concluir a solicitação.
+
+Principais códigos de erro
+Como dito anteriormente, conhecer os principais códigos de erro HTTP vai te ajudar a identificar problemas em suas aplicações, além de permitir que você entenda melhor a comunicação do seu navegador com o servidor da aplicação que está tentando acessar.
+
+Error 403
+O código 403 é o erro “Proibido”. Significa que o servidor entendeu a requisição do cliente, mas se recusa a processá-la, pois o cliente não possui autorização para isso.
+
+Error 404
+Quando você digita uma URL e recebe a mensagem Error 404, significa que essa URL não te levou a lugar nenhum. Pode ser que a aplicação não exista mais, a URL mudou ou você digitou a URL errada.
+
+Error 500
+É um erro menos comum, mas de vez em quando ele aparece. Esse erro significa que há um problema com alguma das bases que faz uma aplicação rodar. Esse erro pode ser, basicamente, no servidor que mantém a aplicação no ar ou na comunicação com o sistema de arquivos, que fornece a infraestrutura para a aplicação.
+
+Error 503
+O erro 503 significa que o serviço acessado está temporariamente indisponível. Causas comuns são um servidor em manutenção ou sobrecarregado. Ataques maliciosos, como o DDoS, causam bastante esse problema.
+** Lidando com erros
+*** Configurando a Response
+Ao longo dos cursos, tivemos que adicionar algumas propriedades no arquivo application.properties para realizar configurações no projeto, como, por exemplo, as configurações de acesso ao banco de dados.
+Para configurar para não imprimir o StackTrace na response de uma requisição HTTP, adicionar na application.properties:
+	server.error.include-stacktrace=never
+
+Para saber outras configurações:
+ https://docs.spring.io/spring-boot/docs/current/reference/html/application-properties.html
+*** Exemplo de aplicação de GlobalExceptionHandler para tratar quando algum campo consumido do request body não vem correto (ex: faltando um campo)
+@RestControllerAdvice
+public class TratadorDeErros {
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity tratarErro400(MethodArgumentNotValidException ex) {
+        var erros = ex.getFieldErrors();
+        return ResponseEntity.badRequest().body(erros.stream().map(DadosErroValidacao::new).toList());
+    }
+
+    private record DadosErroValidacao(String campo, String mensagem) {
+        public DadosErroValidacao(FieldError erro) {
+            this(erro.getField(), erro.getDefaultMessage());
+        }
+    }
+}
+*** Personalizando mensagens de erro retornada na requisição para passagens de formato/falta de campos
+Você deve ter notado que o Bean Validation possui uma mensagem de erro para cada uma de suas anotações. Por exemplo, quando a validação falha em algum atributo anotado com @NotBlank, a mensagem de erro será: must not be blank.
+
+Essas mensagens de erro não foram definidas na aplicação, pois são mensagens de erro padrão do próprio Bean Validation. Entretanto, caso você queira, pode personalizar tais mensagens.
+
+Uma das maneiras de personalizar as mensagens de erro é adicionar o atributo message nas próprias anotações de validação:
+
+public record DadosCadastroMedico(
+    @NotBlank(message = "Nome é obrigatório")
+    String nome,
+
+    @NotBlank(message = "Email é obrigatório")
+    @Email(message = "Formato do email é inválido")
+    String email,
+
+    @NotBlank(message = "Telefone é obrigatório")
+    String telefone,
+
+    @NotBlank(message = "CRM é obrigatório")
+    @Pattern(regexp = "\\d{4,6}", message = "Formato do CRM é inválido")
+    String crm,
+
+    @NotNull(message = "Especialidade é obrigatória")
+    Especialidade especialidade,
+
+    @NotNull(message = "Dados do endereço são obrigatórios")
+    @Valid DadosEndereco endereco) {}
+
+
+Outra maneira é isolar as mensagens em um arquivo de propriedades, que deve possuir o nome ValidationMessages.properties e ser criado no diretório src/main/resources:
+
+nome.obrigatorio=Nome é obrigatório
+email.obrigatorio=Email é obrigatório
+email.invalido=Formato do email é inválido
+telefone.obrigatorio=Telefone é obrigatório
+crm.obrigatorio=CRM é obrigatório
+crm.invalido=Formato do CRM é inválido
+especialidade.obrigatoria=Especialidade é obrigatória
+endereco.obrigatorio=Dados do endereço são obrigatórios
+
+E, nas anotações, indicar a chave das propriedades pelo próprio atributo message, delimitando com os caracteres { e }:
+
+public record DadosCadastroMedico(
+    @NotBlank(message = "{nome.obrigatorio}")
+    String nome,
+
+    @NotBlank(message = "{email.obrigatorio}")
+    @Email(message = "{email.invalido}")
+    String email,
+
+    @NotBlank(message = "{telefone.obrigatorio}")
+    String telefone,
+
+    @NotBlank(message = "{crm.obrigatorio}")
+    @Pattern(regexp = "\\d{4,6}", message = "{crm.invalido}")
+    String crm,
+
+    @NotNull(message = "{especialidade.obrigatoria}")
+    Especialidade especialidade,
+
+    @NotNull(message = "{endereco.obrigatorio}")
+    @Valid DadosEndereco endereco) {}
+** Spring Security
+Com esse código, ao batermos no endpoint: "/login" com os campos "login" e "senha" ele retornará code 200 se for autenticado, e 403 se não for.
+
+O Json Web Token, ou simplesmente JWT.
+
+(Obs: ver código atualizado no projeto "./Curso2-aplique boas práticas e proteja uma API Rest-2770-spring-boot-aula_5")
+*** Adicionando Spring Security no pom.xml
+Primeiramente, você precisará adicionar o Spring Security no projeto, incluindo essas dependências no pom.xml:
+
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-security</artifactId>
+</dependency>
+
+<dependency>
+    <groupId>org.springframework.security</groupId>
+    <artifactId>spring-security-test</artifactId>
+    <scope>test</scope>
+</dependency>
+*** Domain
+@Table(name = "usuarios")
+@Entity(name = "Usuario")
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(of = "id")
+public class Usuario implements UserDetails {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    private String login;
+    private String senha;
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(new SimpleGrantedAuthority("ROLE_USER"));
+    }
+
+    @Override
+    public String getPassword() {
+        return senha;               // Diz pro SpringSecurity que a senha estará no campo senha
+    }
+
+    @Override
+    public String getUsername() {
+        return login;               // Diz pro SpringSecurity que o usuário estará no campo login;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;       // Faz configurações personalizadas, que para esse escopo não foram customizadas
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;       // Faz configurações personalizadas, que para esse escopo não foram customizadas
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;       // Faz configurações personalizadas, que para esse escopo não foram customizadas
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
+}
+*** migration
+create table usuarios(
+    id bigint not null auto_increment,
+    login varchar(100) not null,
+    senha varchar(255) not null,
+
+    primary key(id)
+);
+*** Repository
+package med.voll.api.domain.usuario;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface UsuarioRepository extends JpaRepository <Usuario, Long> {
+}
+*** Service
+(Obs: ver código atualizado no projeto "./Curso2-aplique boas práticas e proteja uma API Rest-2770-spring-boot-aula_5")
+
+O Spring possui um comportamento padrão, ele procura por uma classe específica no projeto. Portanto, precisamos criar essa classe seguindo o padrão do Spring e, com isso, ele consegue identificá-la no projeto e usá-la para fazer o processo de autenticação.
+
+@Service
+public class AutenticacaoService implements UserDetailsService {
+
+    @Autowired
+    private UsuarioRepository repository;
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        return repository.findByLogin(username);
+    }
+}
+
+Com isso, o Spring será o responsável por chamar essa classe. Não injetaremos a classe AutenticacaoService em nenhum controller, o Spring consegue identificá-la e chamá-la quando ocorrer o processo de autenticação.
+
+Precisamos detalhar somente um método na classe dessa interface. No caso, o load User By Username, sendo o método que o Spring chama de forma automática ao efetuarmos o login.
+
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+		return repository.findByLogin(username);
+    }
+
+com iss precisamos adicionar o método abaixo na repository:
+	public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
+    UserDetails findByLogin(String username);
+	}
+*** Configuração de segurança
+(Obs: ver código atualizado no projeto "./Curso2-aplique boas práticas e proteja uma API Rest-2770-spring-boot-aula_5")
+notar que: 
+csrf.disable()  // Como vamos usar tokens, a proteção de CSRF já estará sendo feita com o token
+
+
+@Configuration
+@EnableWebSecurity
+public class SecurityConfigurations {
+
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        return http.csrf().disable()
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and().build();
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
+        return configuration.getAuthenticationManager();
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();           // Diz que irá usar a encriptação do tipo BCrypt
+    }
+}
+*** Controller
+(Obs: ver código atualizado no projeto "./Curso2-aplique boas práticas e proteja uma API Rest-2770-spring-boot-aula_5")
+
+@RestController
+@RequestMapping("/login")
+public class AutenticacaoController {
+
+    @Autowired
+    private AuthenticationManager manager;
+
+    @PostMapping
+    public ResponseEntity efetuarLogin(@RequestBody @Valid DadosAutenticacao dados) {
+        var token = new UsernamePasswordAuthenticationToken(dados.login(), dados.senha());
+        var authenticaon = manager.authenticate(token);
+
+        return ResponseEntity.ok().build();
+    }
+}
+*** Dto
+public record DadosAutenticacao(String login, String senha) {
+}
+** JSON Web Token
+com o código dessa seção será retornado o token quando feita uma requisição com usuário/senha válidos
+*** Auth0
+Entrando em http://jwt.io e indo em "Libraries" e filtrando por "Java", vemos que nos é dada a opção de escolha de umas 7 bibliotecas. Escolhemos a: Auth0, que apesar de a biblioteca poder ser usada por várias linguagens, no github https://github.com/auth0/java-jwt traz o conteúdo descreve como: Biblioteca em Java para gerar tokens em JWT.
+
+Como importar:
+<dependency>
+  <groupId>com.auth0</groupId>
+  <artifactId>java-jwt</artifactId>
+  <version>4.4.0</version>
+</dependency>
+
+*** código para adição do Auth0
+Obs: O ideal é que os tokens da API tenham data de validade.
+
+Vamos gerar a validade chamando o método .withExpiresAt(), passando como parâmetro dataExpiracao(). Precisamos criar esse método privado clicando em "Alt + Enter".
+
+@Service
+public class TokenService {
+
+    @Value("${api.security.token.secret}")
+    private String secret;
+
+    public String gerarToken(Usuario usuario) {
+        try {
+            var algoritmo = Algorithm.HMAC256(secret); // (JWS: HS256)(Algorithm HMAC256): HMAC with SHA-256
+            return JWT.create()
+                    .withIssuer("API Voll.med")
+                    .withSubject(usuario.getLogin())
+                    .withExpiresAt(dataExpiracao())
+                    .sign(algoritmo);
+        } catch (JWTCreationException exception){
+            throw new RuntimeException("erro ao gerar token jwt", exception);
+        }
+    }
+
+    private Instant dataExpiracao() {
+       return LocalDateTime.now().plusHours(2).toInstant(ZoneOffset.of("-03:00"));  //Data de validade: 2 horas
+    }
+}
+*** application.properties
+Abaixo, se não for passado nenhum campo JWT_SECRET quando subirmos nosso servidor, usa por padrão então o 12345678:
+
+api.security.token.secret=${JWT_SECRET:12345678}
+*** DadosTokenJWT
+Só pra dar uma cara de json na resposta da requisição via postman (conterá uma chave "token" com seu valor)
+
+public record DadosTokenJWT(String token) {}
+
+*** Controller
+(Obs: ver código atualizado no projeto "./Curso2-aplique boas práticas e proteja uma API Rest-2770-spring-boot-aula_5")
+
+@RestController
+@RequestMapping("/login")
+public class AutenticacaoController {
+
+    @Autowired
+    private AuthenticationManager manager;
+
+    @Autowired
+    private TokenService tokenService;
+
+    @PostMapping
+    public ResponseEntity efetuarLogin(@RequestBody @Valid DadosAutenticacao dados) {
+        var authenticationToken = new UsernamePasswordAuthenticationToken(dados.login(), dados.senha());
+
+
+
+        var authentication = manager.authenticate(authenticationToken);   // Caso não sejam fornecidos senha e usuário corretos, não le linhas abaixo, mas retorna um HttpStatusCode 403 daqui
+
+
+
+
+        var tokenJWT = tokenService.gerarToken((Usuario) authentication.getPrincipal());
+
+        return ResponseEntity.ok(new DadosTokenJWT(tokenJWT));
+    }
+
+}
+
+*** outras informações no token
+
+(Obs: ver código atualizado no projeto "./Curso2-aplique boas práticas e proteja uma API Rest-2770-spring-boot-aula_5")
+
+Além do Issuer, Subject e data de expiração, podemos incluir outras informações no token JWT, de acordo com as necessidades da aplicação. Por exemplo, podemos incluir o id do usuário no token, para isso basta utilizar o método withClaim:
+
+return JWT.create()
+    .withIssuer("API Voll.med")
+    .withSubject(usuario.getLogin())
+    .withClaim("id", usuario.getId())
+    .withExpiresAt(dataExpiracao())
+    .sign(algoritmo);
+
+O método withClaim recebe dois parâmetros, sendo o primeiro uma String que identifica o nome do claim (propriedade armazenada no token), e o segundo a informação que se deseja armazenar.
+** Controle de acesso
+*** Controle de acesso por URL
+(Obs: ver código atualizado no projeto "./Curso2-aplique boas práticas e proteja uma API Rest-2770-spring-boot-aula_5")
+
+Na aplicação utilizada no curso não teremos perfis de acessos distintos para os usuários. Entretanto, esse recurso é utilizado em algumas aplicações e podemos indicar ao Spring Security que determinadas URLs somente podem ser acessadas por usuários que possuem um perfil específico.
+
+Por exemplo, suponha que em nossa aplicação tenhamos um perfil de acesso chamado de ADMIN, sendo que somente usuários com esse perfil possam excluir médicos e pacientes. Podemos indicar ao Spring Security tal configuração alterando o método securityFilterChain, na classe SecurityConfigurations, da seguinte maneira:
+
+@Bean
+public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    return http.csrf().disable()
+        .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+        .and().authorizeHttpRequests()
+        .requestMatchers(HttpMethod.POST, "/login").permitAll()
+        .requestMatchers(HttpMethod.DELETE, "/medicos").hasRole("ADMIN")
+        .requestMatchers(HttpMethod.DELETE, "/pacientes").hasRole("ADMIN")
+        .anyRequest().authenticated()
+        .and().addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
+        .build();
+}
+Repare que no código anterior foram adicionadas duas linhas, indicando ao Spring Security que as requisições do tipo DELETE para as URLs /medicos e /pacientes somente podem ser executadas por usuários autenticados e cujo perfil de acesso seja ADMIN.
+*** Controle de acesso por anotações
+Outra maneira de restringir o acesso a determinadas funcionalidades, com base no perfil dos usuários, é com a utilização de um recurso do Spring Security conhecido como Method Security, que funciona com a utilização de anotações em métodos:
+
+@GetMapping("/{id}")
+@Secured("ROLE_ADMIN")
+public ResponseEntity detalhar(@PathVariable Long id) {
+    var medico = repository.getReferenceById(id);
+    return ResponseEntity.ok(new DadosDetalhamentoMedico(medico));
+}
+
+No exemplo de código anterior o método foi anotado com @Secured("ROLE_ADMIN"), para que apenas usuários com o perfil ADMIN possam disparar requisições para detalhar um médico. A anotação @Secured pode ser adicionada em métodos individuais ou mesmo na classe, que seria o equivalente a adicioná-la em todos os métodos.
+
+Atenção! Por padrão esse recurso vem desabilitado no spring Security, sendo que para o utilizar devemos adicionar a seguinte anotação na classe Securityconfigurations do projeto:
+
+@EnableMethodSecurity(securedEnabled = true)
+
+Você pode conhecer mais detalhes sobre o recurso de method security na documentação do Spring Security, disponível em: https://docs.spring.io/spring-security/reference/servlet/authorization/method-security.html
+*** Filter
+A cada vez que batemos num endpoint do serviço é executado o método do filtro: doFilterInternal() - os filtros tem essa função: são executados a cada/toda requisição.
+
+Você precisará criar uma classe Filter, responsável por interceptar as requisições e realizar o processo de autenticação e autorização:
+
+@Component
+public class SecurityFilter extends OncePerRequestFilter {
+
+    @Autowired
+    private TokenService tokenService;
+
+    @Autowired
+    private UsuarioRepository repository;
+
+    @Override
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+        var tokenJWT = recuperarToken(request);
+
+        if (tokenJWT != null) {
+            var subject = tokenService.getSubject(tokenJWT);
+            var usuario = repository.findByLogin(subject);
+
+            var authentication = new UsernamePasswordAuthenticationToken(usuario, null, usuario.getAuthorities());
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+        }
+
+        filterChain.doFilter(request, response);
+    }
+
+    private String recuperarToken(HttpServletRequest request) {
+        var authorizationHeader = request.getHeader("Authorization");
+        if (authorizationHeader != null) {
+            return authorizationHeader.replace("Bearer ", "");
+        }
+
+        return null;
+    }
+
+}
+* Curso de Spring Boot 3: documente, teste e prepare uma API para o deploy
+** @JsonAlias
+Imaginemos que temos o seguinte Dto para ser populado via requisição do postman:
+
+public record DadosCompra(
+    Long idProduto,
+    LocalDate dataCompra
+){}
+
+e queremos passar no postman o payload como:
+
+{
+    “produto_id” : 12,
+    “data_da_compra” : “01/01/2022”
+}
+
+
+Bastaria declarar no Dto:
+public record DadosCompra(
+    @JsonAlias({“produto_id”, “id_produto”}) Long idProduto,
+    @JsonAlias({“data_da_compra”, “data_compra”}) LocalDate dataCompra
+){}
+
+onde "dataCompra" tem 2 possibilidades de nomes a serem passados: data_da_compra e data_compra.
+** Configurando possíveis formatos de passagem de data/hora via postman
+Como foi demonstrado no vídeo anterior, o Spring tem um padrão de formatação para campos do tipo data quando esses são mapeados em atributos do tipo LocalDateTime. Entretanto, é possível personalizar tal padrão para utilizar outras formatações de nossa preferência.
+
+Por exemplo, imagine que precisamos receber a data/hora da consulta no seguinte formato: dd/mm/yyyy hh:mm. Para que isso seja possível, precisamos indicar ao Spring que esse será o formato ao qual a data/hora será recebida na API, sendo que isso pode ser feito diretamente no DTO, com a utilização da anotação @JsonFormat:
+
+@NotNull
+@Future
+@JsonFormat(pattern = "dd/MM/yyyy HH:mm")
+LocalDateTime data
+No atributo pattern indicamos o padrão de formatação esperado, seguindo as regras definidas pelo padrão de datas do Java. Você pode encontrar mais detalhes nesta página do JavaDoc.
+
+Essa anotação também pode ser utilizada nas classes DTO que representam as informações que a API devolve, para que assim o JSON devolvido seja formatado de acordo com o pattern configurado. Além disso, ela não se restringe apenas à classe LocalDateTime, podendo também ser utilizada em atributos do tipo LocalDate e LocalTime.
+** Como trazer um elemento aleatório no resultado de uma query 
+...
+)
+order by rand()
+limit 1
+** Aplicação de Padrão de Projeto "Strategy"
+No arquivo: AgendaDeConsultas.java
+
+    @Autowired
+    private List<ValidadorAgendamentoDeConsulta> validadores;
+
+    validadores.forEach(v -> v.validar(dados));
+
+com isso são executados todos os métodos "v.validar()" de todas as classes que implementam a interface, sem precisar ficar manualmente inserindo de uma em uma na List.
+** Spring Doc (Swagger)
+Você precisará adicionar a biblioteca SpringDoc no projeto. Para isso, será necessário adicionar a seguinte dependência no arquivo pom.xml:
+
+<dependency>
+<groupId>org.springdoc</groupId>
+    <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+    <version>2.0.2</version>
+</dependency>
+
+Você também vai precisar alterar o método securityFilterChain, na classe SecurityConfigurations, para liberar acesso aos endpoints disponibilizados pelo SpringDoc:
+
+.requestMatchers("/v3/api-docs/**", "/swagger-ui.html", "/swagger-ui/**").permitAll()
+
+Para que o token JWT possa ser informado na interface do Swagger UI, será necessário criar essa classe de configurações no projeto, dentro do pacote med.voll.api.infra.springdoc:
+
+@Configuration
+public class SpringDocConfigurations {
+
+    @Bean
+    public OpenAPI customOpenAPI() {
+        return new OpenAPI()
+            .components(new Components()
+                .addSecuritySchemes("bearer-key",
+                    new SecurityScheme()
+                        .type(SecurityScheme.Type.HTTP)
+                        .scheme("bearer")
+                        .bearerFormat("JWT")))
+                .info(new Info()
+                    .title("Voll.med API")
+                .description("API Rest da aplicação Voll.med, contendo as funcionalidades de CRUD de médicos e de pacientes, além de agendamento e cancelamento de consultas")
+                    .contact(new Contact()
+                    .name("Time Backend")
+                    .email("backend@voll.med"))
+                    .license(new License()
+                        .name("Apache 2.0")
+                        .url("http://voll.med/api/licenca")));
+}
+}
+
+E, por fim, precisará adicionar a seguinte anotação em cima das classes PacienteController, MedicoController e ConsultaController`:
+
+@SecurityRequirement(name = "bearer-key")
+** Testando JPA da camada respository
+*** Usando banco "físico"
+ver arquivo: 
+"./Formacao Spring Boot 3/Curso3-documente, teste e prepare uma API para o deploy-2771-spring-boot-main/src/test/java/med/voll/api/domain/medico/MedicoRepositoryTest.java"
+
+com a observação que foi criado também o arquivo: "./Formacao Spring Boot 3/Curso3-documente, teste e prepare uma API para o deploy-2771-spring-boot-main/src/main/resources/application-test.properties"
+
+obs: ao final *de cada teste* o spring faz automaticamente o rollback das persistências que foram feitas para o @Test em questão.
+
+*** Usando banco em memória (ex: h2)
+Como citado no vídeo anterior, podemos realizar os testes de interfaces repository utilizando um banco de dados em memória, como o H2, ao invés de utilizar o mesmo banco de dados da aplicação.
+
+Caso você queira utilizar essa estratégia de executar os testes com um banco de dados em memória, será necessário incluir o H2 no projeto, adicionando a seguinte dependência no arquivo pom.xml:
+
+<dependency>
+  <groupId>com.h2database</groupId>
+  <artifactId>h2</artifactId>
+  <scope>test</scope>
+</dependency>
+
+E também deve remover as anotações @AutoConfigureTestDatabase e @ActiveProfiles na classe de teste, deixando-a apenas com a anotação @DataJpaTest:
+
+@DataJpaTest
+class MedicoRepositoryTest {
+
+  //resto do código permanece igual
+
+}
+
+Você também pode apagar o arquivo application-test.properties, pois o Spring Boot realiza as configurações de url, username e password do banco de dados H2 de maneira automática.
+** Testando camada controller
+Como exemplo de retornos 400 e 200, ver:
+Ver: "./Formacao Spring Boot 3/Curso3-documente, teste e prepare uma API para o deploy-2771-spring-boot-main/src/test/java/med/voll/api/controller/ConsultaControllerTest.java"
+
+Obs: Para usarmos JacksonTester<> precisamos declarar a annotation: @AutoConfigureJsonTesters
+
+Nesse código escrevemos testes automatizados de uma classe Controller, utilizando a classe MockMvc para simular requisições na API.
+** Escrevendo outros application.properties que não o principal
+Podemos declarar em um application-prod.properties, apenas as propriedades que queremos sobrescrever, pois as outras não declaradas nele serão as do application.properties principal.
+** build com arquivos war (ao invés de jar)
+Projetos que utilizam o Spring Boot geralmente utilizam o formato jar para o empacotamento da aplicação, conforme foi demonstrado ao longo desta aula. Entretanto, o Spring Boot fornece suporte para o empacotamento da aplicação via formato war, que era bastante utilizado em aplicações Java antigamente.
+
+Caso você queira que o build do projeto empacote a aplicação em um arquivo no formato war, vai precisar realizar as seguintes alterações:
+
+1) Adicionar a tag <packaging>war</packaging> no arquivo pom.xml do projeto, devendo essa tag ser filha da tag raiz <project>:
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-parent</artifactId>
+    <version>3.0.0</version>
+    <relativePath/> <!-- lookup parent from repository -->
+  </parent>
+  <groupId>med.voll</groupId>
+  <artifactId>api</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  <name>api</name>
+
+  <packaging>war</packaging>
+
+2) Ainda no arquivo pom.xml, adicionar a seguinte dependência:
+
+<dependency>
+  <groupId>org.springframework.boot</groupId>
+  <artifactId>spring-boot-starter-tomcat</artifactId>
+  <scope>provided</scope>
+</dependency>
+
+3) Alterar a classe main do projeto (ApiApplication) para herdar da classe SpringBootServletInitializer, bem como sobrescrever o método configure:
+
+@SpringBootApplication
+public class ApiApplication extends SpringBootServletInitializer {
+
+  @Override
+  protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
+    return application.sources(ApiApplication.class);
+  }
+
+  public static void main(String[] args) {
+    SpringApplication.run(ApiApplication.class, args);
+  }
+
+}
+
+Pronto! Agora, ao realizar o build do projeto, será gerado um arquivo com a extensão .war dentro do diretório target, ao invés do arquivo com a extensão .jar.
+** Deployar jar especificando variáveis de ambiente
+*** application-prod.properties
+spring.datasource.url=${DATASOURCE_URL}
+spring.datasource.username=${DATASOURCE_USERNAME}
+spring.datasource.password=${DATASOURCE_PASSWORD}
+
+spring.jpa.show-sql=false
+spring.jpa.properties.hibernate.format_sql=false
+
+*** linha de comando para execução em produção
+você já pode gerar o jar da aplicação via terminal/prompt com o seguinte comando:
+
+	mvn clean package
+
+Depois executar:
+	java -Dspring.profiles.active=prod -DDATASOURCE=jdbc:mysql://localhost/vollmed_api -DDATASOURCE_USERNAME=root -DDATASOURCE_PASSWORD=root -jar target/api-0.0.1-SNAPSHOT.jar
+** GraalVM Native Image
+Uma das novidades de mais destaque da versão 3 do Spring Boot é o suporte a imagens nativas, algo que reduz, de maneira muito significativa, o consumo de memória e o tempo de inicialização de uma aplicação, sendo que alguns outros frameworks concorrentes do Spring Boot, como Micronaut e Quarkus, já forneciam suporte a esse recurso.
+
+Na realidade até era possível gerar imagens nativas em aplicações com Spring Boot antes da versão 3, mas para isso se fazia necessário a utilização de um projeto chamado Spring Native, que adicionava suporte a isso. Com a chegada da versão 3 do Spring Boot, tal projeto não é mais necessário.
+
+*** Native Image
+Imagem nativa é uma tecnologia utilizada para compilar uma aplicação Java, incluindo todas as suas dependências, gerando um arquivo binário executável que pode ser executado diretamente no sistema operacional, sem a necessidade de se utilizar a JVM. Mesmo sem executar numa JVM, a aplicação também contará com os recursos dela, como gerenciamento de memória, garbage collector e controle de execução de threads.
+
+Para saber mais detalhes sobre a tecnologia de imagens nativas acesse a documentação no site: https://www.graalvm.org/native-image
+
+*** Native Image com Spring Boot 3
+Uma maneira bem simples de gerar uma imagem nativa da aplicação é utilizando um plugin do Maven, que deve ser incluído no arquivo pom.xml:
+
+<plugin>
+  <groupId>org.graalvm.buildtools</groupId>
+  <artifactId>native-maven-plugin</artifactId>
+</plugin>
+
+Pronto! Essa é a única alteração necessária no projeto. Após isso, a geração da imagem deve ser feita via terminal, com o seguinte comando Maven sendo executado no diretório raiz do projeto:
+
+./mvnw -Pnative native:compile
+
+O comando anterior pode levar vários minutos para finalizar sua execução, sendo totalmente normal essa demora.
+
+Atenção! Para executar o comando anterior e gerar a imagem nativa do projeto, é necessário que você tenha instalado em seu computador o GraalVM (máquina virtual Java com suporte ao recurso de Native Image) em uma versão igual ou superior a 22.3.
+
+Após o comando anterior finalizar, será gerado no terminal um log como o seguinte:
+
+Top 10 packages in code area:           Top 10 object types in image heap:
+   3,32MB jdk.proxy4                      19,44MB byte[] for embedded resources
+   1,70MB sun.security.ssl                16,01MB byte[] for code metadata
+...
+
+A imagem nativa é gerada no diretório target, juntamente com o arquivo .jar da aplicação, como um arquivo executável de nome "api".
+
+Diferente do arquivo .jar, que é executado pela JVM via comando java -jar, a imagem nativa é um arquivo binário e deve ser executada diretamente pelo terminal:
+
+	target/api
+
+Ao rodar o comando anterior será gerado o log de inicialização da aplicação, que ao final exibe o tempo que levou para a aplicação inicializar:
+
+INFO 127815 --- [restartedMain] med.voll.api.ApiApplication : Started ApiApplication in 0.3 seconds (process running for 0.304)
+
+Repare que a aplicação levou menos de meio segundo para inicializar, algo realmente impressionante, pois quando a executamos pela JVM, via arquivo .jar, esse tempo sobe para algo em torno de 5 segundos.
+
+Para saber mais detalhes sobre a geração de uma imagem nativa com Spring Boot 3 acesse a documentação no site:
+
+GraalVM Native Image Support: https://docs.spring.io/spring-boot/docs/current/reference/html/native-image.html
+
