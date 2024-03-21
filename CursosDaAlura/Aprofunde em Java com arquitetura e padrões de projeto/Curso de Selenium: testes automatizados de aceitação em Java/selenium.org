@@ -1,0 +1,186 @@
+O Selenium é uma ferramenta de automação de testes para aplicações web.
+
+* Hello, World
+<dependency>
+  <groupId>org.seleniumhq.selenium</groupId>
+  <artifactId>selenium-firefox-driver</artifactId>
+  <version>3.X</version>
+</dependency>
+
+Note que esta versão está adaptada ao Firefox, mas podemos simplesmente substituir, no arquivo pom.xml, a palavra firefox por chrome de modo a conseguirmos o driver correto. Como estamos utilizando o Springboot no projeto, que dá conta de fazer o download da versão correta das dependências, podemos remover essa informação da tag.
+
+<dependency>
+    <groupId>org.seleniumhq.selenium</groupId>
+    <artifactId>selenium-chrome-driver</artifactId>
+</dependency>
+
+
+Para abrir o navegador, existe uma interface principal do Selenium chamada WebDriver. Criaremos uma variável browser do tipo WebDriver e importaremos esta interface do pacote org.openqa.selenium.WebDriver. Sendo uma interface, no momento da instanciação precisamos passar qual será a implementação. Já que queremos utilizar o Chrome, instanciaremos um novo ChromeDriver() e o importaremos. Se quiséssemos utilizar o Firefox, teríamos new FirefoxDriver, e assim por diante para cada navegador específico.
+
+
+Entretanto, ao executarmos o teste (clicando com o botão direito e então em "Run as > JUnit Test"), receberemos um erro indicando que o executável do driver não foi encontrado.
+
+Isso acontece porque o Selenium, além de ter uma API que disponibiliza classes para escrevermos nosso teste automatizado, também precisa de um driver - um arquivo que fará a ponte com o navegador que está instalado no computador. Sendo assim, além de baixarmos a dependência do Selenium por meio do pom.xml, também precisamos baixar o driver do Google Chrome.
+
+Pesquisando por "chrome webdriver" no buscador, encontrarems o site do projeto Chromium, no qual poderemos baixar o driver desejado. À época da gravação desse curso, a última versão disponível era a 87, que é justamente a versão do Chrome que tenho instalada em meu computador. É ideal que você baixe a versão respectiva ao navegador que você tem instalado em sua máquina, de preferência atualizando o seu Chrome para ter disponível a versão mais recente.
+
+Clicando no link de download, seremos levados a uma página com as versões do driver para cada sistema operacional, seja Linux, Windows ou Mac. Baixaremos então o arquivo ZIP cujo conteúdo deverá ser extraído para o computador. Em seguida, criaremos no projeto um diretório "drivers" dentro da qual manteremos o driver que acabamos de baixar. Todos os drivers que quisermos utilizar posteriormente serão salvos nessa pasta.
+
+Agora precisamos apontar para o Selenium que o driver do Chrome está no diretório que criamos. Na documentação disponível no site do Selenium encontramos a seção "Driver requirements" (requisitos de driver). Na parte específica do Java, ele indica a linha que informa ao Selenium o caminho do executável.
+
+System.setProperty("webdriver.chrome.driver", "/path/to/chromedriver");
+
+Adicionaremos a linha ao nosso método de teste, substituindo o caminho pelo diretório do nosso webdriver ("/drivers/chromedriver", já que o criamos na raiz do projeto).
+
+public class HelloWorldSelenium {
+
+    @Test
+    public void hello() {
+        System.setProperty("webdriver.chrome.driver", "/drivers/chromedriver");
+        WebDriver browser = new ChromeDriver();
+        browser.navigate().to("http://localhost:8080/leiloes");
+        browser.quit();
+    }
+}
+
+Ao executarmos, teremos um novo erro indicando que o driver encontrado não é executável. Isso acontece no Linux e no MacOS, pois o arquivo baixado não está com permissão de escrita. Para resolvermos, abriremos o Terminal/Prompt de comando, acessaremos o diretório em que está o driver e substituiremos a sua permissão de execução (no Linux) com chmod +x chromedriver. Após executarmos, voltaremos ao teste e tentaremos executá-lo novamente.
+
+Nosso navegador será aberto, mas não conseguiremos entrar no endereço - nesse caso, somente porque nosso projeto não está sendo executado. Resolveremos esse problema acessando a classe LeilaoApplicationJava e executando-a com botão direito seguido de "Run as > Java Application".
+
+Ao rodarmos o teste, uma janela do navegador será aberta, acessará o endereço da aplicação e será fechada em seguida. Na aba do JUnit veremos que 1 teste foi executado e que ele passou com sucesso.
+* Observação
+Para rodar os testes do Selenium tem que subir a aplicação antes.
+* Métodos
+Que é possível recuperar elementos na página utilizando o método findElement();
+Que é possível recuperar o código fonte da página utilizando o método getPageSource();
+Que é possível recuperar o url atual do browser utilizando o método getCurrentUrl();
+Que devemos utilizar o método sendKeys() para enviar textos para os inputs da página;
+Que uma das maneiras de submeter um formulário é via método submit().
+* Testes
+Escrever um teste end-to-end é justamente traduzir os passo a passo que fizemos manualmente para código. Sendo assim, antes de escrevermos um teste, precisamos entender qual é a funcionalidade que queremos testar e simular os passos que normalmente são realizados. Essa é, inclusive, a ideia de um teste E2E: simular a utilização de um software do ponto de vista do usuário.
+
+Ou seja, para efetuar um login na aplicação, os passos são: entrar na tela de login, preencher o formulário com usuário e senha, clicar no botão de logar e ser redirecionado para a tela de leilões com o nome de usuário sendo exibido no canto superior direito. É isso que desejamos verificar se está funcionando como esperado, mas agora de maneira automatizada usando a API do Selenium.
+
+O próximo passo é preencher os campos "Usuário" e "Senha". Mas como fazemos para que o Selenium encontre um elemento em uma página HTML e digite um valor em um campo de input? Como queremos manipular a página, usaremos a variável browser e, a partir dela, chamaremos o método findElement(), que nos permite encontrar um elemento na página.
+
+Esse método recebe como parâmetro uma outra classe do Selenium, chamada By. Essa classe não é instanciada, pois possui diversos métodos estáticos. Existem várias maneiras de referenciarmos um elemento de uma página HTML, por exemplo pelo nome da classe CSS, pelo nome da tag, pelo ID e assim por diante - ou seja, pelos recursos e atributos do próprio HTML. A escolha de qual utilizar vai depender de como a sua página está configurada.
+
+Geralmente, recomenda-se utilizar o ID, e não a classe. Isso porque as classes geralmente são utilizadas pela equipe de front-end, que cuida do CSS, e elas posteriormente podem ser modificadas gerando um impacto nos testes. O mesmo vale para os nomes das tags ou o xpath, pois qualquer mudança na estrutura da página pode quebrar os testes.
+
+Sendo assim, utilizaremos o ID também no nosso treinamento. Mas qual o ID dos nossos inputs? Uma das desvantagens dos testes de interface, seja com o Selenium ou com qualquer outra biblioteca, é que eles são muito frágeis devido a serem acoplados à tela. A ideia é que, para escrevermos o teste, precisamos conhecer coisas externas ao teste - como os IDs de uma página HTML. Da mesma forma, se as IDs forem alteradas, ao invés de termos um erro de compilação, nossos testes irão quebrar.
+
+*Os testes E2E, portanto, são bem frágeis e costumam quebrar com facilidade conforme os times de desenvolvimento trabalham nas páginas.* Isso significa que você e o seu time devem ter isso em mente para tomar determinados cuidados de modo a evitar que os testes quebrem.
+
+No projeto existe um arquivo login.html localizado no diretório "leilao/src/main/rescources/tempaltes". Nele encontraremos os inputs que representam o usuário e a senha, e adicionaremos os ids username e password, respectivamente. Note que eles serão idênticos ao atributo for da tag <label>, o que é uma boa prática.
+* Detalhes
+** alternativa ao uso de browser.findElement(By.id("login-form")).submit();
+Outra alternativa seria usarmos findElement() para encontrarmos o botão de login e chamarmos o método click(), que dispara um clique.
+** Pegando todo o conteúdo da página e verificando se ele contém uma string
+Outra maneira de recuperar elementos em uma página é com o método browser.getPageSource(), que devolve uma string com todo o código fonte da página. A partir dele, podemos usar o contains() para verificarmos se a mensagem "Usuário e senha inválidos." está presente na página.
+* Aprendizados
+O método findElement() devolve um objeto do tipo WebElement;
+Que não devemos enviar null pelo método sendKeys() ao testar campos vazios; (Podemos enviar "").
+Que um objeto Page Object pode devolver outro Page Object quando ocorre uma navegação entre páginas;
+Que podemos reaproveitar o objeto WebDriver entre diferentes objetos Page Object;
+Que podemos recuperar um elemento na página a partir de outro elemento;
+Que podemos utilizar herança, design patterns, dentre outras práticas para organizar os códigos de testes da aplicação.
+* Cenário estranho: manualmente a página carrega normalmente, mas via Selenium ela quebra o teste
+Isso acontece, especialmente, em aplicações que trabalham muito com JavaScript, algo comum hoje em aplicações front-end. Nesses casos, pode acontecer que o Selenium não encontre um elemento na página devido a algum código JavaScript ou outra coisa que tenha travado a página antes que tal elemento fosse carregado e exibido.
+
+Podemos simular um exemplo na página de login (login.html). Antes do navegador desenhar o campo "Senha", podemos incluir um código JS (<script>window.stop()</script>) que faz com que o navegador pare de carregar a página, simulando um travamento.
+
+<div class="card mb-3">
+    <form id="login-form" th:action="@{/login}" class="card-body" method="post">
+        <div class="form-group">
+            <label for="username">Usuário</label>
+            <input id="username" name="username"  class="form-control" placeholder="usuário" autofocus="autofocus">
+        </div>
+
+        <script>window.stop()</script>
+        <div class="form-group">
+            <label for="password">Senha</label>
+            <input id="password" type="password" name="password" class="form-control" placeholder="senha">
+        </div>
+
+Dessa forma, o campo "Senha" e todo conteúdo após a execução do window.stop() não serão desenhados. Claro, nesse caso estamos forçando a parada manualmente, mas poderíamos ter um código JavaScript que chama um API ou serviço externo que cause lentidão, ou uma requisição AJAX.
+
+Ao executarmos os testes de LoginTest, somente o campo "Usuário" será exibido na tela. Na aba do JUnit, perceberemos que nossos testes falharam e retornaram uma exceção, NoSuchElementExceptionError, ou seja, um elemento - nesse caso o de ID password - não foi encontrado.
+
+Se acessarmos manualmente a página de login (http://localhost:8080/login), teremos que o campo "Senha" realmente não é exibido por conta do nosso código JavaScript. Esse é um cenário que pode acontecer em seus testes, e pode fazer com que às vezes eles falhem e às vezes passem.
+
+Uma maneira de lidar com isso é configurar o timeout do Selenium, fazendo com que ele espere um determinado tempo antes de acusar uma falha no teste.
+
+Na nossa classe PageObect, assim que chamamos o construtor e criamos o browser, chamaremos um método browser.manage() que permite fazer algumas configurações no WebDriver, uma delas sendo justamente os timeouts. Utilizando o método timeouts(), conseguiremos fazer configurações como a do método implicitlyWait(), que permite ajustar um tempo de espera que deverá existir antes de lançar um erro na busca de um elemento na página.
+
+No nosso caso, passaremos os parâmetros 5, que é o valor, e TimeUnit.SECONDS, representando a unidade de tempo que estamos definindo.
+
+public PageObject(WebDriver browser) {
+    System.setProperty("webdriver.chrome.driver", "/drivers/chromedriver.exe");
+
+    if (browser == null) {
+        this.browser = new ChromeDriver();
+    } else {
+        this.browser = browser;
+    }
+
+    this.browser.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
+}
+
+Com isso, toda vez que o Selenium buscar um elemento na página, ele esperará no máximo 5 segundos, caso não encontre tal elemento, antes de lançar um erro. Existem outros timetouts que podem ser configurados, como o pageLoadTimeout(). Quando nossas páginas demoram um pouco a carregar, podemos, por exemplo, fazer com que o Selenium espere 10 segundos antes de efetuar os testes e lançar os erros.
+
+Esses timeouts são bastante úteis quando trabalhamos com AJAX, com requisições assíncronas e com JavaScript, que podem desacelerar ou travar o carregamento da página. Quando estamos cientes de que nosso projeto trabalha com essas tecnologias, podemos, preventivamente, configurar os timeouts de acordo com o tempo limite que desejamos esperar. Como em nosso projeto não temos essa situação, vale como dica para aplicações futuras.
+* Boas práticas
+Ao longo do curso conversamos um pouco sobre boas práticas, e chegamos a utilizar o padrão Page Object, recomendado quando escrevemos testes automatizados com o Selenium. Na aula anterior, fizemos também uma refatoração, extraindo uma classe PageObject que centraliza todo o código comum a essas páginas.
+
+Existem diversas outras recomendações de boas práticas que podem ser seguidas quando trabalhamos com testes de aceitação, para que seu código seja mais legível e fácil de ser mantido. O próprio site do Selenium disponibiliza um guia de boas práticas, e nessa aula a ideia é analisarmos esse guia, que serve como um bom ponto de partida para o seu desenvolvimento.
+
+Recomendamos fortemente que você leia essas guidelines e siga os padrões nos projetos em que utilizar o Selenium. A primeira delas, que já seguimos, se refere aos Page Objects, e indica que não devemos acessar a API do Selenium dentro das classes de teste com o JUnit, favorecendo a separção de responsabilidades e a facilidade de manutenção.
+
+Outra recomendação é utilizar uma linguagem específica de domínio (ou DSL, de "Domain Specific Language"), algo que também já fizemos. No momento em que escrevemos os testes, é recomendado que os nomes de métodos sejam legíveis e estejam orientados ao domínio.
+
+Em nosso projeto, os nomes dos métodos já têm uma linguagem voltada ao domínio da aplicação, como é perceptível no método deveriaEfetuarLoginComDadosValidos() e outros das nossas classes de teste. O mesmo vale para nossos Page Objects, com métodos como preencherFormularioDeLogin(), efetuaLogin(), getNomeUsuarioLogado(), isPaginaAtual() e assim por diante.
+
+Também poderíamos utilizar o encadeamento de métodos. Por exemplo, vamos analisar o método deveriaEfetuarLoginComDadosValidos():
+
+@Test
+public void deveriaEfetuarLoginComDadosValidos() {
+    paginaDeLogin.preencheFormularioDeLogin("fulano", "pass");
+    paginaDeLogin.efetuaLogin();
+    Assert.assertFalse(paginaDeLogin.isPaginaDeLogin());
+    Assert.assertEquals("fulano", paginaDeLogin.getNomeUsuarioLogado());
+}
+
+Poderíamos tê-lo implementado de maneira que os passos fossem encadeados:
+
+@Test
+public void deveriaEfetuarLoginComDadosValidos() {
+    paginaDeLogin.preencheFormularioDeLogin("fulano", "pass").efetuaLogin();
+    Assert.assertFalse(paginaDeLogin.isPaginaDeLogin());
+    Assert.assertEquals("fulano", paginaDeLogin.getNomeUsuarioLogado());
+}
+
+A ideia é tentarmos escrevermos os testes de maneira legível e com uma linguagem fluida, com base no domínio da aplicação. A próxima prática se refere a gerar o estado da aplicação.
+
+O idela é que o Selenium não seja usado para preparar um estado da aplicação, mas que cada cenário de teste prepare tudo que ele precisa. Por exemplo, para cadastrarmos um leilão, primeiro tivemos que abrir o formulário de login, efetuar o login, navegar para a página de leilões e então navegar para a prática de formulário. Não é uma boa prática deixar isso pré-configurado, mas sim criar o passo-a-passo no próprio teste. Dessa forma, o teste não ficará baseado em um estado estático da aplicação, que poderá ser alterado futuramente.
+
+Continuando, temos uma página sobre serviços externos. Se o seu teste precisa acessar uma API externa ou algo do gênero, o ideal é fazermos um Mock, como o Mockito, simulando os comportamentos desses serviços. Como os testes E2E já são demorados e precisam que a aplicação esteja rodando, de modo a abrir o navegador e clicar nos elementos, acessar recursos externos fará com que eles demorem mais ainda. A utilização de mocks favorece uma melhor performance nos testes.
+
+A próxima seção é sobre o "report" de testes. O Selenium por si só não reporta os estados dos testes, e portanto recomenda que você utilize uma ferramenta de testes como o JUnit, que permite a configuração desses reports para que saibemos quais testes passaram, quanto tempo levou, quais demoraram mais e assim por diante.
+
+A documentação também nos recomenda evitar o compartilhamento de estados. Cada teste deve rodar de maneira isolada - ou seja, um teste não deve guardar um estado para outros testes o reaproveitem. Se um teste precisa acessar uma página de login, não devemos depender que ela já esteja carregada a partir de outro teste.
+
+Foi exatamente isso que fizemos em nosso projeto: cada método de teste começa a navegação do zero, desde a abertura do navegador até as verificações. É um pouco mais trabalhoso, já que precisamos escrever mais códigos, mas é uma garantia a mais de que nossos testes serão fidedignos e de fácil manutenção no futuro. Além disso, podemos utilizar alguns padrões e a herança para reduzirmos a verbosidade dos códigos de teste.
+
+O próximo conteúdo fala sobre a independência dos testes, conceito bastante relacionado ao anterior: cada teste deve rodar de maneira independente do outro.
+
+Recomenda-se utilizar uma API fluente, contendo exemplos de como utilizar uma linguagem fluente para fazer encadeamentos de métodos.
+
+driver.get( "http://www.google.com/webhp?hl=en&amp;tab=ww" );
+GoogleSearchPage gsp = new GoogleSearchPage();
+gsp.withFluent().setSearchString().clickSearchButton();
+
+Com isso, fica mais fácil ler e entender o código. Não fizemos esse tipo de construção no nosso projeto, mas fica como desafio se você quiser implementar.
+
+A última recomendação é que cada teste deve ter um navegador "limpo", ou seja, devemos abrir uma nova janela ao invés de reaproveitarmos o que já estiver aberto do teste anterior. Isso porque um teste pode guardar alguma informação, como um cookie ou um estado, que pode influenciar nos testes seguintes.
+
+Também já fizemos isso em nosso projeto, com cada cenário de testes abrindo e fechando uma nova janela do navegador. Essas são as boas práticas recomendadas pelo Selenium, e já estamos seguindo a maioria das que se aplicam ao nosso projeto, com exceção da API fluente (que é relativamente simples de seguir). A dica é ler a documentação e as boas práticas, discutí-las com seu time e até pensar em outras boas práticas que podem ser seguidas em seu projeto.
