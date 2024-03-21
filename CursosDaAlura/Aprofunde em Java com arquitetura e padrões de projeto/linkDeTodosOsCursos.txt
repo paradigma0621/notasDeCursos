@@ -1,0 +1,5 @@
+Aprofunde em Java com arquitetura e padrões de projeto
+
+Modelo o seu projeto usando boas práticas e padrões de projeto como o SOLID. Use BDD e DDD e saiba as vantagens da Clean Architecture.
+
+https://cursos.alura.com.br/formacao-arquitetura-design-projetos-java-v142135

@@ -42,7 +42,6 @@ as camadas mais internas não vêem as camadas mais externas
 
 Entities, segundo o DDD: uma entidade é um tipo de classe que possui uma identidade (ed: CPF de uma pessoa)
 
-
 Use Cases (ex: Services)
 
 Controllers (ex: adaptadores vistos na aula passada)
@@ -58,8 +57,6 @@ Domain-Driven Design: o código pr ecisa refletir a realidade do negócio
 - Domínio e subdomínio: ex: domínios possíveis da Alura: domínio principal (o que faz a empresa ser a empresa, o núcleo): "acadêmico", subdomínio: gameficação
 *** 2) Padrões Táticos
 - Blocos de construção: entidades, repositórios, ...
-
-
 ** DDD é um padrão arquitetural?
 DDD não é um padrão arquitetural, está mais para uma filosofia de desenvolvimento onde se busca atender ao requisitos do domínio/negócio. 
 
@@ -78,7 +75,6 @@ Delegando para os correios (Message Broker), a empresa ou pessoa especializada e
 
 Exemplos de mensageria: SQS da Amazon, Kafka.
 Event Bus: implementado através de serviços de mensageria (ex: Kafka)
-
 * 06_Modelagem de eventos  (**** TODO - PREENCHER)
 * 07_O que é uma arquitetura orientada a eventos?
 Comunicação entre diversos componentes de uma arquitetura pode ser um assunto bastante complexo. Uma arquitetura orientada a eventos (Event-driven Architecture) pode fazer com que essa comunicação seja feita de forma assíncrona, permitindo maior escalabilidade do sistema como um todo.

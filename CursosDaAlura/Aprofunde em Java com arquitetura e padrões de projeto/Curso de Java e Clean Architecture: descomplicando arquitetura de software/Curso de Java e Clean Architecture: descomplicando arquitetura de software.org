@@ -1,0 +1,282 @@
+* O que é Arquitetura?
+Vamos tentar definir e traçar uma visão geral sobre arquitetura de software, um assunto que pode ser bastante complexo.
+
+Se pesquisarmos sobre esse conceito, perceberemos que existem muitas opiniões e pontos de vista diferentes na internet, em livros e entre autores. Portanto, é um desafio definir a arquitetura, pois é um conceito subjetivo. Cada pessoa que trabalha com desenvolvimento e arquitetura de software pode ter uma visão diferente, com base em sua experiência, e todas essas visões podem ser validadas.
+
+** Por exemplo, vamos considerar as duas definições de arquitetura abaixo.
+
+*** ANSI/IEEE Std 1471-2000
+De acordo com o padrão IEEE 1471 de 2000, arquitetura pode ser definida como as práticas e fundamentos de como organizamos um sistema em relação aos seus componentes, suas relações, o ambiente e como o design e a evolução do software são gerenciados em relação ao código.
+
+*** BOEHM, ET AL., 1995
+Já o autor Barry Boehm, em um de seus livros, escreveu que a arquitetura de software é composta por um conjunto de regras. Segundo ele, os componentes do software e suas relações, as restrições entre eles, os requisitos de negócio de entidades stakeholders (patrocinadoras) e clientes do software fazem parte da arquitetura.
+
+Além disso, demonstrar como esses componentes e suas relações vão atender aos requisitos de negócio quando forem implementados também faz parte da arquitetura.
+
+Percebemos que os autores geralmente falam sobre componentes, estrutura de código, relacionamentos entre eles e, também, sobre como a arquitetura pode suportar os requisitos de negócios da aplicação.
+
+** Abaixo, veremos uma lista das coisas que eu, Rodrigo, considero estarem relacionadas à arquitetura de software e serem geralmente tratadas com prioridade.
+
+- Componentes do software e suas relações: Inclui o código que escrevemos, as bibliotecas que utilizamos, os frameworks e como eles estão relacionados.
+
+- Infraestrutura do código: Refere-se ao ambiente que o código vai executar, o sistema operacional, o banco de dados, hardware, entre outros.
+
+- Estrutura e design de código: Trata de como estruturar o código e entender como o seu design influencia na arquitetura do software como um todo.
+
+- Requisitos de negócio: Como a arquitetura vai prover uma maneira desses requisitos serem alcançados.
+
+- Evolução do software: A arquitetura deve ser simples e favorecer a evolução do software.
+
+Os pontos acima são os principais que estão relacionados à arquitetura de software e que serão o foco do nosso treinamento.
+
+** Requisitos Não Funcionais
+Geralmente quando falamos sobre arquitetura, associamos muito com os requisitos não funcionais, como:
+
+- Performance
+- Escalabilidade
+- Disponibilidade
+- Confiabilidade
+- Segurança
+- Entre outros.
+
+No entanto, a arquitetura de software não só está relacionada aos requisitos não funcionais, mas também aos requisitos funcionais, à infraestrutura e ao código.
+
+Existem dois requisitos não funcionais que são frequentemente negligenciados pelos times de desenvolvimento de software:
+
+- Manutenibilidade
+- Extensibilidade.
+
+Manutenibilidade é a capacidade de realizar manutenções no software, como ajustes e melhorias. Já extensibilidade é a capacidade de estender o software, adicionando novos comportamentos e funcionalidades. Esses requisitos estão diretamente relacionados ao código e à maneira como ele está estruturado.
+
+Eles são comumente negligenciados porque, no início, é fácil e rápido desenvolver o software. No entanto, conforme o tempo passa, o software tende a crescer e a ter muitas funcionalidades, componentes, bibliotecas, padrões e ferramentas. Se não prestarmos atenção na manutenibilidade e extensibilidade, afetamos a facilidade e agilidade de evolução do software.
+
+Durante o curso, perceberemos que arquitetura é um conceito muito amplo e extenso e não é possível cobrir todos os assuntos relacionados a ele. Por isso, focaremos no que diz respeito à estrutura, organização e o design do código para favorecer a manutenibilidade e a extensibilidade.
+ 
+* Clean Architecture
+Além do MVC, existem outros modelos além da arquitetura em camadas. Um deles é o modelo Onion Architecture (Arquitetura de Cebola), que é semelhante a uma cebola na medida em que mantém o modelo do domínio (Domain Model) e a lógica das regras de negócio na camada central da aplicação. Em torno disso estão os serviços da aplicação e uma camada externa que inclui partes do software essenciais para a aplicação, como a tela, o banco de dados, testes, entre outras coisas.
+
+Outro modelo de arquitetura é a Arquitetura Hexagonal, cuja ideia é bastante similar à Onion Architecture. A aplicação está no centro, que inclui a parte de modelo e de domínio. Ela é cercada por infraestruturas como banco de dados, tela, e integração com outros serviços. A comunicação entre o domínio da aplicação e esses serviços externos são feitos por meio de adaptadores, usando o conceito de ports and adapters (portas e adaptadores).
+
+Finalmente, temos a Clean Architecture (Arquitetura Limpa), a qual iremos estudar neste curso. Ela é uma espécie de consolidação desses outros dois modelos.
+
+A ideia é bastante semelhante: a camada com o domínio da aplicação, chamada "Entities" (entidades) está no centro, em torno da qual está a camada de Casos de Uso (Use Cases) na qual temos a lógica de controle de fluxo e execução das regras de negócio da camada de entidades.
+
+Em volta dos Casos de Uso, temos a camada de Adaptadores, a qual faz a conversação com camada mais externa, que corresponde ao mundo externo — esta inclui a parte da web, do banco de dados, de serviços, e toda a parte da infraestrutura.
+
+A Clean Architecture foi criada por Robert Martin, também conhecido como "Uncle Bob" ("tio Bob") na comunidade. O grande foco deste modelo está na separação do domínio da aplicação. Além disso, ele possui algumas características e pontos principais:
+
+- Isola o código de domínio da aplicação;
+- Utiliza o conceito de inversão de dependências;
+- Favorece boas práticas de Orientação a Objetos;
+- Fornece um código de domínio com alta testabilidade;
+- Favorece a independência de frameworks e detalhes de infraestrutura.
+
+No isolamento do domínio, o código deve ser isolado e não dependente de aspectos externos que podem mudar. Já para fazer a ponte com o resto do software e permitir a comunicação da aplicação, utilizamos a inversão de dependências. Ou seja, o domínio não chama a infraestrutura e não dispara as regras. São as regras que interagem com o domínio.
+
+Nós invertemos as dependências e, ao pensar no mundo Java, conseguimos usar bastante isso com interfaces. Vamos aprender ao longo desse curso como aplicar o conceito de inversão de dependências com a utilização de interfaces.
+
+Outra grande vantagem desse modelo de arquitetura é que ele permite que nós apliquemos com facilidade as boas práticas de Orientação a Objetos. Quando nós seguimos este modelo de arquitetura, é possível escrever um código que tem baixo acoplamento e alta coesão.
+
+Ele permite seguir as boas práticas de orientação a objetos e a adoção de padrões de projetos, (design patterns), fazendo com que o nosso código siga as boas práticas de programação para favorecer a extensibilidade e a manutenibilidade, tópicos que discutimos anteriormente.
+
+Adicionalmente, por conta dessa separação e dessas boas práticas, o código acaba por ser facilmente e altamente testável. Sendo assim, se nós desejarmos escrever testes automatizados da nossa camada de domínio, isso poderá ser realizado de maneira muito simples.
+
+Nós conseguiremos testar tudo utilizando a ideia dos testes de unidade, eliminando a necessidade daqueles testes de integração, testes complexos que dependem de infraestrutura. Focando na camada de domínio, poderemos testá-la de maneira totalmente isolada, alcançando até 100% de cobertura de teste nessa camada da aplicação. Isso é certamente um grande benefício.
+
+Uma outra grande vantagem desse modelo de arquitetura é o fato de que ele deixa o domínio da aplicação totalmente independente dos detalhes de infraestrutura, como frameworks, bibliotecas, banco de dados e interface da pessoa usuária. Todos esses aspectos, que podem ser considerados detalhes de infraestrutura, não deveriam afetar o código do domínio, já que, eventualmente, nós podemos desejar trocar de ferramentas.
+
+Por exemplo, nós podemos querer mudar de banco de dados ou trocar a tecnologia de visualização, ou seja, de interface gráfica. Podemos querer alterar a maneira como é feita a integração com o sistema externo. O domínio da aplicação não deveria ser impactado com essas mudanças, pois a regra de negócio continua a mesma. Ao trocar o banco de dados do MySQL para o Oracle, por exemplo, não deveria haver nenhum impacto no domínio, pois nenhuma regra de negócio mudou. Apenas o mecanismo de persistência foi alterado.
+
+Portanto, nesse tipo de modelo de arquitetura, o domínio da aplicação fica totalmente isolado e nós podemos trocar esses detalhes de infraestrutura de maneira muito simples, sem causar impactos e sem quebrar regras que já estavam implementadas e funcionando corretamente.
+
+Essas são as vantagens de se utilizar o modelo de Clean Architecture.
+
+O objetivo dessa aula é fornecer uma visão geral sobre a Clean Architecture, fornecendo entendimento sobre o porquê desses modelos de arquitetura terem sido criados. O foco é auxiliar a evoluir o software de uma maneira mais simples e mais ágil.
+
+Quando não seguimos modelos de arquitetura que favorecem esse isolamento do domínio da aplicação, a tendência é o domínio ficar todo misturado com a infraestrutura e qualquer mudança desses detalhes de infraestrutura acaba por gerar um impacto no domínio da aplicação.
+
+A aplicação fica com o código de domínio totalmente "amarrado" aos detalhes de infraestrutura e isso dificulta a evolução, a testabilidade e a aplicação das boas práticas de orientação a objetos. A consequência é que temos um software mais difícil de manter e de evoluir.
+
+No modelo da Clean Architecture, na Onion (Cebola) e na Arquitetura Hexagonal, não enfrentamos esses problemas, pois o domínio da aplicação fica isolado.
+
+* Tipos de objetos
+** Entidade
+No contexto de Clean Architecture:
+Cada classe que possua um atributo que identifique unificamente cada objeto. Ex: em Aluno.java temos o campo "cpf".
+** Value Object
+Se tivermos por exemplo a classe Email.java, e dentro dela tivermos apenas o campo "String endereco" - ela não é uma Entidade (pois não possui um atributo que identifique unificamente cada objeto) - ela é um Value Object - se tivermos 2 objetos com o mesmo "endereco", é considerada a mesma instância.
+
+Ou seja:
+	Entidades possuem uma identidade única, enquanto VOs são considerados iguais, se todos os seus atributos tiverem valores iguais.
+	Se dois e-mails possuem o mesmo endereço, podemos considerá-los como o mesmo e-mail. Já duas pessoas com o nome, altura e idade não necessariamente são a mesma pessoa.
+** Teste: é entidade ou VO?
+A Classe Telefone.java com:
+
+	String ddd, numero;
+
+*** A classe Telefone é um Value Object ou uma Entidade (No contexto de Clean Architecture)?
+**** Value Object, já que dois telefones com DDD e número iguais são considerados o mesmo telefone.
+Alternativa correta! Se a igualdade entre dois objetos de uma classe é verificada através da comparação de todos os seus valores, se trata de um Value Object.
+**** Entidade, já que não podem existir dois telefones com o mesmo DDD e número.
+Alternativa errada! Dois telefones com o mesmo DDD e número são o mesmo telefone na prática. Logo, não é uma entidade.
+* Clean Architecture usada no curso
+No nosso curso faremos uma simplificação da Clean Architecture - será como mostrada na imagem: "./CleanArchitecture-queSeraDesenvolvidaNoCurso(=ApenasSimplificacao).png"
+** Pergunta do curso
+Vimos que em vários padrões arquiteturais existem divisões em camadas. Esses modelos foram evoluindo, até que essas camadas foram divididas em mais interiores e mais exteriores.
+
+Qual a ordem em que as dependências deveriam acontecer nas camadas de um projeto?
+
+*** Sempre para fora (camadas de dentro podem depender das de fora)
+Alternativa errada! Dessa forma, o nosso domínio acabaria dependendo de detalhes da aplicação ou infraestrutura.
+*** Sempre para dentro (camadas de fora podem depender das de dentro)
+Alternativa correta! Assim, o nosso domínio (camada mais interna) é independente de qualquer detalhe exterior. 
+Nossa aplicação depende apenas do nosso domínio, e não conhece detalhes de infraestrutura. A camada de infraestrutura apoia as camadas mais interiores.
+
+Na clean architecture as camadas de fora conversam com as de dentro, mas as de dentro não conversam com as de fora.
+** Para saber mais: Domain Driven Design
+Ao desenvolver um sistema complexo, o domínio deve ser o foco. Por isso, ele é a camada central dos padrões de arquitetura.
+
+Web, frameworks e mecanismos de persistência (como bancos de dados) são meros detalhes. São ferramentas para executar suas regras de negócio.
+
+Executar a sua aplicação pela CLI deve ser tão fácil quanto através de uma API. O mesmo vale para uma interface Web.
+
+O conceito de modelarmos a nossa aplicação pensando primeiramente no domínio é chamado de Domain Driven Design, ou design orientado a domínio.
+
+Munidos desta mentalidade, podemos garantir uma melhor manutenibilidade e extensibilidade de nosso projeto.
+
+** Estrutura da camada de domínio
+Não podemos simplesmente escrever um código SQL dentro da camada de domínio ou chamar uma classe DAO que faz parte da camada de infraestrutura diretamente do domínio, porque isso feriria nosso modelo de arquitetura. Essas são algumas das discussões que faremos nesta aula.
+
+Podemos ver que na pasta de domínio de aluno:
+"./1963-java-clean-architecture-aula_6/src/main/java/br/com/alura/escola/dominio/aluno"
+temos lá dentro o arquivo:
+#+BEGIN_SRC java
+package br.com.alura.escola.dominio.aluno;
+
+import java.util.List;
+
+public interface RepositorioDeAlunos {
+	
+	void matricular(Aluno aluno);
+	
+	Aluno buscarPorCPF(CPF cpf);
+	
+	List<Aluno> listarTodosAlunosMatriculados();
+	
+	//...
+
+}
+#+END_SRC
+AP:Ora, a camada de domínio está acessando camadas mais externas com isso?
+AP:Não. Está acontecendo uma inversão de dependência
+
+*Pro:*
+Por que uma interface? Uma interface representa um contrato no mundo Java. Ela define os métodos e descreve o que precisa ser feito. Porém, a forma como será feito não é responsabilidade da interface. A implementação ocorre externamente. No nosso caso, a implementação será realizada nas camadas externas, na camada de infraestrutura, por exemplo.
+
+Uma das vantagens de utilizar uma interface é que podemos ter múltiplas implementações. Na camada de infraestrutura, podemos criar uma implementação desta interface que acessa o banco de dados via JDBC. Podemos ter outra implementação que utiliza JPA, ou uma implementação que não utiliza banco de dados, que utiliza arquivos, por exemplo.
+
+Assim, temos um código bastante flexível.
+
+Os métodos dependem das funcionalidades que queremos implementar e dos conceitos do domínio da aplicação relacionados ao repositório de alunos.
+
+*Ainda que a persistência seja um conceito técnico, ela também faz parte do domínio da aplicação. A camada de domínio deve ter a noção de repositório, de persistência, mas não pode ficar presa aos detalhes de como a persistência será implementada.*
+
+As interfaces do mundo Java são úteis neste caso. Conseguimos definir os comportamentos necessários e a implementação fica de fora. Porém, dentro do domínio, quando quisermos matricular um aluno, ou seja, interagir com a parte de persistência, utilizamos essa interface.
+
+*A implementação fica fora da camada de domínio para evitar misturar dentro do domínio os detalhes de infraestrutura, isto é, os detalhes técnicos. Dessa forma, mantemos a camada de domínio totalmente isolada dos detalhes de infraestrutura.*
+
+Nosso código permanece "puro", livre de interferências técnicas de tecnologias e detalhes de infraestrutura. Assim, caso seja necessário alterar esses detalhes de infraestrutura, não precisaremos mexer na camada de domínio, que não será impactada.
+
+Isto é um exemplo de inversão de dependência. Fornecemos a interface, e a implementação será feita em outra camada, invertendo, assim, a dependência, e utilizando interfaces neste caso.
+
+Conclusão
+Nosso objetivo era discutir sobre persistência e alguns detalhes técnicos e como eles estão presentes em nossa camada de domínio, mantendo essa camada totalmente isolada da camada de infraestrutura. Mais precisamente, abordamos o conceito de persistência utilizando repositórios.
+
+Posteriormente, vamos criar implementações e verificar como a implementação interage com essa interface do nosso domínio. Porém, isso é assunto para próximas aulas!
+** Service
+Qual o objetivo da utilização de classes service?
+R: Representar uma classe que executa alguma ação que não pertence a nenhuma entidade ou VO.
+	As nossas regras de negócio devem ficar nas entidades e VOs, mas nem sempre isso faz sentido. Quando precisamos executar alguma ação que não faça parte de nenhuma entidade nem de um VO, podemos utilizar uma classe Service.
+
+
+No arquivo:
+ "./1963-java-clean-architecture-aula_6/src/main/java/br/com/alura/escola/infra/aluno/CifradorDeSenhaComMD5.java"
+criamos essa classe que representa um serviço. Existe até um padrão chamado service, que é um padrão variável, dependendo da literatura, ele tem um significado distinto.
+
+Mas o service representa a ideia de que temos uma lógica que não pertence a uma classe em específico, a uma entidade, a um value object, então, separamos ela numa classe distinta e essa classe funciona como um serviço.
+
+É justamente o exemplo do cifrador, ele é um serviço e ele cria o hash da senha. Mas temos um serviço na camada de domínio, que é só a interface ("./1963-java-clean-architecture-aula_6/src/main/java/br/com/alura/escola/dominio/aluno/CifradorDeSenha.java"), a definição do que precisa ser feito e o serviço de infraestrutura, que é a implementação que fica na parte de infraestrutura com os detalhes de infraestrutura, com o algoritmo de hash específico.
+
+*Temos o serviço de domínio e o serviço de infraestrutura. Às vezes, encontramos essa diferença. Podemos ter um serviço que pode estar em uma camada ou na outra, dependendo do objetivo dele.*
+
+----------------------
+Nesta aula aprendemos:
+
+O conceito de classes Services e mais especifico Domain, Application e Infrastructure Services
+*** Domain Services 
+São classes que representam uma ação entre mais de uma entidade.
+*** Application Services 
+Controlam o fluxo de alguma regra em nossa aplicação.
+*** Infrastructure Services 
+São implementações de interfaces presentes nas camadas de domínio ou de aplicação.
+** Camada Aplicação
+Agora, continuando nossos estudos, vamos voltar a nossa atenção para a classe Indicacao.java que criamos anteriormente, mas ainda não trabalhamos. Lembrem-se que essa classe representa o domínio da aplicação, em que um aluno pode indicar outro. Essa classe tem um aluno indicado, um aluno que indicou, quem foi o indicante e a data dessa indicação.
+
+Uma regra da nossa aplicação é que sempre que acontece uma indicação, precisamos enviar um e-mail para o aluno indicado. Essa comunicação pode ser um e-mail de boas-vindas ou algo do gênero, sobre a questão da indicação.
+
+O envio do e-mail, é um serviço da aplicação, não faz parte da regra de negócio ou do domínio. Na verdade, este é um serviço que pertence à aplicação e não ao domínio. Aqueles que estão preocupados com a parte da indicação, querem saber quem indicou, quem foi indicado, quando foi indicado. No entanto, o e-mail, é uma maneira de notificar o aluno, e não pertence, à camada de domínio.
+
+Isso nos leva de volta ao nosso diagrama do modelo de arquitetura que estamos adotando em nossa aplicação]
+("./CleanArchitecture-queSeraDesenvolvidaNoCurso(=ApenasSimplificacao).png"). Já mencionamos bastante sobre a camada do domínio, falamos da camada de infraestrutura, mas ainda não discutimos a camada intermediária entre o domínio e a infraestrutura, que é a camada de aplicação.
+
+Essa questão do e-mail de indicação vai pertencer à camada de aplicação, pois é um serviço que pertence à aplicação e não ao domínio.
+
+Dentro do pacote br.com.alura.escola criamos um sub-pacote chamado aplicacao. Portanto, tudo relacionado a camada de aplicação ficará neste pacote. Criamos outro um sub-pacote na camada de aplicação chamado indicacoes. Nele, vamos criar uma classe chamada EnviarEmailIndicacao. Aqui temos a mesma questão do cifrador de senha: o envio do e-mail é um conceito, mas como exatamente ele é enviado é um detalhe de infraestrutura.
+
+Na camada de aplicação, precisamos criar uma interface EnviarEmailIndicacao ("./1963-java-clean-architecture-aula_6/src/main/java/br/com/alura/escola/aplicacao/indicacao/EnviarEmailIndicacao.java") que terá apenas um método: enviarPara(), que receberá como parâmetro um objeto do tipo aluno que foi indicado.
+
+package br.com.alura.escola.aplicacao.indicacao
+
+import br.com.alura.escola.dominio.aluno.Aluno;
+
+public interface EnviarEmailIndicacao {
+    void enviarPara(Aluno indicado);
+}
+
+Na camada de aplicação temos esse serviço de envio de e-mails relacionado à aplicação. No entanto, o disparo do e-mail em si já é um detalhe de infraestrutura, porque a tecnologia em si que vai disparar o e-mail já é um detalhe de infraestrutura.
+
+Criamos essa interface na camada de aplicação e, na camada de infraestrutura (infra.aluno). Podemos gerar um pacote indicacao, onde teremos uma classe que implementará essa interface. Por exemplo, poderíamos criar uma classe chamada EnviarEmailIndicacaoComJavaMail com a biblioteca Java Mail.
+
+A implementação dessa interface poderá ser realizada de várias maneiras, cada uma utilizando uma biblioteca ou tecnologia distinta.
+
+Ou seja, montar o código que dispara o e-mail de fato, estamos recebendo o objeto aluno. Então pegar o e-mail dessa pessoa estudante e enviar um e-mail com um texto de boas-vindas.
+
+Conclusão e Próximos Passos
+A principal ideia dessa aula é mostrar que, quando temos alguma regra ou serviço que não pertence explicitamente ao domínio, mas é importante para a aplicação, como o envio de e-mails nesse caso, esse serviço pertence à camada de aplicação e a implementação deste serviço pertence à infraestrutura.
+* Camada 'Use Cases' da Clean Architecture
+Implementamos neste vídeo o que é conhecido no mundo da Arquitetura Limpa (Clean Architecture) como Use Cases.
+
+Os termos Use Case, Application Service e Command Handler são basicamente sinônimos e servem para fornecer pontos de entrada na sua aplicação, de forma independente dos mecanismos de entrega (Web, CLI, etc).
+* Vantagens da Clean Architecture
+Ao longo das aulas, descobrimos algumas vantagens desse modelo de arquitetura. O nosso código de domínio ficou totalmente isolado da aplicação, da infraestrutura, e conseguimos fazer isso usando inversão de dependências.
+
+Com isso, o nosso código favoreceu o uso de boas práticas de Orientação a Objetos. Foi um projeto onde utilizamos bastante o conceito de interfaces do Java, e conseguimos aplicar diversas implementações, deixando o código totalmente desacoplado.
+
+O código de domínio ficou com uma alta "testabilidade". Como ele não depende de detalhes de infraestrutura, bibliotecas ou frameworks, sendo um código Java basicamente puro, conseguimos fazer testes de unidade, testes utilizando mock ou testes bem simples, porque não temos muitos detalhes de infraestrutura para atrapalhar e dificultar.
+
+E, por fim, os detalhes de infraestrutura e frameworks estão totalmente separados, então o nosso domínio da aplicação fica totalmente independente desse tipo de código.
+
+* Desvantagens da Clean Architecture
+Voltando ao nosso projeto, uma coisa interessante que talvez vocês tenham percebido é a quantidade de classes e interfaces que criamos no nosso projeto. Temos muitos pacotes, mesmo que tenhamos poucas funcionalidades, pois passamos apenas pela parte de matricular aluno e de indicação.
+
+Com essas duas funcionalidades, dois conceitos do domínio, tivemos que criar bastante código. Imaginem que à medida que o projeto vai crescendo, que precisamos implementar novos conceitos do domínio da aplicação, acabaremos tendo centenas de classes e pacotes.
+
+Isso pode confundir e aumentar a curva de aprendizado. Quando uma pessoa entrar no time de desenvolvimento, ela vai demorar um pouco até absorver todo esse conteúdo e começar a entender e praticar no projeto.
+
+* Quando usar a Clean Architecture?
+Obviamente, esse tipo de arquitetura é mais recomendado para projetos complexos. Ou seja, projetos com muitas validações, muitas regras de negócio e uma grande complexidade no domínio, em si, da aplicação. Além disso, é recomendado para um projeto que tende a crescer, que você vai querer escalar no futuro, separando a arquitetura da sua aplicação em micro serviços, por exemplo.
+
+Agora, se o projeto da sua aplicação é um CRUD, um formulário simples para cadastro de informações, talvez não valha a pena montar toda essa arquitetura. Você poderia simplesmente colocar o seu framework, puxar os dados da tela, acessar o banco de dados e pronto. Essa arquitetura seria desnecessária para esse tipo de projeto.
+
+Novamente, questione: Será que vale a pena usar isso para todos os projetos? Provavelmente não. Existem casos específicos para você utilizar esse tipo de abordagem.
+

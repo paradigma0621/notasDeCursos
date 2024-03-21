@@ -25,3 +25,9 @@ A única exceção foi a classe Assert, que permanece no pacote org.junit. Entre
 
 ** Dicas de casos de teste
 Se o valor testado é numérico: testar valores maior, menor e igual
+** Quais classes testar?
+Não faz sentido testar todas as classes (ex: classes com apenas getters e setters).
+
+Classes que tem sentido de serem testadas:
+*** Classes que podem ter alguma mudança
+*** Classes que tem regras de negócio
