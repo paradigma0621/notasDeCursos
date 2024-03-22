@@ -1,5 +1,17 @@
 O Selenium é uma ferramenta de automação de testes para aplicações web.
 
+* Teste E2E: Testes de ponta à ponta (end-to-end)
+AP: Fazem simulações de preenchimentos de formulários e clicks no front-end/browser, por exemplo, usando Selenium.
+
+Pro (GPT4):
+Um teste end-to-end (E2E) em Java, ou em qualquer outra linguagem de programação, é um tipo de teste de software que simula cenários reais de uso para validar o fluxo completo de uma aplicação desde o início até o fim. Esse tipo de teste abrange a aplicação inteira, incluindo suas interações com o banco de dados, redes, interfaces de usuário, e outros sistemas externos ou serviços com os quais possa se comunicar. O objetivo é assegurar que todos os componentes do sistema trabalhem harmoniosamente para realizar as tarefas pretendidas sob condições variadas.
+
+No contexto de desenvolvimento com Java, especialmente em aplicações web, os testes end-to-end podem ser realizados utilizando frameworks e bibliotecas como Selenium WebDriver, que permite automatizar ações do navegador em uma aplicação web. Isso inclui, mas não está limitado a, navegar por páginas, preencher e enviar formulários, clicar em links e botões, e verificar os resultados na interface do usuário para assegurar que tudo funciona como esperado.
+
+Diferentemente dos testes unitários, que verificam a corretude de pequenas partes do código isoladamente, e dos testes de integração, que garantem que múltiplos componentes funcionam bem juntos, os testes end-to-end consideram a aplicação como um todo. Eles são cruciais para identificar problemas que só podem ser percebidos durante uma simulação de uso real, incluindo problemas de performance, de interface com o usuário e de integração com sistemas externos.
+
+Embora poderosos, os testes E2E podem ser complexos para configurar e manter, e tendem a ser mais lentos para executar devido à amplitude dos cenários que cobrem. Portanto, é comum que sejam complementados por outros tipos de testes mais granulares, como os testes unitários e de integração, para uma estratégia de teste de software mais abrangente e eficiente.
+
 * Hello, World
 <dependency>
   <groupId>org.seleniumhq.selenium</groupId>

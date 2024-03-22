@@ -1,0 +1,71 @@
+Usar documentos da pasta: "./Aprofunde em Java com arquitetura e padrões de projeto/Curso de BDD e Java: Behavior Driven Development com Cucumber/1821-bdd-cucumber-java-aula6/src/test/java/br/com/alura/leilao/acceptance" 
+e da: "./Aprofunde em Java com arquitetura e padrões de projeto/Curso de BDD e Java: Behavior Driven Development com Cucumber/1821-bdd-cucumber-java-aula6/src/test/resources/features"
+* Pergunta
+Levamos o curso todo falando sobre testes, ferramentas (como Cucumber e junit) e implementando código.
+
+Agora, o que é o BDD, na prática?
+
+** É descrever uma funcionalidade que automatiza um teste antes mesmo de desenvolver a funcionalidade.
+Alternativa errada! Automatizar um teste não é BDD (e sim Cucumber e Junit). Claro que queremos automatizar mas não é a essência do BDD.
+** É aplicar o TDD com testes E2E e testes de integração.
+Alternativa errada! Automatizar um teste não é BDD, nem o TDD. O TDD (test-driven-development) é focado no desenvolvedor, são testes escritos antes tendo um impacto positivo no design e qualidade do código.
+
+** É unir as equipes técnicas e não técnicas para definir os comportamentos necessários do software, e a partir dessas definições, desenvolver.
+Alternativa correta! Essa pode ser uma definição simplória de BDD, e repare que testes nem faz parte dessa definição. Para garantir que o que você desenvolveu está de acordo com a funcionalidade descrita, nós testamos.
+O ponto principal é colaboração para melhorar o entendimento das funcionalidades a implementar.
+
+* Usando Cucumber
+Cucumber pode ser inicializado a partir do junit4 (@RunWith)
+
+os arquivos .feature são analisados pelo Gherkin e Cucumber
+- Gerkin é uma linguagem para definir os .feature
+- Cucumber gera e roda os passos (steps) associados ao .feature
+
+dentro do .feature escrevemos a funcionalidade e os critérios de aceitação
+
+um critério de aceitação segue a estrutura de um teste (passos ou steps)
+- os passos são Given-When-Then ou Dado-Quando-Entao
+
+cada passo será implementado por um método anotado (step)
+* Cucumber Expression
+Já vimos como definir valores nos passos dentro do cenário, por exemplo:
+
+ Dado um lance de 10.0 reais do usuario "fulano"
+
+No código Java usamos uma expressão delimitado por {} para definir o tipo de parâmetro:
+
+@Dado("um lance de {double} reais do usuario {string}")
+public void um_lance(Double valor, String nomeUsuario) {
+   //codigo obtido
+Esse forma de definir os parâmetros se chama de Cucumber Expression.
+
+Obs: Lembrando que o nome do método não importa.
+
+** Regex
+Existe uma alternativa ao Cucumber Expression, os famosos expressões regulares. Em lugar da Cucumber Expression podemos usar uma regex, e assim temos todo o poder dessas expressões para definir mais detalhe sobre o formato do parâmetro, por exemplo:
+
+@Dado("um lance de {double} reais do usuario {string}")
+public void um_lance_de_reais_do_usuario_fulano(Double valor, String nomeUsuario) {
+   //resto obtido
+
+Se torna:
+
+@Dado("^um lance de (\\d+[.]\\d\\d?) reais do usuario (\\w+)$")
+public void um_lance_de_reais_do_usuario_fulano(Double valor, String nomeUsuario) {
+    System.out.println(valor);
+    System.out.println(nomeUsuario);
+}
+
+Repare que os expressões regulares tem a sua própria complexidade. Em alguns momentos ajudam, em outros fica mais complicado como é o caso da definicao de um número decimal ((\\d+[.]\\d\\d?)).
+
+* Nota sobre @Before e @After
+Vimos no vídeo as anotações @After e @Before usado em métodos nas classes que implementam os passos de um cenário. (Obs AP: Para eles devem ser usados import's da biblioteca do Cucumber).
+
+Esse métodos também são chamados de Hooks (ganchos) que nada mais são métodos chamados automaticamente quando algum evento acontece. No caso, o evento é a execução de um cenário.
+
+Também existem os hooks @BeforeStep e @AfterStep. Como o nome já indica, nessas anotações o evento é a execução de um step. Ou seja, cada vez que um métodos anotado com @Dado @Quando ou @Entao é chamado, será chamado o hook (antes ou depois, dependendo da anotação).
+
+Em geral, vale a pena alertar que devemos ter cuidado com o uso de hooks pois esses métodos não ficam visíveis para quem lê apenas o arquivo .feature.
+* Notas sobre rodar vários casos para um mesmo teste
+usar Exemplos para alimentar o mesmo teste com dados diferentes
+usar DataTables para passar vários dados ao teste de uma vez só
