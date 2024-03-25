@@ -1,0 +1,230 @@
+https://cursos.alura.com.br/course/java-jdbc-banco-dados
+Curso de Java e JDBC: trabalhando com um banco de dados
+* Para saber mais: padrão Factory
+
+Para evitar a duplicação de código, usamos a classe ConnectionFactory. Fazer isso é algo tão comum em projetos de programação que se tornou um padrão de projeto, o Factory. Podemos definir o padrão Factory pensando justamente na sua tradução: significa “Fábrica”. Dessa forma, criamos uma classe que terá um método que retorna um objeto.
+
+Assim, ao invés de usar o new a todo momento, fazemos isso apenas uma vez, quando estamos criando o método na classe Factory. Depois, para criar os objetos, apenas chamamos esse método de criação.
+
+Usando os padrões factory conseguimos manter as dependências de um projeto muito mais flexíveis. Como o código é modificado uma única vez em um método, se o jeito de criar o objeto muda ao longo do tempo, fazemos essa mudança uma única vez, reduzindo acoplamento em nosso software.
+
+Na própria API do Java, encontramos vários exemplos do Padrão Factory, como por exemplo, o Calender.getInstance() ou Integer.valueOf("3").
+* DAO
+Para melhorar o código definindo responsabilidades, podemos criar uma classe DAO (Data Access Object), que ficará responsável por toda integração com o banco de dados.
+* HikariCP
+Agora vamos acessar o site mvnreposity.com, o mesmo site em que pegamos o nosso driver SQL.
+
+Neste site, vamos buscar por "hikaricp". HikariCP é uma biblioteca de pool de conexões que podemos usar com nossa aplicação.
+
+Vamos instalar a versão mais recente do HikariCP da zaxxer. Usaremos a versão 5.0.1. Ao clicar na versão podemos copiar o código com as dependências:
+
+<!-- https://mvnrepository.com/artifact/com.zaxxer/HikariCP -->
+<dependency>
+    <groupId>com.zaxxer</groupId>
+    <artifactId>HikariCP</artifactId>
+    <version>5.0.1</version>
+</dependency>
+
+Vamos colocar esse bloco de código no arquivo pom.xml do nosso projeto, logo abaixo da dependência do mysql-connector-java.
+
+Onde vamos configurar esse pool?
+
+Quando pegamos a conexão, usamos o ConnectionFactory. então, vamos abrir a classe ConnectionFactory.
+
+É nesse momento, em que chamamos ConnectionFactory.recuperarConexao() que pegamos de fato a connection. Então, é aqui que vamos configurar nosso pool de conexões.
+
+Vamos alterar a ConnectionFactory e não vamos alterar mais nada do resto das classes.
+
+Para a configuração do DataSouce, vou copiar um bloco de código que já tenho pronto aqui. Isso é algo que não fazemos todo dia, então não precisamos memorizar.
+
+    private HikariDataSource createDataSource() {
+        HikariConfig config = new HikariConfig();
+        config.setJdbcUrl("jdbc:mysql://localhost:3306/byte_bank");
+        config.setUsername("root");
+        config.setPassword("root");
+        config.setMaximumPoolSize(10);
+
+        return new HikariDataSource(config);
+    }
+
+Essa função retorna um HikariDataSource, e a nomeamos de createDataSource(). Em seguida, temos HikariConfig nomeando como config a nossa variável. E temos alguns sets: o setJdbcUrl, que é a nossa string de conexão, mas agora com a diferença que passamos username e password para métodos específicos.
+
+E, por fim, temos setMaximumPoolSize, que define quantas conexões queremos permitir que fiquem abertas para serem reutilizadas, vamos deixar com o valor 10.
+
+Vamos importar as classes da HikariDataSource e HikariConfig, e nosso método passa a funcionar.
+
+No método recuperarConexao(), em vez de usar o DriverManager vamos apagar o código do DriverManager.getConnection e no lugar dele colocaremos createDataSource().getConnection();
+
+package br.com.alura.bytebank;
+
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
+
+import java.sql.Connection;
+import java.sql.SQLException;
+
+public class ConnectionFactory {
+
+    public Connection recuperarConexao() {
+        try {
+            return createDataSource().getConnection();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private HikariDataSource createDataSource() {
+        HikariConfig config = new HikariConfig();
+        config.setJdbcUrl("jdbc:mysql://localhost:3306/byte_bank");
+        config.setUsername("root");
+        config.setPassword("root");
+        config.setMaximumPoolSize(10);
+
+        return new HikariDataSource(config);
+    }
+}
+
+Ao voltar ao menu principal da aplicação e selecionar a opção 1 para listar contas abertas, ele exibiu corretamente a conta que cadastramos!
+
+Agora, com o pool de conexões, temos operações menos custosas e mais fáceis de gerenciar. Lembrando que não é porque a conexão fica aberta no pool que não precisamos fechar no ContaDAO.
+
+Vamos continuar fechando porque quando fechamos é que a conexão volta para o pool, senão ela fica presa.
+
+Minha ideia era mostrar para vocês esse recurso que é muito utilizado em ambientes de produção, ao subir para produção precisamos usar um pool de conexões.
+
+--------
+Dez pessoas querem acessar a nossa aplicação ao mesmo tempo. Porém, temos apenas nove conexões e todas estão ocupadas.
+
+O que vai acontecer quando a décima pessoa se conectar?
+R: O 10º usuário esperará alguma das 9 conexões ficar disponível.
+* Nota
+Existe uma interface que representa a conexão (java.sql.Connection), também existe uma que representa o pool de conexões (javax.sql.DataSource) .
+* E se der erro no meio de uma transação bancária?
+Criamos o nosso método para realizar transferências, aproveitando os de realizar depósitos e saques, que já existiam. Fizemos os testes e fomos bem sucedidos, ou seja, alcançamos o nosso objetivo.
+
+Mas podemos fazer a pergunta: e se no momento do depósito houvesse um erro? Nós já tínhamos sacado o valor da conta de origem, no entanto, esse valor não seria depositado na conta de destino devido ao erro, o que causaria uma inconsistência.
+
+Em um banco real, se tentamos fazer uma transferência e por algum motivo ocorre um erro, quando olhamos nosso saldo, o valor não é alterado. Então, como podemos replicar esse comportamento no nosso código?
+
+Podemos alcançar esse resultado trabalhando com transações. Uma transação é um recurso de gerência do banco de dados que faz com que uma sequência de operações seja considerada como um único procedimento.
+
+Dessa forma, garantimos que durante uma recuperação de falhas, nenhuma das operações seja tratada isoladamente, pois todas fazem parte de um bloco único e indivisível (atômico), além de conseguirmos promover isolamento entre acessos concorrentes na mesma massa de dados.
+
+Assim, quando ocorre uma transação, todas operações são bem sucedidas. Caso contrário, se ao menos uma delas apresentar um erro, todas as outras serão desfeitas, evitando inconsistências.
+
+Quando todas as operações dão certo, podemos fazer o commit da transação;Se uma delas der errado, precisamos desfazer tudo por meio do rollback.
+
+Vamos atualizar nosso código para usar transações, assumindo o controle desse commit e rollback. Este é um exemplo de como ficaria o nosso método de alterar
+
+#+BEGIN_SRC java
+public void alterar(Integer numero, BigDecimal valor) {
+        PreparedStatement ps;
+        String sql = "UPDATE conta SET saldo = ? WHERE numero = ?";
+
+        try {
+            conn.setAutoCommit(false);
+
+            ps = conn.prepareStatement(sql);
+
+            ps.setBigDecimal(1, valor);
+            ps.setInt(2, numero);
+
+            ps.execute();
+		conn.commit();
+            ps.close();
+            conn.close();
+        } catch (SQLException e) {
+            try {
+                conn.rollback();
+            } catch (SQLException ex) {
+                throw new RuntimeException(ex);
+            }
+            throw new RuntimeException(e);
+        }
+    }
+#+END_SRC
+
+Em primeiro lugar, usamos o método de Connection chamado setAutoCommit() e passamos false como parâmetro. Com essa alteração, informamos que chamaremos explicitamente o commit e o rollback.
+
+Após chamar o método execute(), se a operação obteve sucesso, será chamado o conn.commit( ) e a alteração será realizada no banco. Se commit() não for chamado, a modificação não acontecerá.
+
+Caso ocorra algum erro, o catch será executado e o método rollback()vai desfazer a operação ou operações,se forem mais de uma.
+
+Transações são um recurso poderoso do banco de dados que vale a pena conhecer. para mais informações, recomendo a leitura do artigo sobre transações no SQL: https://www.alura.com.br/artigos/transacoes-no-sql-mantendo-os-dados-integros?_gl=1*ktcfyw*_ga*MTU0Mjg2MDQ4LjE3MDg0NjU5Nzc.*_ga_1EPWSW3PCS*MTcxMTM4MzMwNy4xNy4xLjE3MTEzOTM1NTEuMC4wLjA.*_fplc*V1ZiVGJmWU91JTJCQ2t3d1hBJTJCTVJEeXN6NGZyJTJCTG52SFR5cmxJMiUyQkY2UHFIOElNUyUyRlNwSzFwN3lGT1VpWklyVEpncDVqYVU1TURSRlFWSVpoYU15NjhjNUwwSUIlMkZWMzV2NHlrVDJjNkZkR0FNa0w3S2Y4SyUyRkJBbGdtS3dPcmclM0QlM0Q.
+* Exemplos de uso de prepareStatement
+** SELECT
+    public Conta listarPorNumero(Integer numero) {
+        String sql = "SELECT * FROM conta WHERE numero = " + numero + " and esta_ativa = true";
+
+        PreparedStatement ps;
+        ResultSet resultSet;
+        Conta conta = null;
+        try {
+            ps = conn.prepareStatement(sql);
+            ps.setInt(1, numero);
+            resultSet = ps.executeQuery();
+
+            while (resultSet.next()) {
+                Integer numeroRecuperado = resultSet.getInt(1);
+                BigDecimal saldo = resultSet.getBigDecimal(2);
+                String nome = resultSet.getString(3);
+                String cpf = resultSet.getString(4);
+                String email = resultSet.getString(5);
+                Boolean estaAtiva = resultSet.getBoolean(6);
+
+                DadosCadastroCliente dadosCadastroCliente =
+                        new DadosCadastroCliente(nome, cpf, email);
+                Cliente cliente = new Cliente(dadosCadastroCliente);
+
+                conta = new Conta(numeroRecuperado, saldo, cliente, estaAtiva);
+            }
+            resultSet.close();
+            ps.close();
+            conn.close();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return conta;
+    }
+** UPDATE
+    public void alterar(Integer numero, BigDecimal valor) {
+        PreparedStatement ps;
+        String sql = "UPDATE conta SET saldo = ? WHERE numero = ?";
+
+        try {
+            conn.setAutoCommit(false);
+
+            ps = conn.prepareStatement(sql);
+
+            ps.setBigDecimal(1, valor);
+            ps.setInt(2, numero);
+
+            ps.execute();
+            ps.close();
+            conn.close();
+            conn.commit();
+        } catch (SQLException e) {
+            try {
+                conn.rollback();
+            } catch (SQLException ex) {
+                throw new RuntimeException(ex);
+            }
+            throw new RuntimeException(e);
+        }
+    }
+** DELETE
+    public void deletar(Integer numeroDaConta) {
+        String sql = "DELETE FROM conta WHERE numero = ?";
+
+        try {
+            PreparedStatement ps = conn.prepareStatement(sql);
+
+            ps.setInt(1, numeroDaConta);
+
+            ps.execute();
+            ps.close();
+            conn.close();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }

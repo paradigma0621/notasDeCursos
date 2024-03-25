@@ -1,0 +1,88 @@
+https://cursos.alura.com.br/course/java-domain-driven-design-conceitos
+* DDD
+Os conceitos já aprendidos no curso de clean architecture são diretamente relacionados com o estudo de Domain Driven Design.
+
+Muito do que aprendemos no curso anterior é o que chamamos de Building blocks ou Blocos de construção.
+
+- Entity
+- Value Object
+- Repository
+- Factory
+- Service
+
+Todos esses padrões são descritos no estudo sobre DDD e com isso já temos um belo ponto de partida.
+
+Vale ressaltar que o termo Domain Driven Design significa literalmente modelar nosso software nos orientando pelo domínio do negócio.
+* Linguagem Ubíqua
+[00:00] Continuando os nossos estudos, na aula de hoje eu quero discutir sobre um dos conceitos que é um dos conceitos mais importantes do Domain Driven Design. Talvez, se você já tiver pesquisado, lido a respeito sobre o Domain Driven Design, talvez lido o livro do Eric Evans, você deve ter se esbarrado com esse termo: linguagem ubíqua, Ubiquitous Language.
+
+[00:17] Esse é um dos conceitos que tem no Domain Driven Design. A ideia é justamente tentarmos criar uma linguagem universal, uma linguagem onipresente, que vai ser a ponte entre esses dois mundos, esses dois times: o time de desenvolvimento, as pessoas técnicas da área de desenvolvimento, que vão desenvolver o software em si; e o time, as pessoas da área de negócio, que são os especialistas do domínio.
+
+[00:42] Quando esses dois conjuntos de pessoas vão conversar, eles tem que usar uma linguagem em comum, que deve ser a linguagem do domínio da aplicação. Então não deveria haver uma reunião onde se falam termos técnicos, o time de desenvolvimento só conversar utilizando termos técnicos, porque o time de negócios não vai entender nada, ele não vai entender sobre padrões de projeto, sobre framework e bibliotecas.
+
+[01:04] Eles conhecem sobre o domínio, eles são os especialistas do domínio da aplicação. Então isso é importante. Mas não apenas durante essa comunicação, essa conversa, essas reuniões entre esses dois times, mas principalmente no código. Quando vamos escrever o código da aplicação, temos que ter no código esses termos, os mesmos termos que são conversados nas reuniões, os termos que são falados pelos especialistas do domínio.
+
+* Invatiante
+É muito comum que na relação entre 2 (ou mais) classes hajam invariantes, mas…
+
+O que é uma invariante?
+
+** É uma regra de negócio que deve sempre ser verdadeira para os objetos serem válidos.
+Alternativa correta! Se um aluno tiver mais do que 2 telefones em nosso sistema, essa regra foi violada, logo, o Aluno estará em um estado inválido. Invariantes nada mais são do que regras de negócio que precisam ser verificadas para garantir sua consistência.
+** São conceitos que não mudam, como por exemplo nomes de classes, etc.
+Alternativa errada! Alternativa errada! Essa não é a definição de uma invariante.
+** É uma construção de linguagem, como variáveis e constantes.
+Alternativa errada! Alternativa errada! Essa construção de linguagem não existe.
+* Mapas de Contexto
+AP: Quando vamos separ/quebrar um projeto/módulo precisamos decidir como serão organizadas as classes que são comuns às futuras partes individualmente. Ver imagens dessa pasta para entender visualmente. (Ex: de separação: criar 2 microsserviços à partir de um inicial. Ou, gerar 2 módulos de pacotes do java 9. Ou, apenas gerar 2 pacotes à partir de apenas 1. Nesse curso foi adotada a última abordagem e utilizou-se um recurso de criar um terceiro pacote nomeado de "shared" para armazenar as classes que eram comuns ao outros 2 pacotes resultantes da quebra).
+Atentar que na implementação de código do pacote dividido 1 não deve haver imports de classes do pacote dividido 2 , e vice-versa. Assim se evita o acoplamento e dependências no software.
+
+Pro:
+Bounded Contexts, ou contextos delimitados, são um dos conceitos mais complexos de entender e implementar do estudo do DDD.
+
+[00:00] Na última aula, eu tinha comentado sobre essa questão de separarmos os dois contextos. Existe um conceito no Domain Driven Design chamado mapa de contextos, que nada mais é do que uma representação visual dos contextos que existem dentro daquele domínio, daquela aplicação e os conceitos do domínio, onde eles se encaixam.
+
+Ver imagem "./aula4_video3_imagem1.png"
+
+[00:19] Eu peguei na internet um exemplo aleatório de uma representação, um mapa de contexto, como seria isso no Domain Driven Design. Perceba que temos os especialistas de domínio, no lado direito, conversando, interagindo, e utilizando aquela ideia da linguagem ubíqua para definir, para fazer esse desenho, esse mapa mental, sobre os contextos do domínio da aplicação.
+
+[00:41] Nesse exemplo, perceba que temos vários contextos. Você tem isolado o contexto de CRM, você tem o contexto de categoria, de pedidos, de produtos, de locação, de entrega, enfim, você tem vários contextos. Dentro de cada contexto você tem as várias informações: as entidades, os value objects, os services.
+
+[00:59] Nesse mapa, a grande questão desse mapa é identificarmos como esses contextos estão separados, mas também principalmente como eles se comunicam - qual contexto conversa com qual contexto? Então você percebe, por exemplo, que temos um contexto de produto e ele tem do outro lado um contexto de pedidos.
+
+[01:17] Mas eles precisam trocar informações em comum, então entre eles você tem um contexto, um núcleo compartilhado. Então o contexto de produtos e pedidos, eles conversam entre si e eles estão isolados, tem essa linha pontilhada em volta. Temos um contexto de categorias, que também precisa conversar com produtos, mas já é algo que está separado. Lá fora, externo, você tem um domínio separado, que é o domínio CRM.
+
+[01:44] Enfim, então perceba que isso é um trabalho que é feito em conjunto com o time de desenvolvimento e o time de especialistas de domínio da aplicação. Nós precisamos entender aqueles conceitos e entender como funcionam esses contextos, quais são os contextos e como eles se comunicam. Quais contextos pertencem ao mesmo domínio, a um subdomínio, se terá que ficar separado e quais são as informações em comum entre eles.
+
+[02:07] No nosso caso, da nossa aplicação eu fiz um desenho. Nós temos mais ou menos esse contexto aqui. Temos o nosso projeto e temos esses dois contextos no momento, o contexto acadêmico e o contexto gamificação. Duas informações específicas de cada um desses contextos: no contexto acadêmico eu tenho a informação do aluno, já no contexto de gamificação eu tenho aquela ideia de um selo.
+
+Ver imagem "./aula4_video3_imagem2.png"
+Figura com dois círculos: um grande chamado "Acadêmico" contendo o círculo menor "Aluno", e ao lado há outro grande círculo chamado "Gamificação" contendo o círculo menor chamado "Selo".
+
+[02:30] São duas informações separadas. Porém esses dois contextos terão que conversar. Lembra que no conceito de gamificação eu preciso do CPF do aluno, o selo, ele precisa saber: esse selo é de qual aluno? Nós fizemos esse mapeamento com o CPF do aluno. Então temos basicamente duas abordagens para fazer essa comunicação entre esses dois contextos. Uma delas seria essa, dessa outra figura.
+
+Ver imagem "./aula4_video3_imagem3.png"
+Figura com dois grandes círculos sobrepostos: um grande chamado "Acadêmico" contendo o círculo menor "Aluno", e ao lado há outro grande círculo chamado "Gamificação" contendo o círculo menor chamado "Selo". Na intersecção de "Acadêmico" e "Gamificação", há o escrito "CPF".
+
+[02:53] Nós poderíamos ter um núcleo compartilhado que, no caso aqui, estaria dentro dele o CPF. Então no nosso exemplo eu tenho o contexto acadêmico, que tem o aluno, o contexto de gamificação separado, ele tem um selo, mas tem uma interseção entre esses contextos, que é justamente usando o CPF.
+
+[03:09] Aqui a vantagem é que compartilhamos informações, tudo o que é comum entre esses dois contextos vai ficar nesse núcleo central. Você favorece essa união, você tem esse código que está compartilhado. Porém você tem aquele problema do acoplamento, um contexto, ele vai depender diretamente do outro contexto.
+
+[03:27] Então se quiséssemos extrair esse contexto da gamificação, jogar para um outro retângulo, que seria um outro sistema, teríamos essa dificuldade, porque teríamos que levar junto o CPF, só que o CPF, ele está amarrado aqui no meio. Então, talvez, uma outra abordagem seria essa, dessa outra figura.
+
+Ver imagem "./aula4_video3_imagem4.png"
+Figura com dois círculos: um grande chamado "Acadêmico" contendo os círculos menores "Aluno" e "CPF", e ao lado há outro grande círculo chamado "Gamificação" contendo os círculos menores chamado "Selo" e "CPF".
+
+[03:45] Eu tenho os dois contextos, só que agora eles estão completamente separados. Só que a informação comum entre eles, ela está duplicada, então o CPF está duplicado no contexto acadêmico e também no contexto de gamificação. A desvantagem é essa: você tem a duplicação de código, porém você tem essa vantagem de deixar o código totalmente desacoplado.
+
+[04:03] Eu posso extrair esse contexto de gamificação para fora, jogar para um sistema externo, que ele não vai depender, não vai gerar impactos no contexto acadêmico. *São duas abordagens distintas e não tem um certo e um errado aqui*. Lembre, a arquitetura é esse negócio complexo, nós precisamos entender as vantagens e desvantagens, cada caminho que podemos seguir e quais são as vantagens e desvantagens de cada um desses caminhos.
+
+[04:25] Mas, no geral, não tem uma única maneira. Você terá que pesar, ponderar qual caminho é mais apropriado para vocês. Se há uma desvantagem, se ela é aceitável ou se não, se não é aceitável, ela gera um impacto muito grande no seu contexto. Então são abordagens distintas, com vantagens e desvantagens.
+
+[04:42] Na aula de hoje, eu queria só discutir com você sobre esse conceito de mapa de contexto, delimitação de contextos, que é um assunto muito importante do Domain Driven Design. A grande questão aqui, que precisamos ter em mente, que você precisa ter em mente, é que em um projeto de software complexo, em um projeto grande, que tem muita informação, muitos conceitos complexos e complicados, você vai se esbarrar com esse problema, você eventualmente vai ter que separar esses contextos.
+
+[05:10] Você vai ter conceitos que vão pertencer a um contexto e outros conceitos que vão pertencer a outros contextos. Você vai ter que entender, conseguir enxergar quais são os contextos da aplicação e que informação pertence a cada um desses contextos e, principalmente, como esses contextos vão se comunicar, como vai ser feita a separação entre esses contextos, como será feita a delimitação entre esses conceitos, entre esses contextos.
+
+[05:37] Existe uma discussão, muita coisa importante sobre essa separação, como separar e como fazer essa comunicação entre esses contextos. No nosso curso, vamos utilizar essa primeira abordagem, vamos usar um contexto compartilhado. Então vamos ter um contexto compartilhado, onde o CPF, no caso, estará compartilhado entre o contexto de gamificação e o contexto de acadêmico.
+* Referência bibliográfica mão na massa, usando Spring Boot
+"Domain Driven Design with Spring Boot", do Ajay Kumar
