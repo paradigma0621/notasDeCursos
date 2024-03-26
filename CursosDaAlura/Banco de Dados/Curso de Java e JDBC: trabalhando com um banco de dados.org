@@ -97,8 +97,21 @@ Dez pessoas querem acessar a nossa aplicação ao mesmo tempo. Porém, temos ape
 
 O que vai acontecer quando a décima pessoa se conectar?
 R: O 10º usuário esperará alguma das 9 conexões ficar disponível.
-* Nota
-Existe uma interface que representa a conexão (java.sql.Connection), também existe uma que representa o pool de conexões (javax.sql.DataSource) .
+* Notas
+** Existe uma interface que representa a conexão (java.sql.Connection), também existe uma que representa o pool de conexões  (javax.sql.DataSource).
+
+** Realizada a conexão com o banco de dados, chega o momento de executar as operações de consulta, inserção, atualização e deleção (apagamento) de informações. Temos um conjunto de classes e interfaces já preparados para isso. São elas:
+*** Connection 
+Representa uma sessão junto ao banco de dados desejado. Vimos a classe no trecho de código do exemplo anterior e vamos executar as instruções SQL dentro da conexão estabelecida.
+*** Statement
+Tem como objetivo a execução do comando SQL. Temos também a PreparedStatement, que pré-compila o comando e armazena o SQL em um objeto.
+*** ResultSet 
+Esta interface tem por objetivo armazenar o retorno de uma consulta realizada no banco de dados. As informações das tabelas são recuperadas na sequência e podem ser iteradas em loops para a manipulação.
+** Componentes
+A API JDBC é composta por dois componentes centrais. Em primeiro lugar, podemos falar dos pacotes (Java.sql e Javax.sql) que contêm as classes e interfaces que padronizam a comunicação da aplicação Java com uma base de dados.
+
+Outro item importante são os drivers, verdadeiros responsáveis pela conexão e interação com um banco específico. Um driver JDBC é uma classe que implementa a interface java.sql.Driver. Muitos drivers são totalmente desenvolvidos com o uso de Java, o que colabora para serem carregados de maneira dinâmica.
+Os drivers também podem ser escritos de forma nativa, acessando outras bibliotecas ou outros drivers de sistema que permitam acesso a  uma base de dados determinada.
 * E se der erro no meio de uma transação bancária?
 Criamos o nosso método para realizar transferências, aproveitando os de realizar depósitos e saques, que já existiam. Fizemos os testes e fomos bem sucedidos, ou seja, alcançamos o nosso objetivo.
 
@@ -152,6 +165,10 @@ Caso ocorra algum erro, o catch será executado e o método rollback()vai desfaz
 
 Transações são um recurso poderoso do banco de dados que vale a pena conhecer. para mais informações, recomendo a leitura do artigo sobre transações no SQL: https://www.alura.com.br/artigos/transacoes-no-sql-mantendo-os-dados-integros?_gl=1*ktcfyw*_ga*MTU0Mjg2MDQ4LjE3MDg0NjU5Nzc.*_ga_1EPWSW3PCS*MTcxMTM4MzMwNy4xNy4xLjE3MTEzOTM1NTEuMC4wLjA.*_fplc*V1ZiVGJmWU91JTJCQ2t3d1hBJTJCTVJEeXN6NGZyJTJCTG52SFR5cmxJMiUyQkY2UHFIOElNUyUyRlNwSzFwN3lGT1VpWklyVEpncDVqYVU1TURSRlFWSVpoYU15NjhjNUwwSUIlMkZWMzV2NHlrVDJjNkZkR0FNa0w3S2Y4SyUyRkJBbGdtS3dPcmclM0QlM0Q.
 * Exemplos de uso de prepareStatement
+** NOTA
+Ademais dos exemplos abaixo que foram dados no curso "Curso de Java e JDBC: trabalhando com um banco de dados", no documento da Alura sobre JDBC temos as considerações:
+*** Executar o comando. Neste ponto, vale a pena ficarmos atentos: quando se trata de uma consulta, usamos executeQuery, quando se trata de um insert, update ou delete, usamos executeUpdate
+*** Tratar o resultado. Quando for o retorno de uma consulta (ResultSet), vamos iterar o objeto. Se for o retorno de insert, update ou delete, devemos avaliar o valor retornado.
 ** SELECT
     public Conta listarPorNumero(Integer numero) {
         String sql = "SELECT * FROM conta WHERE numero = " + numero + " and esta_ativa = true";

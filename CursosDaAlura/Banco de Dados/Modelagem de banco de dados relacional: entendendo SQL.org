@@ -1,0 +1,90 @@
+Modelagem de banco de dados relacional: entendendo SQL
+https://cursos.alura.com.br/course/modelagem-banco-dados-relacional-sql
+
+* SQL
+SQL é uma sigla em inglês para Structured Query Language que pode ser livremente traduzida para Linguagem de Consulta Estruturada e é uma linguagem padrão para trabalhar com bancos de dados relacionais.
+
+Vale ressaltar que atualmente a linguagem SQL tem suas limitações. Em tempos de redes sociais e big data, surgiu a possibilidade de analisar dados não-estruturados, como grafos e imagens, pelo fato da modelagem relacional exigir chaves primárias e estrangeiras, acaba trazendo uma iniciativa um pouco engessada e para suprir a necessidade de análise e armazenamento de dados não-estruturados o NoSQLs é a melhor alternativa.
+* SGBD
+Um Sistema de Gerenciamento de Banco de Dados (SGBD) é um software projetado para definir, manipular, recuperar e gerenciar dados em um banco de dados. Um SGBD atua como uma interface entre o banco de dados e os usuários ou aplicações, garantindo que os dados sejam organizados, acessíveis, consistentes, duráveis e seguros. Os principais objetivos de um SGBD incluem:
+
+1. **Gerenciamento de Dados**: Permite criar, editar e deletar os dados armazenados de forma eficiente.
+2. **Gerenciamento de Transações**: Garante a integridade dos dados mesmo em caso de falhas de sistema ou tentativas de acesso concorrente por múltiplos usuários.
+3. **Controle de Acesso**: Restringe o acesso aos dados com base em permissões de usuário, garantindo a segurança dos dados.
+4. **Backup e Recuperação**: Facilita a recuperação dos dados em caso de perda de dados ou falhas de sistema, através de funcionalidades de backup e restauração.
+5. **Consulta de Dados**: Oferece linguagens de consulta (como SQL) para buscar e manipular os dados de forma eficaz.
+
+Exemplos de SGBDs incluem MySQL, PostgreSQL, Oracle, Microsoft SQL Server, e MongoDB, cada um com suas próprias características, vantagens e desvantagens, dependendo das necessidades específicas de armazenamento, manipulação e recuperação de dados.
+* Criando Schema
+** Pergunta
+Matheus é desenvolvedor júnior e foi contratado para implementar um modelo relacional usando a linguagem SQL no sistema de gerenciamento de banco de dados MySQL. Além disso, ele também fará a inclusão, alteração, exclusão e seleção de dados em tabelas. Com o modelo relacional em mãos, qual seria o primeiro passo para fazer a implementação?
+** Resposta
+Usar o comando CREATE SCHEMA após a instalação do SGBD escolhido.
+Logo depois da instalação e configuração do Sistema Gerencial de Banco de Dados é possível criar um esquema usando o comando CREATE SCHEMA que armazenará todas as tabelas que serão criadas.
+* Criando tabela
+CREATE TABLE LIVROS (
+
+** ID_LIVRO INT NOT NULL,           
+Tipo numérico (INT), que não pode ser nulo (NOT NULL).  Isso indica que os valores armazenados nesta coluna devem ser números inteiros (por exemplo, 1, 42, 100, etc.). No MySQL, o tipo de dado INT (inteiro) é um tipo numérico de 4 bytes (32 bits). Os valores que podem ser armazenados em um campo INT variam se o campo for assinado (pode conter tanto valores positivos quanto negativos) ou não assinado (apenas valores positivos).
+Para INT assinado, o intervalo de valores vai de -2,147,483,648 a 2,147,483,647.
+Para INT não assinado, o intervalo de valores é de 0 a 4,294,967,295.
+** NOME_LIVRO VARCHAR(100) NOT NULL, 
+ Tipo texto (VARCHAR com número de 100 caracteres máximo de comprimento), que não pode ser nulo (NOT NULL)
+** PREÇO DECIMAL(5,2) NOT NULL,   
+Este é um tipo de dado decimal ou numérico que é usado para armazenar números com pontos decimais. O número `5` representa a precisão total do número, ou seja, o número total de dígitos que o valor pode ter, incluindo tanto os dígitos antes quanto depois do ponto decimal. O número `2` após a vírgula indica a escala, ou seja, o número de dígitos que podem aparecer após o ponto decimal. Portanto, um campo definido como `DECIMAL(5,2)` pode armazenar números de `-999.99` a `999.99`.
+** PRIMARY KEY (ID_LIVRO)  );
+`PRIMARY KEY (ID_LIVRO)` especifica que a coluna `ID_LIVRO` na tabela de um banco de dados é a chave primária da tabela.
+
+* Definindo as relações entre tabelas
+Este comando SQL está modificando a estrutura de uma tabela existente no banco de dados, especificamente a tabela `VENDAS`, com o objetivo de adicionar uma restrição de chave estrangeira.
+** ALTER TABLE VENDAS ADD CONSTRAINT CE_VENDAS_LIVROS
+- **`ALTER TABLE VENDAS`**: Este é o comando que inicia a alteração da tabela chamada `VENDAS`. `ALTER TABLE` é usado para adicionar, modificar ou excluir colunas em uma tabela existente, bem como para adicionar e remover várias restrições em uma tabela.
+
+- **`ADD CONSTRAINT CE_VENDAS_LIVROS`**: Aqui, estamos adicionando uma nova restrição (`CONSTRAINT`) à tabela. `CE_VENDAS_LIVROS` é o nome dado a essa restrição. Nomear restrições é uma boa prática, pois facilita a identificação e gestão das mesmas no futuro.
+** FOREIGN KEY (ID_LIVRO)
+- **`FOREIGN KEY (ID_LIVRO)`**: Esta parte do comando especifica que a coluna `ID_LIVRO` na tabela `VENDAS` será usada como chave estrangeira. Uma chave estrangeira é um tipo de restrição que é usada para estabelecer uma relação entre os dados de duas tabelas. Essa relação é baseada na correspondência de valores da chave estrangeira com valores em uma coluna de outra tabela (normalmente uma chave primária).
+** REFERENCES LIVROS (ID_LIVRO)
+- **`REFERENCES LIVROS (ID_LIVRO)`**: Isso define a tabela e a coluna na qual a chave estrangeira se referencia. Neste caso, está dizendo que `ID_LIVRO` em `VENDAS` apontará para `ID_LIVRO` em uma tabela chamada `LIVROS`. Isso significa que todos os valores em `ID_LIVRO` em `VENDAS` devem existir como valores em `ID_LIVRO` em `LIVROS`.
+** ON DELETE NO ACTION
+- **`ON DELETE NO ACTION` e `ON UPDATE NO ACTION`**: Estas são as ações de restrição especificadas para o que acontece quando um registro referenciado na tabela `LIVROS` é atualizado ou deletado. `NO ACTION` significa que se tentarmos deletar um registro na tabela `LIVROS` que é referenciado por um registro na tabela `VENDAS`, ou tentarmos atualizar um valor de chave primária em `LIVROS` que é referenciado em `VENDAS`, o MySQL não permitirá a operação e retornará um erro. Essencialmente, isso protege a integridade dos dados, assegurando que não haja registros "órfãos" na tabela `VENDAS` que não correspondam a registros válidos na tabela `LIVROS`.
+** ON UPDATE NO ACTION;
+Ver item acima (ON DELETE)
+* Excluindo uma tabela
+Lembrando se você quiser excluir alguma tabela você pode usar o comando DROP, assim como mostra o código abaixo. Ah! Só não esqueça de desativar (usando o comando SET FOREIGN_KEY_CHECKS = 0; ) e ativar (usando o comando SET FOREIGN_KEY_CHECKS = 1; ) as restrições de chave estrangeira para realizar a exclusão.
+
+DROP TABLE VENDEDORES;  -- exemplo de exclusão da tabela VENDEDORES	
+* Igualdade na comparação de string
+pode ser feito de outra forma que não apenas com like:
+
+SELECT * FROM tb_projeto 
+WHERE Local_Projeto = 'Mauá';
+Nessa consulta foram selecionadas as linhas da tabela tb_projeto onde o local do projeto é a cidade de Mauá.
+* Operações sobre registros de uma tabela
+** deletando 1 registro onde a chave primária é ID_LIVRO = 8
+Deletando um livro que não será mais vendido
+
+DELETE FROM LIVROS 
+WHERE ID_LIVRO = 8;
+** atualizando vários registros
+A outra alteração demandada foi por conta da temporada de promoções do Clube do Livro que garantiu 10% de descontos em todos os livros.
+
+#Reajuste do preço do livro
+UPDATE LIVROS SET PREÇO = 0.9 * PREÇO;
+* Funções de agregação - Métricas
+Além de consultar os valores puramente como foram inseridos na tabela, é comum construirmos informações com métricas que resumem uma tabela. Isso pode ser feito com as funções de agregações, vamos entender cada um dos comandos:
+
+MAX: a partir de um conjunto de valores é retornado o maior entre eles;
+MIN: analisa um grupo de valores e retorna o menor entre eles;
+SUM: calcula o somatório dos valores de um campo específico;
+AVG: realiza a média aritmética dos valores de uma determinada coluna; e
+COUNT: contabiliza a quantidade de linhas selecionadas.
+Para saber a maior venda feita no Clube do Livro, podemos construir o comando:
+
+	SELECT MAX(QTD_VENDIDA) FROM VENDAS;
+
+Usando o GROUP BY agrupamos os registros que serão agregados em grupos de valores permitindo que a função de agregação seja realizada para cada um desses grupos.
+
+Para saber, por exemplo, a maior venda por código de pessoa vendedora podemos consultar da seguinte maneira:
+
+SELECT MAX(QTD_VENDIDA) FROM VENDAS
+GROUP BY(ID_VENDEDOR);
