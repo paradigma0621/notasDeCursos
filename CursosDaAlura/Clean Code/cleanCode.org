@@ -1,0 +1,136 @@
+Notas do livor "Clean Code" de Robert Martin
+* Cap 2 - Nomes significativos
+** Usar nomes que revelem seu propósito
+	Nomes devem demonstrar seu propósito. Devem responder as grandes questões:
+      - porque existe?
+      - o que faz?
+      - como é usado?
+** Evite informações erradas
+   1) Não se refira a um grupo de contas como accountList, a menos que realmente seja uma List.
+   2)  Mesmo se for uma lista é melhor não colocar o tipo no nome
+** Faça distinções significativas 
+	Palavras muito comuns são outra forma de distinção que nada expressam. Imagine que você tenha uma classe Product. Se houver uma outra chamada ProductInfo ou ProductData, você usou nomes distintos que nada revelam de diferente. Info e Data são palavras muito comuns e vagas.
+
+	O nome de uma 'tabela' jamais deve conter a palavr 'tabela'. Então como NameString é melhor do que "Name"? Um "Name" pode ser um número do tipo ponto flutuante? Caso possa, estaria violando uma regra de passar informações incorretas. Imagine que você encontre uma classe Customer e outra CustomerObject. O que a difernça nos nomes lhe diz? Qual seria a melhor para possuir o histório de pagamento de um cliente?
+
+	Conhecemos um aplicativo que é assim - abaixo está exatamente o tipo de erro:
+      getActiveAccount();
+      getActiveAccounts();
+      getActiveAccountInfo();
+
+	Na ausência de convenções específicas, não há como distinguir 'moneyAmount' de 'money', 'customerInfo' de 'customer', 'accountData' de 'account' e 'theMessage' de 'message'. Faça distinção de nomes de uma forma que o leitor compreenda as diferenças
+** Nomes de Classes e Objetos
+	Classes e objetos devem ter nomes com substantivo(s), como Customer, WikiPage, Account e AddressParser. Evite palavras como Gerente, Processador Dados ou Info no nome de uma classe, que também não deve ser um verbo.
+** Nomes de métodos
+	Os nomes de métodos devem ter verbos, como Post Payment, Delete Page ou Save. Devem-se nomear métodos de acesso, alteração e autenticação segundos seus valores e adicionar os prefixos get, set ou is de acordo como o padrão javabean.
+** Use nomes a partir do Domínio da Solução
+	Lembre-se de que serão prorgamadores que lerão seu código. Portanto, pode usra termos de Informática, nomes de algoritmos, nomes de padrões, temos matemáticos etc. Não é prudente pensar num nome a partir do domínio do problema, pois não queremos que nossos companheiros de trabalhalho tenham de consultar o cliente toda hora para saber o significado de um nome o qual eles já conhecem o conceito, só que por outro nome.
+	O nome AccountVisitor ("conta do visitante") significa o bastante para um programador familiarizado com o padrão VISITOR. Qual programador não saberia o que é uma JobQueue ("fila de tarefas")? Há muitoas coisas técnicas que os programadores devem fazer. Selecionar nomes técnicos para tais coisas é, geralmente, o método mais adequado.
+** Contextos
+*** Adicione um Contexto Significativo
+	Há poucos nomes que são significativos por si só - a maioria não é. Por conta disso, você precisa usar nomes que façam parte do contexto do leitor. Para isso vocÊ os coloca em classes, funções e namespaces bem nomeados. Se nada disso funcionar, então talvez como último recurso seja necessário adicionar prefixos ao nome.
+	Imagine que você tenha variáveis chamadas firstName, lastName, street, houseNumber, city, state, zipcode. Vistas juntas, fica bem claro que elas formam um endereço. Mas e se você só visse a variável state sozinha num método? Automaticamente você assumiria ser parte de um endereço?
+	Podem-se usar prefixos para adicionar um contexto: addrFirstName, addrLastName, addrState etc. Pelo menos os leitores entenderão que essas variáveis são parte um uma estrutura maior. É claro que uma melhor solução seria criar yna classe chamada Address. Então, até o compilador sabe que as variáveis pertencem a um escopo maior.
+*** Não Adicione Contextos Desnecessários
+	Em um aplicativo fictício chamado "Gas Station Deluxe" (GSD), seria uma péssima ideia adicionar prefixos a todas classe com GSD. Para ser sincero, você estará trabalhando contro suas ferramentas. Você digita G e pressiona a tecla para autocompletar e recebe uma lista quilométrica de cada classe no sistema. Isso é inteligente? Para que dificultar a ajuda da IDE?
+	Da mesma forma, digamos que você inventou uma classe MailingAddress no módulo de contabilidade do GSD e que o chamou de GSDAccountAddress. mais tarde, você precisa armazenar um endereço postal de seu cliente no aplicativo. Você usaria GSDAccountAddress? Parece que o nome é adequado? Dez dos 17 caracteres são redundantes ou irrelevantes.
+	Nomes curtos geralmente são melhores contanto que sejam claros. *Não adicione mais contexto a um nome do que o necessário.*]
+	Os nomes accountAddress e customerAdress estão bons para instâncias da classe Address, mas seriam ruins para nomes de classes. Address está bom para uma classe. Se precisar diferenciar entre endereço MAC, enderço de portas e endereços da Web, uma ideia seria PostalAddress, MAC e URI. Os nomes resultantes são mais precisos, motivo esse da tarefa de se atribuir nomes.
+** Geral
+Prefira nomes de uma única letra SÓ quando usados como variáveis locais dentro de métodos pequenos. *O tamanho de um nome deve ser proporcional ao tamanho do escopo*.
+* Cap 3 - Funções 
+** Pequenas!
+A primeira regra para funções é que elas devem ser pequenas. Elas devem ter no máximo 20 linhas. As funções devem ter duas, ou três, ou quatro linhas.
+** Blocos e Identação
+	Blocos dentro de instruções if, else, while devem ter apenas 1 linha. Possivelmente uma chamada de função. Além de manter a função 	pequena, isso adiciona um valor significativo, pois a função chamada de dentro do blco pode receber um nome descritivo.
+	Isso também implica que as funções não devem ser grandes e ter estruturas aninhadas. Portanto, o nível de identação de uma função deve ser de, no máximo, um ou dois.
+** Faça Apenas uma Coisa
+	AS FUNÇÕES DEVEM FAZER UMA COISA. DEVEM FAZÊ-LA BEM. DEVEM FAZER APENAS ELA.
+	O problema dessa declaração é que é difícil saber o que é "uma coisa". A Listagem 3-3 (pg 35, citada abaixo) faz uma coisa?
+
+#+BEGIN_SRC java
+	public static String renderPageWithSetupsAndTeardowns(PageData pageData,  boolean isSuite) throws Exception {
+		if (isTestPage(pageData))
+			includeSetupAndTearDownPages(pageData, isStuite);
+		return pageData.getHtml();
+#+END_SRC
+
+	É fácil dizer que ela faz três:
+	1. Determina se a página é de teste
+	2. Se for, inclui SetUps e TearDowns
+	3. Exibe a página em HTML
+
+	Então, qual é? A função está fazendo uma ou três coisas? Note que os três passos da função estão em um nível de abstração abaixo do nome da função. Podemos descrever a função com um breve parágrafo TO:
+	
+		TO RenderPageWithSetupsAndTeardowns, verificamos se a página é de teste, se for, incluímos setups e teardowns. Em ambos os casos, exibimos a página em HTML.
+
+	Se uma função faz apenas aqueles passos em um nível abaixo do nome da função, então ela está fazendo uma só coisa. Apesar de tudo, o motivo de criarmos função é para decompor um conceito maior (em outras palavras, o nome da função) em uma série de passos no próximo nível de abstração.
+	Ficaria muito difícil reduzir a Listagem 3-3 de modo significativo. Poderíaomos colocar a instrução if numa função chamada includeSetupsAndTeardownsIfTestPage, mas isso simplesmente reformula o código, sem modificar o nível de abstração.
+	Portanto, uma forma de saber se uma função faz mais de "uma coisa" é se você pode extrair outra função dela a partir de seu nome que não seja apenas uma reformulação de sua implementação.
+** Use Nomes Descritivos
+	Não tenha medo de criar nomes extensos, pois eles são melhores do que um pequeno e enigmático. Um nome longo e descritivo é melhor do que um comentário extenso e descritivo. Use uma convenção de nomenclatura que possibilite uma fácil leitura de nomes de funçõoes com várias palavras e, então, use estas para dar à função um nome que explique o que ela faz.
+** Parâmetros Lógicos
+	Esses parâmetros são feios. Passar um booleano para um função certamente é uma prátic horrível, pois ele complica imediatamente a assinatur do método, mostrando explicitamente que a função faz mais de uma coisa. Ela faz uma coisa se o valor for verdadeiro, e outra se for falso.
+** Verbos e Palavras-Chave
+	Escolher bons nomes para funções pode ir desde explicar o propósito da função à ordem a finalidade dos parâmetros. No caso de uma mônade, a função e o parâmetro devem formar um belo par verbo/substantivo. Por exemplo, write(name) é bastante claro. Seja o que for esse 'nome', ele será 'escrito'.  Um nome ainda melhor seria writeField(name), que nos diz que 'nome' é um 'campo'.
+	Este último é um exemplo do formato palavra-chave do nome de uma função. Ao usar este formato codificamos os nomes dos parâmetros no nome da função. Por exemplo, pode ser melhor escrever asserEquals do que assertExpectedEqualsActual(expected, actual), o que resolveria o problema de ter de lembrar a ordem dos parâmetros.
+** Parâmetros de Saída
+	Os parâmetros são comumente interpretados como entradas de uma função. Se já usa o programa há alguns anos, estou certo de que você já tece de voltar e ler novamente um parâmetro que era, na verdade, de saída, e não de entrada. Por exemplo:
+
+		appendFooter(s);
+
+	Essa função anexa s como rodapé (Footer, em inglês) em algo? Ou anexa um rodapé a s? O s é uma entrada ou uma saída? Não precisa olhar muito a assinatura da função para ver:
+
+		public void appendFooter(StringBuffer report)
+
+	Isso esclarece a questão, mas à custa da verificação da declaração da função. Qualquer coisa que lhe force a verificar a assinatura da função é equivalente a uma releitura. Isso é uma interrupção do raciocínio e deve ser evitado.
+	Antes do surgimento da programação orientada a objeto, às vezes era preciso ter parâmetros de saída. Entretanto, grande parte dessa necessidade sumiu nas linguagens OO, pois o propósito de this é servir como parâmetro de saída. Em outras palavras, seria melhor invocar appendFooter como:
+	
+		report.appendFooter();
+
+	De modo geral, devem-se evitar parâmetros de saída. Caso sua função precise alterar o estado de algo, faça-a mudar o estado do objeto a que pertence.
+** Tratamento de erro é uma coisa só
+	As funções devem fazer uma coisa só. Tratamento de erro é uma coisa só. Portanto, uma função que trata de erros não deve fazer mais nada. Isso implica que a palavra try está dentro de uma função e deve ser a primeira instrução e nada mais deve vir após os blocos catch/finally.
+* Cap 4 - Comentários
+** Evite o comentário se é possível usar uma função ou uma variável
+	Considere o peda~p de código abaixo:
+		
+		// o módulo da lista global <mod> depende do
+		// subsistema do qual fazemos parte?
+		if (smodule.getDependSubsystems().contains(subSysMod.getSubSystem()))
+
+	Poderia-se evitar o comentáio e usar:
+		
+		ArrayList moduleDependees = smodule.getDependSynsystems();
+		String outSubSystem = subSysMod.getSubSystem();
+		if (moduleDependees.contains(ourSubsystem))
+* Cap 5 - Formatação
+** Distância vertical
+	Os conceitos intimamente relacionados devem ficar juntos verticalmente. Obviamente essa regra não funciona para conceitos em arquivos separados. Mas, então, não se devem separar em arquivos distintos conceitos intimamente relacionados, a menos que tenha uma razão muito boa. Na verdade, esse é um dos motivos por que se devem evitar variáveis protegidas.
+	Para os conceitos que são tão intimamente relacionados e que estão no mesmo arquivo-fonte, a separação vertical deles deve ser uma medida do quão importante eles são para a inteligibilidade um do outro. Queremos evitar que nossos leitores tenham de ficar visualizando vários dos nossos arquivos-fonte e classes.
+*** Funções dependentes
+Se uma função chama outra, elas devem ficar verticalmente próximas, e a que chama deve ficar acima da que for chamada, se possível. Isso dá um fluxo natural ao programa. Se essa convenção for seguida a fim de legibilidade, os leitores poderão confiar que as declarações daquelas funções virão logo em seguida após seu uso.
+
+* Cap 6 - Objetos e Estruturas de Dados
+** Conclusão 
+	Os objetos expõem as ações e ocultam os dados. Isso facilita a adição de novo tipos de objetos sem precisar modificar as ações existentes e dificulta a inclusão de novas atividades em objetos existentes. As estrutras de dados expõem os dados e não possuem ações significativas. Isso facilita a adição de novas ações às estruturas de dados existentes e dificulta a inclusão de novas estruturas de dados em funções existentes.
+	Em um dado sistema, às vezes, desejaremos flexibilidade para adicionar novos tipos de dados, e, portanto, optaremos por objetos. Em outras ocasiões, desejaremos querer flexibilidade para adicionar novas ações, e, portanto optaremos por tipos de dados e procedimentos.
+* Cap 7 - Tratamento de Erros
+** Use exceções não verificadas
+As exceções verificadas podem às vezes ser úteis se você estiver criando uma biblioteca crítica: é preciso capturá-las. Mas no desenvolvimento geral de aplicativo, os custos da dependência superam as vantagens.
+* Cap 8 - Limites
+	Entender código de terceiros é difícil. Integrá-lo ao seu também é. Fazer ambos ao mesmo tempo dobra a dificuldade. E se adotássemos uma outra abordagem? Em vez de experimentar e temtar o novo código, poderíamos criar testes para explorar nosso conhecimento sobre ele. Jim Newkirk chama isso de testes de aprendizagem.
+	Nesses testes, chamamos a API do código externo como faríamos ao usá-la em nosso aplicativo. Basicamente estaríamos controlando os experimentos que verificam nosso conhecimento daquela API. O teste se focaliza no que desejamos saber sobre a API.
+* Cap 9 - Testes de Unidade
+** As três leis do TDD
+	Hoje em dia todos sabem que o TDD nps pede para criar primeiro os testes de unidade antes do código de produção. Mas essa regra é apenas o início. Considere as três leis abaixo:
+	1a Lei) Não se deve escrever o código de produção até criar um teste de unidade de falhas.
+	2a Lei) Não se deve escrever mais de um teste de unidade do que o necessário para falhar, e não compilar é falhar.
+	3a Lei) Não se deve escrever mais códigos de produção do que o necessário para aplicar o teste de falha atual.
+	
+	Os testes e o código de produção são escritos juntos, com os testes apenas alguns segundos mais adiantados.
+** Testes limpos
+	O que torna um teste limpo? Três coisas: legilibilidade, legilibilidade e legilibilidade. Talvez isso seja até mais importante nos testes de unidade do que no código de produção. O que torna os testes legíveis? O mesmo que torna todos os códigos legíveis: clareza, simplicidade e consistência de expressão. Num teste você quer dizer muito com o mínimo de expressões possíveis.
+* Code smells
+** G34
+em ** Faça Apenas uma Coisa (pg  36 - 5o paragrafo)

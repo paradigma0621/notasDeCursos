@@ -1177,7 +1177,7 @@ Mais informações podem ser adquiridas em https://kubernetes.io/docs/concepts/s
 
 * Curso de Kubernetes: Deployments, Volumes e Escalabilidade
 https://github.com/alura-cursos/kubernetes-parte2/tree/Aula1
-** Conhecendo ReplicaSets e Deployments
+** Aula 01 - Conhecendo ReplicaSets e Deployments
 *** Conhecendo ReplicaSets
 AP: Ver exemplo em: "./Arquivos-k8s/kubernetes-parte2-Aula1/exemplo-replicaset.yaml" (obs: depois eu consegui o arquivo da aula, é o "portal-noticias-replicaset.yaml")
 AP: Ver também: "./Imagens/Aula01_video01_img01.png" à "Aula01_video01_img05.png"
@@ -1516,7 +1516,7 @@ foi devidamente criado. Se dermos um kubectl get pods, tudo devidamente funciona
 [09:49] Então, já temos a primeira pergunta: aonde foi parar as nossas notícias? Como podemos persistir os dados em caso de falhas? Precisamos ter alguma maneira de, caso um container dentro de um Pod reinicie ou o Pod todo reinicie, precisamos ter o acesso às informações que já estavam lá.
 
 [10:11] E, para isso, vamos começar a ver um conceito novo no próximo vídeo que vão ser os Volumes Persistentes, Storage Classes. Um conteúdo bem vasto sobre toda essa questão de armazenamento no Kubernetes. E para isso eu vejo vocês no próximo vídeo. Até mais!
-** Persistindo dados com volumes
+** Aula 02 - Persistindo dados com o Kubernets
 *** Persistindo dados com volumes (reler e editar... renomear imagens que fiz de printscreens tb, que já movi pra pasta de 
 "./Kubernetes: Deployments, Volumes e Escalabilidade/Imagens/Aula02_video01_img01.png" à "Aula02_video01_img08.png"
 Ver arquivo: "./Arquivos-k8s/kubernetes-parte2-Aula2/pod-volume.yaml"
@@ -1553,9 +1553,9 @@ Ver arquivo: "./Arquivos-k8s/kubernetes-parte2-Aula2/pod-volume.yaml"
 
 [03:31] E mais aqui embaixo ele tem os tipos de Volumes, então, ele fala que o Kubernetes suporte diversos tipos, por exemplo, o awsElasticBlockStore, azureDisc, azureFile, vários.
 
-[03:44] O que nós vamos usar para exemplificar a nossa utilização de Volumes é o hostPath, que é que nem o que vocês fizeram lá no curso de Docker.
+*[03:44] O que nós vamos usar para exemplificar a nossa utilização de Volumes é o hostPath, que é que nem o que vocês fizeram lá no curso de Docker.*
 
-[03:53] Então, nós fazemos o bind de um diretório do nosso host para um diretório de dentro do nosso container do nosso Pod, nesse caso do Kubernetes.
+*[03:53] Então, nós fazemos o bind de um diretório do nosso host para um diretório de dentro do nosso container do nosso Pod, nesse caso do Kubernetes.*
 
 [04:06] E como que ele funciona? Se nós clicarmos no link do “hostPath” e ver, é exatamente dessa mesma maneira, o hostPath monta um caminho ou arquivo do nosso host e monta ele dentro do nosso Pod, dentro dos containers desse Pod.
 
@@ -1579,6 +1579,7 @@ Ver arquivo: "./Arquivos-k8s/kubernetes-parte2-Aula2/pod-volume.yaml"
 
 [06:40] Que é bem simples, basta nós definirmos um nome para ele, como por exemplo, primeiro-volume e definir qual é o tipo, o que nós queremos fazer? Nós queremos criar um hostPath e agora nós precisamos definir qual é o caminho dele no nosso host.
 
+AP: O professor do curso fez essa configuração no Windows - a configuração no Linux será apresentada em aula mais à frente.
 [06:56] O caminho vai ser para /c/Users/Daniel/Desktop/primeiro-volume. Eu criei essa pasta na minha área de trabalho e ela vai ser o nosso Volume para nós.
 
 [07:12] E agora, a questão é bem simples, basta nós também falarmos que o tipo desse Volume é um diretório, sem nenhum mistério.
