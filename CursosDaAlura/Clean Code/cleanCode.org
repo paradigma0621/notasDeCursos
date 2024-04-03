@@ -203,5 +203,138 @@ public enum DateInterval {
 #+END_SRC
 
 * Code smells
-** G34
-em ** Faça Apenas uma Coisa (pg  36 - 5o paragrafo)
+** F1: Parâmetros em excesso
+	As funções devem ter um número pequeno de parâmetros. Ter nenhum é melhor. Depois vem um, dois, três. Mais do que isso é questionável e deve-se evitar com preconceito.
+** F2: Parâmetros de saída
+	Os parâmetros de saída são inesperados. Os leitores esperam que parâmetros sejam de entrada, e não de saída. Se sua função deve alterar o estado de algo, faça-a mudar o do objeto no qual ela é chamada.
+** F3: Parâmetros lógicos
+	Parâmetros booleanos explicitamente declaram que a função faz mais de uma coisa. Eles são confusos e se devem eliminá-los.
+** F4: Função morta
+	Devem-se descartar os métodos que nunca são chamados. Manter pedaços de código morto é devastador. Não tenha receio de excluir a função. Lembre-se de que seu sistema de controle de código fonte ainda se lembrará dela.
+** G3: Comportamento incorreto nos limites
+	Parece óbvio dizer que o código deva se comportar corretamente. O problema é que raramente percebemos como é complicado um comportamento correto. Desenvolvedores geralmente criam funções as quais eles acham que funcionarão e, então, confiam em suas intuições em vez de se esforçar para provar que o código funciona em todos os lugares e limites.
+	Não existe substituição para uma dedicação minuciosa. Cada condição de limite, cada canto do código, cada ajuste e exceção representa algo que pode estragar um algoritmo elegante e intuitivo. Não dependa da sua intuição. Cuida de cada condição de limite e crie testes para cada.
+** G5: Duplicação
+	Essa é uma das regras mais importantes neste livro, e você deve levá-la muito a sério. Praticamente, todo autor que escreve sobre projetos de software a mencionam. Dave Thomas e Andy Hunt a chamaram de princípio DRY (Don´t Repeat Yourself - Não se Repita), o qual Kent Beck tornou o centro dos princípios da eXtreme Programming (XP) e o chamou de "Uma vez, e apenas uma". Ron Jeffries colocou essa como a segunda regra, sendo a primeira aquela em que se deve fazer todos os testes passarem com êxito.
+	Sempre que você vir duplicação em código, isso significa que você perdeu uma chance para abstração. Aquela duplicação provavelmente poderia se tornar uma sub-rotina ou talvez outra classe completa. Ao transformar a duplicação em tal, você aumenta o vocabulário da linguagem de seu projeto. Outros programadores podem usar os recursos de abstração que você criar. E a codificação se torna mais rápida e menos propensa a erros devido a você ter elevado o nível de abstração.
+	A forma mais óbvia de duplicação é quando você possui blocos de código idênticos, como se alguns programadores tivessem saído copiando e colando o mesmo código várias vezes. Estes devem ser substituídos por métodos simples.
+	Una forma mais sutil seriam as estruturas aninhadas de switch/case e if/else que aparecem repetidas vezes em diversos módulos, sempre testando as mesmas condições. Nesse caso, deve-se substituir pelo polimorfismo.
+	Formas ainda mais sutil seriam os módulos que possuem algoritmos parecidos, mas que não possuem as mesmas linhas de código. Isso ainda é duplicação e deveria-se resolvê-la através do padrão TEMPLATE METHOD ou STRATEGY.
+	Na verdade, a maioria dos padrões de projeto que têm surgido nos últimos 15 anos são simplesmente maneiras bem conhecidas para eliminar a duplicação. Assim como as regras de normalização (Normal Forms) de Codd são uma estratégia para eliminar a duplicação em banco de dados. A OO em si - e também a programação estruturada - é uma tática para organizar módulos e eliminar a duplicação.
+	Acho que a mensagem foi passada: encontre e elimine duplicações sempre que puder.
+** G8: Informações excessivas
+	Módulos bem definidos possuem interfaces pequenas que lhe permite fazer muito com pouco. Já os mal definidos possuem interfaces grandes e longas que lhe obriga a usar muitas formas diferentes para efetuar coisas simples. Uma interface bem definida não depende de muita funções, portanto, há baixo acoplamento. E uma interface mal definida depende de diversas funções que devem ser chamadas, gerando um alto acoplamento.
+	Bons desenvolvedores de software aprendem a limitar o que expõem nas interfaces de suas classes e módulos. Quanto menos métodos tiver uma classe, melhor. Quanto menos variáveis uma função usar, melhor. Quanto menos variáveis tiver uma classe, melhor.
+	Esconda seus dados. Esconda suas funções utilitárias. Esconda suas constantes e suas variáveis temporárias. Não crie classes com muitos métodos ou variáveis de instâncias. Não crie muitas variáveis e funções protegidas para suas subclasses. Concentre-se em manter as interfaces curtas e muito pequenas. Limite as informações para ajudar a manter um baixo acoplamento.
+** G10: Separação vertical
+	Devem-se declarar as variáveis e funções próximas de onde são usadas. Devem-se declarar as variáveis locais imediatamente acima de seu primeiro uso, e o escopo deve ser vertical. Não queremos que variáveis locais sejam declaradas centenas de linhas afastadas de onde são utilizadas.
+	Devem-se declarar as funções privadas imediatamente abaixo de seu primeiro uso. Elas pertencem ao escopo de toda a classe. Mesmo assim, ainda desejamos limitar a distância vertical entre as chamadas e as declarações. Encontrar uma função privada deve ser uma questão de buscar para baixo a partir de seu primeiro uso.
+** G11: Inconsistência
+	Se você fizer algo de uma determinada maneira, faça da mesma forma todas as outras coisas similares. Isso retoma o princípio da surpresa mínima. Atenção ao escolher suas convenções. Uma vez escolhidas, atente para continuar seguindo-as.
+	Se dentro de uma determinada função você usa uma variável de nome response para armazenar uma HttpServletResponse, então use o mesmo nome da variável de nome consistente nas outras funções que usem os objetos HttpServletResponse. Se chamar um método de processVerificationRequest, então use um nome semelhante, como processDeletionRequest para métodos que processem outros tipos de pedidos (request).
+	Uma simples consitência como essa, quando aplicada corretamente, pode facilitar muito mais a leitura e a modificação do código.
+** G19: Use variávies descritivas
+	Uma das formas mais poderosas de tornar um programa legível é separar os cálculos em valors intermediários armazenados em variáveis com nomes descritivos.
+	Mais variáveis explicativas geralmente são melhores do que menos. É impressionante como um módulo opaco pode repentinamente se tornar transparente simplesmente ao separar os cálculos em valores intermediários bem nomeados.
+** G20: Nomes de funções devem dizer o que elas fazem
+	Veja este código:
+
+		Date newDate = date.add(5);
+
+	Você acha que ele adiciona cinco dias à data? Ou seria a semanas, ou horas? A instância date mudou ou a função simplesmente retornou uma nova Date sem alterar a antiga? Não dá para saber a partir da chamada o que a função faz.
+	Se a função adiciona cinco dias à data e a altera, então ela deveria se chamae addDaysTo ou increaseByDays. Se, por outro lado, ela retorna uma nova data acrescida de cinco dias, mas não altera a instância date, ela deveroa se chamar daysLater ou daysSince.
+	Se você tiver de olhar a implementação (ou a documentação) da função para saber o que ela faz, então é melhor selecionar um nome melhor ou reorganizar a funcionalidade de modo que esta possa ser colocada em funções com nomes melhores.
+** G25: Substitua os números mágicos por constantes com nomes
+	De modo geral, é um péssima ideia ter números soltos em seu código. Deve-se escondê-los em constantes com nomes bem selecionados.
+	O termo "Número Mágico" não se aplica apenas a números, mas também a qualquer token (símbolo, termos, expressões, números, etc) que possua um valor que não seja auto-explicativo.
+** G26: Seja preciso
+	Quando você toma uma decisão em seu código, certifique-se de fazê-la precisamente. Saiba por que a tomou e como você lidará com quaisquer exceções. Não seja desleixado com a precisão de suas decisões. Se decidir chamar uma função que retorne null, certifique-se de verificar por null. Se for consultar o que você acha ser o únivo registro no banco de dados, garanta que seu código verifique se não há outros. Se precisar lidar com concorrência, use inteiros (ou, melhor ainda, uma classe Money que use inteiros) e lide apropriadamente com arrendondamento. Se houver a possibilidade de atualização concorrente, certifique-se de implementar algum tipo de mecanismo de bloqueio.
+	Ambiguidades e imprecisão em códigos são resultado de desacordos ou desleixos. Seja qual for o caso, elas devem ser eliminadas.
+** G28: Encapsule as condicionais
+	A lógica booleana já é difícil o bastante de entender sem precisar vê-la  no contexto de um if ou um while. Extraia funções que expliquem o propósito da estrutura condicional.
+	Por exemplo:
+	
+		if (shouldBeDeleted(timer))
+
+	é melhor do que
+
+		if (timer.hasExpired() && !timer.isRecurrent())
+** G30: As funções devem fazer uma coisa só
+	Costuma ser tentador criar funções que tenham várias seções que efetuam uma série de operações. Funções desse tipo fazem amis de uma coisa, e devem ser divididas em funções melhores, cada uma fazendo apenas uma coisa.
+	Por exemplo:
+#+BEGIN_SRC java
+	public void pay() {
+		for (Employee e: employees) {
+			if (e.isPayday()) {
+				Money pay = e.calculatePay();
+				e.delivererPay(pay);
+			}
+		}
+	}
+#+END_SRC
+
+	Esse pedaço de código faz três coisas. Ele itera sobre todos os funcionários, verifica se cada um deve ser pago e, então, paga o funcionário. Esse código ficaria melhor assim:
+
+#+BEGIN_SRC java
+	public void pay() {
+		for (Employee e: employees) {
+			payIfNecessary(e);
+		}
+	}
+
+	private void payIfNecessary(Employee e) {
+            if (e.isPayday()) {
+			calculateAndDeliverPay(e); 
+		}
+	}
+
+	private void calculateAndDeliverPay(Employee e)
+            Money pay = e.calculatePay();
+            e.delivererPay(pay);
+    }
+#+END_SRC
+	
+	Cada uma dessas funções faz apenas uma coisa.
+** G33: Encapsule as condições de limites
+	Condições de limite são difíceis de acompanhar. Coloque o processamento para elas em um único lugar. Não as deixe espalhadas pelo código. Não queremos um enxame de +1s e -1s aparecendo aqui e acolá. Considere o exemplo abaixo do FIT:
+#+BEGIN_SRC java
+	if (level + 1 < tags.length) 
+	{
+		parts = new Parse(body, tags, level + 1, offset + endTag);
+		body = null;
+	}
+#+END_SRC
+
+	Note que 'level + 1' aparece duas vezes. Essa é uma condição de limite que deveria estar encapsulada dentro de uma variável com um nome ou algo como nextLevel.
+#+BEGIN_SRC java
+	int nextLevel = level + 1;
+	if (nextLevel < tags.length) 
+	{
+		parts = new Parse(body, tags, nextLevel, offset + endTag);
+		body = null;
+	}
+#+END_SRC
+** G36: Evite a navegação transitiva	
+	De modo geral, não queremos que um único módulo saiba tudo sobre seus colaboradores. Mais especificamente, se A colabora com B e B colabora com C, nã queremos que os módulos que usem A enxerguem C. (Por exemplo, não queremos a.getB().getC().doSomething();.)
+	Isso às vezes se chama de Lei de Demeter. Os programadores pragmáticos chamam de "Criar um Código Tímido". Em ambos casos, resume-se a se garantir que os módulos saibam sobre seus colaboradores imediatos apenas e não sobre o mapa de navegação de todo o sistema.
+	Se muitos módilos usam algum tipo de instrução a.getB().getC(), então seria difícil alterar o projeto e a arquitetura para introduzir um Q entre B e C. Seria preciso encontrar cada instância de a.getB().getC() e converter para a.getB().getQ().getC(). É assim que as estruturas se tornam rígidas. Módulos em excesso enxergam demais sobre a arquitetura.
+	Em vez diso, queremos que nossos colaboradores imediatos ofereçam todos os serviços de que precisamos. Não devemos ter de percorrer a planta do sistema em busca do módulo que desejamos chamar, mas simplesmente ser capaz de dizer:
+		meuColaborador.facaAlgo().
+** N1: Escolha nomes descritivos
+	Não se apresse ao escolher um nome. Certifique-se de que seja desctitivo. Lembre-se de que os sentidos tendem a se perder conforme o software evolui. Portanto, reavalie frequentemente a adequação dos nomes que você escolher.
+	Essa não é apenas uma recomendação para lhe "satisfazer". Nomes em softwares são 90% responsáveis pela legibilidade do software. Você precisa tomar seu tempo para escolhê-los sabiamente e mantê-los relevantes. Nomes são muito importantes para serem tratados de qualquer jeito.
+** N7: Nomes devem descrever os efeitos colaterais
+	Nomes devem descrever tudo o que uma função, variável ou classe é ou faz. Não oculte os efeitos colaterais com um nome. Não use um simples verbo para descrever uma função que faça mais do que uma mera ação. Por exemplo, considere o código abaixo do TestNG:
+
+#+BEGIN_SRC java
+	public ObjectOutputStream getOos() throws IOException {
+		if (m_oos == null) {
+			m_oos = new ObjectOutputStream(m_socket.getOutputStream());
+		}
+		return m_oos;
+	}
+#+END_SRC
+	
+	Essa função faz um pouco mais além de pegar um "oos", ela cria o "oos" se ele não tiver sido criado ainda. Logo, um nome melhor seria createOrReturnOos.
+** T6: Teste abundantemente bugs próximos	
+	Bugs tendem a se reunir. Quando encontrar um bug numa função, é sábio fazer um teste exaustivo nela. Provavelmente você verá que o bug não estava só.
