@@ -11,7 +11,7 @@ Notas do livor "Clean Code" de Robert Martin
 ** Faça distinções significativas 
 	Palavras muito comuns são outra forma de distinção que nada expressam. Imagine que você tenha uma classe Product. Se houver uma outra chamada ProductInfo ou ProductData, você usou nomes distintos que nada revelam de diferente. Info e Data são palavras muito comuns e vagas.
 
-	O nome de uma 'tabela' jamais deve conter a palavr 'tabela'. Então como NameString é melhor do que "Name"? Um "Name" pode ser um número do tipo ponto flutuante? Caso possa, estaria violando uma regra de passar informações incorretas. Imagine que você encontre uma classe Customer e outra CustomerObject. O que a difernça nos nomes lhe diz? Qual seria a melhor para possuir o histório de pagamento de um cliente?
+	O nome de uma 'tabela' jamais deve conter a palavr 'tabela'. Então como NameString é melhor do que "Name"? Um "Name" pode ser um número do tipo ponto flutuante? Caso possa, estaria violando uma regra de passar informações incorretas. Imagine que você encontre uma classe Customer e outra CustomerObject. O que a diferença nos nomes lhe diz? Qual seria a melhor para possuir o histório de pagamento de um cliente?
 
 	Conhecemos um aplicativo que é assim - abaixo está exatamente o tipo de erro:
       getActiveAccount();
@@ -24,13 +24,13 @@ Notas do livor "Clean Code" de Robert Martin
 ** Nomes de métodos
 	Os nomes de métodos devem ter verbos, como Post Payment, Delete Page ou Save. Devem-se nomear métodos de acesso, alteração e autenticação segundos seus valores e adicionar os prefixos get, set ou is de acordo como o padrão javabean.
 ** Use nomes a partir do Domínio da Solução
-	Lembre-se de que serão prorgamadores que lerão seu código. Portanto, pode usra termos de Informática, nomes de algoritmos, nomes de padrões, temos matemáticos etc. Não é prudente pensar num nome a partir do domínio do problema, pois não queremos que nossos companheiros de trabalhalho tenham de consultar o cliente toda hora para saber o significado de um nome o qual eles já conhecem o conceito, só que por outro nome.
-	O nome AccountVisitor ("conta do visitante") significa o bastante para um programador familiarizado com o padrão VISITOR. Qual programador não saberia o que é uma JobQueue ("fila de tarefas")? Há muitoas coisas técnicas que os programadores devem fazer. Selecionar nomes técnicos para tais coisas é, geralmente, o método mais adequado.
+	Lembre-se de que serão programadores que lerão seu código. Portanto, pode usar termos de Informática, nomes de algoritmos, nomes de padrões, temos matemáticos etc. Não é prudente pensar num nome a partir do domínio do problema, pois não queremos que nossos companheiros de trabalho tenham de consultar o cliente toda hora para saber o significado de um nome o qual eles já conhecem o conceito, só que por outro nome.
+	O nome AccountVisitor ("conta do visitante") significa o bastante para um programador familiarizado com o padrão VISITOR. Qual programador não saberia o que é uma JobQueue ("fila de tarefas")? Há muitas coisas técnicas que os programadores devem fazer. Selecionar nomes técnicos para tais coisas é, geralmente, o método mais adequado.
 ** Contextos
 *** Adicione um Contexto Significativo
 	Há poucos nomes que são significativos por si só - a maioria não é. Por conta disso, você precisa usar nomes que façam parte do contexto do leitor. Para isso vocÊ os coloca em classes, funções e namespaces bem nomeados. Se nada disso funcionar, então talvez como último recurso seja necessário adicionar prefixos ao nome.
 	Imagine que você tenha variáveis chamadas firstName, lastName, street, houseNumber, city, state, zipcode. Vistas juntas, fica bem claro que elas formam um endereço. Mas e se você só visse a variável state sozinha num método? Automaticamente você assumiria ser parte de um endereço?
-	Podem-se usar prefixos para adicionar um contexto: addrFirstName, addrLastName, addrState etc. Pelo menos os leitores entenderão que essas variáveis são parte um uma estrutura maior. É claro que uma melhor solução seria criar yna classe chamada Address. Então, até o compilador sabe que as variáveis pertencem a um escopo maior.
+	Podem-se usar prefixos para adicionar um contexto: addrFirstName, addrLastName, addrState etc. Pelo menos os leitores entenderão que essas variáveis são parte um uma estrutura maior. É claro que uma melhor solução seria criar uma classe chamada Address. Então, até o compilador sabe que as variáveis pertencem a um escopo maior.
 *** Não Adicione Contextos Desnecessários
 	Em um aplicativo fictício chamado "Gas Station Deluxe" (GSD), seria uma péssima ideia adicionar prefixos a todas classe com GSD. Para ser sincero, você estará trabalhando contro suas ferramentas. Você digita G e pressiona a tecla para autocompletar e recebe uma lista quilométrica de cada classe no sistema. Isso é inteligente? Para que dificultar a ajuda da IDE?
 	Da mesma forma, digamos que você inventou uma classe MailingAddress no módulo de contabilidade do GSD e que o chamou de GSDAccountAddress. mais tarde, você precisa armazenar um endereço postal de seu cliente no aplicativo. Você usaria GSDAccountAddress? Parece que o nome é adequado? Dez dos 17 caracteres são redundantes ou irrelevantes.
@@ -93,7 +93,7 @@ A primeira regra para funções é que elas devem ser pequenas. Elas devem ter n
 	As funções devem fazer uma coisa só. Tratamento de erro é uma coisa só. Portanto, uma função que trata de erros não deve fazer mais nada. Isso implica que a palavra try está dentro de uma função e deve ser a primeira instrução e nada mais deve vir após os blocos catch/finally.
 * Cap 4 - Comentários
 ** Evite o comentário se é possível usar uma função ou uma variável
-	Considere o peda~p de código abaixo:
+	Considere o pedaço de código abaixo:
 		
 		// o módulo da lista global <mod> depende do
 		// subsistema do qual fazemos parte?
@@ -130,7 +130,78 @@ As exceções verificadas podem às vezes ser úteis se você estiver criando um
 	
 	Os testes e o código de produção são escritos juntos, com os testes apenas alguns segundos mais adiantados.
 ** Testes limpos
-	O que torna um teste limpo? Três coisas: legilibilidade, legilibilidade e legilibilidade. Talvez isso seja até mais importante nos testes de unidade do que no código de produção. O que torna os testes legíveis? O mesmo que torna todos os códigos legíveis: clareza, simplicidade e consistência de expressão. Num teste você quer dizer muito com o mínimo de expressões possíveis.
+	O que torna um teste limpo? Três coisas: legibilidade, legibilidade e legibilidade. Talvez isso seja até mais importante nos testes de unidade do que no código de produção. O que torna os testes legíveis? O mesmo que torna todos os códigos legíveis: clareza, simplicidade e consistência de expressão. Num teste você quer dizer muito com o mínimo de expressões possíveis.
+* Cap 10 - Classes
+** As classes devem ser pequenas!
+	A primeira regra para classes é que devem ser pequenas. Assim como as funções, ser pequena também é a regra principal quando o assunto for criar classes.
+	Com as funções medimos o tamanho contando as linhas físicas. Com as classes usamos uma medida diferente. Contamos responsabilidades.
+	O nome da uma classe deve descrever quais responsabilidades ela faz. Na verdade, selecionar um nome é a primeira forma de ajudar a determinar o tamanho da classe. Se não derivamos um nome conciso para ela, então provavelmente ela ficará grande. Quanto mais ambíguo for o nome da classe, maiores as chances de ela ficar com muitas responsabilidades. Por exemplo, nomes de classes que possuam palavras de vários sentidos, como Processor ou Manager ou Super, geralmente indicam um acúmulo lastimável de responsabilidades.
+	Devemos também poder escrever com cerca de 25 palavras uma breve descrição da classe, sem usar as palavras "se", "e", "ou" ou "mas". Como descreveríamos a SuperDashboard? "A SuperDashboard oferce acesso ao componente que foi o último utilizado e também nos permite acompanhar os números da versão e da compilação". O primeiro "e" é uma dica de que a classe possui responsabilidades em excesso.
+** O Princípio da Responsabilidade Única
+	O Princípio da Responsabilidade Única  (SRP, sigla em inglês para Sigle Responsability Principle) afirma que uma classe ou módulo deve ter um, e apneas um, motivo para mudar. Este princípio nos dá uma definição de responsabilidade e uma orientação para o tamanho da classe. Estas devem ter apenas uma responsabilidade e um motivo para mudar.
+	Desejamos que nossos sistemas sejam compostos por muitas classes pequenas, e não poucas classes grandes. Cada classe pequena encapsula uma única responsabilidade, possui um único motivo para ser alterada e contribui com poucas outras para obter os comportamentos desejados no sistema.
+* Cap 13 - Concorrência
+** Cuidado com dependências entre métodos sincronizados
+	Dependências entre métodos sincronizados causam pequenos bugs no código concorrente. A linguagem Java possui a palavra chave synchonized, que protege um único método. Entretanto, se houver mais de um método sincronizado na mesma classe compartilhada, então seu sistema pode ser sido escrito incorretamente.
+
+	Recomendação: Evite usar mais de um método em um objeto compartilhado.
+
+	Haverá vezes em que você deverá usar mais de um método em um objeto compartilhado. Neste caso, há três formas de deixar o código certo:
+*** Bloqueio voltado para o cliente
+Faça o cliente bloquear o servidor antes de chamar o primeiro método e certifique-se de que o bloqueio inclua o código que chama o último método
+*** Bloqueio voltado para o servidor
+Dentro do servidor, crie um método que bloqueie o servidor, chame todos os métodos e, então, desbloqueie. Faça o cliente chamar o novo método.
+*** Servidor extra
+Crie um servidor intermediário que efetue o bloqueio. Esse é um exemplo de bloqueio voltado para o servidor, no qual o servidor original não pode ser alterado.
+** Primeiro, faça com que seu código sem thread funcione
+Isso pode parecer óbvio, mas não custa nada repetir. Certifique-se de que o código funcione sem threads. Geralmente, isso significa criar POJOs que são chamados pelas suas threads. Os POJOs não enxergam as threads e, portanto, podem ser testados fora do ambiente com threads. Quando mais locais no seu sistema você conseguir colocar POJOs, melhor.
+
+Recomendação: Não procure bugs não relacionados a threads com os relacionados a elas ao mesmo tempo. Certifique-se de que seu código funcione sem threads.
+* Cap 16 - Refatorando o SerialDate
+** final (pg 276)
+Também exclui a palavra reservada 'final' das declarações de parâmetros e variáveis. Até onde pude entender, ela não adicionava nenhum valor real, só adiciona mais coisas aos restos inúteis. Eliminar essas 'final' contraria alguns conhecimentos convencionais, Por exemplo, Robert Simons nos aconselha a "... colocar final e, todo o seu código". Obviamente, eu discordo. Acho que há alguns poucos usos para o final, como a constante 'final', mas fora isso, as palavras reservadas acrescentam pouca coisa e criam muito lixo. Talvez eu me sinta dessa forma porque os tipos de erros que 'final' possa capturar, os testes de unidade que escrevi já capturam.
+* Exemplos de código
+** pg 278 - parse String -> Object
+#+BEGIN_SRC java
+public static Month parse(String s) {
+s = s.trim();
+for (Month m : Month.values())
+	if (m.matches(s))
+		return m;
+
+throw new IllegalArgumentException(String.format("%s is not a valid mont
+#+END_SRC
+
+** pg 282 - mover switch para enum
+#+BEGIN_SRC java
+public enum DateInterval {
+	OPEN {
+		public boolean isIn(int d, int left, int right) {
+			return d > left && d < right;
+		}
+
+	},
+	CLOSED_LEFT {
+		public boolean isIn(int d, int left, int right) {
+			return d >= left && d < right;
+		}
+	},
+	CLOSED_RIGHT {
+		public boolean isIn(int d, int left, int right) {
+			return d > left && d <= right;
+		}
+	},
+	CLOSED {
+		public boolean isIn(int d, int left, int right) {
+			return d >= left && d <= right;
+		}
+	};
+
+	public abstract boolean isIn(int d, int left, int right);
+}
+
+#+END_SRC
+
 * Code smells
 ** G34
 em ** Faça Apenas uma Coisa (pg  36 - 5o paragrafo)
