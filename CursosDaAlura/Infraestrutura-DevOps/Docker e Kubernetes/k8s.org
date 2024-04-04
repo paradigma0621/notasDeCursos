@@ -1,4 +1,5 @@
-Do curso "Curso de Kubernetes: Pods, Services e ConfigMaps": https://github.com/alura-cursos/1846-kubernetes/tree/Aula3
+https://cursos.alura.com.br/course/kubernetes-pods-services-configmap
+https://cursos.alura.com.br/course/kubernetes-deployments-volumes-escalabilidade
 * Toda vez que quiser iniciar o cluster no Linux
 rodar antes:
 
@@ -42,6 +43,8 @@ kubectl rollout undo deployment
 (ou: kubectl rollout undo deployment --to-revision=2 )
 
 kubectl delete deployment nginx-deployment 
+
+kubectl get hpa
 ----------
  kubectl port-forward --address 0.0.0.0 service/svc-sistema-noticias 30001:80
 direciona todas as requisições da porta 30001 dessa máquina local para a porta 80 do service/svc-sistema-noticias
@@ -1517,9 +1520,18 @@ foi devidamente criado. Se dermos um kubectl get pods, tudo devidamente funciona
 
 [10:11] E, para isso, vamos começar a ver um conceito novo no próximo vídeo que vão ser os Volumes Persistentes, Storage Classes. Um conteúdo bem vasto sobre toda essa questão de armazenamento no Kubernetes. E para isso eu vejo vocês no próximo vídeo. Até mais!
 ** Aula 02 - Persistindo dados com o Kubernets
-*** Persistindo dados com volumes (reler e editar... renomear imagens que fiz de printscreens tb, que já movi pra pasta de 
+*** O que aprendemos nessa aula
+Como criar Volumes através de arquivos de definição
+Volumes persistem dados de containers dentro de pods e permitem o compartilhamento de arquivo dentro dos pods
+Que Volumes possuem ciclo de vida independente dos containers, porém, vinculados aos pods
+Como criar PersistentVolumes através de arquivos de definição
+PersistentVolumes persistem dados de pods como um todo
+PersistentVolumes possuem ciclo de vida independente de quaisquer outros recursos, inclusive pods
+Como criar e para que servem os PersistentVolumeClaims
+Que precisamos de um PersistentVolumeClaim para acessar um PersistentVolume
+*** Persistindo dados com volumes (no Windows)
 "./Kubernetes: Deployments, Volumes e Escalabilidade/Imagens/Aula02_video01_img01.png" à "Aula02_video01_img08.png"
-Ver arquivo: "./Arquivos-k8s/kubernetes-parte2-Aula2/pod-volume.yaml"
+Ver arquivo: "./Arquivos-k8s/kubernetes-parte2-Aula2/pod-volume (Windows).yaml"
 
 [00:00] Nós estamos enfrentando um problema de persistência de dados, porque, o que acabou de acontecer? Nós pegamos alguns arquivos das nossas notícias, colocamos dentro do nosso Pod, dentro do container desse Pod e quando este Pod é encerrado, todos os arquivos dele são perdidos.
 
@@ -1637,7 +1649,480 @@ se nós dermos uma olhada aqui em cima, olha só a definição dele aqui do Volu
 [13:08] Então, nós precisamos ver agora como que isso vai funcionar no Linux, então, eu vou fazer um vídeo um pouco mais breve em relação ao que nós fizemos no Windows agora, para o pessoal do Linux entender como vai funcionar lá.
 
 [13:20] Então, por esse vídeo aqui é só, eu vejo vocês no próximo vídeo onde nós vamos falar sobre como isso que nós acabamos de fazer vai funcionar no Linux e eu vejo vocês lá. Até mais!
+*** Volumes no Linux
+Ver arquivo: "./Arquivos-k8s/kubernetes-parte2-Aula2/pod-volume (Linux).yaml"
+(e para fazer a criação do diretório de modo dinâmico, ver: "./Arquivos-k8s/kubernetes-parte2-Aula2/pod-volume (Linux) (DirectoryOrCreate).yaml"
+
+Atenção! A imagem do Jenkins no Docker Hub foi alterada! Agora para executá-la, você deve utilizar a imagem jenkins/jenkins:alpine e não a jenkins:alpine!
+
+[00:00] Eu estou no Linux agora para nós entendermos qual vai ser a diferença do Windows para o Linux nesse cenário do nosso terminal.
+
+[00:08] Nós temos já, se eu executar o kubectl get pods tudo da mesma maneira, só falta nós colocarmos o nosso primeiro Volume lá com o pod-volume.yaml para ser executado e nós fazermos o nosso teste.
+
+[00:22] Então, eu vou abrir o arquivo com o pod-volume.yaml e nós temos a mesma definição que eu fiz no Windows, mas, qual vai ser a diferença? É que no Windows nós temos o diretório c:// que nós definimos já no formato do Unix.
+
+[00:40] O que nós precisamos fazer aqui agora? Nós precisamos, a princípio, trocar para algum diretório que nós tenhamos no Linux, por exemplo, para /home/primeiro-volume e assim como nós fizemos no Windows, eu preciso aqui no Linux criar essa pasta.
+
+[00:57] Então, eu vou clicar no botão “New Folder” dentro da minha home e vou criar o meu primeiro-volume. E a minha pasta foi criada, já estou dentro dela.
+
+[01:08] A princípio, se eu vier no terminal agora e executar o comando kubectl apply -f pod-volume o que vai acontecer? Ele falou que foi criado, mas, se nós viermos e dermos um comando kubectl get pods ele está em criação.
+
+[01:24] O ponto é, vamos dar uma olhada para ver uma coisa mais específica na descrição da criação desse Pod, kubectl describe pod pod-volume. O que está acontecendo aqui? Ele deu um erro aqui embaixo, ele deu um warning e um problema de montagem.
+
+[01:42] O que aconteceu? Ele tentou fazer toda essa configuração para o nosso primeiro volume, mas ele falou que não encontrou com o hostPath, com /home/primeiro-volume, ele falou que esse arquivo não é um diretório.
+
+[01:57] Mas, por que se ele está aqui, eu estou acessando ele agora? Porque, como eu falei para vocês, nesse cenário aqui do Linux nós estamos utilizando uma máquina virtual para criar e utilizar o nosso cluster que é o Minikube.
+
+[02:12] Então, a grande questão é que nós precisamos criar dentro dessa máquina virtual, dentro do sistema operacional dessa máquina essa pasta chamada primeiro-volume dentro de home.
+
+[02:24] E como é que nós acessamos essa máquina virtual? Com o comando 
+
+	minikube ssh
+
+e agora nós estamos dentro do Minikube.
+
+[02:32] Então, podemos acessar agora cd /home. Se nós dermos um ls, nós não temos a pasta primeiro-volume aqui, só a pasta docker, então, sudo mkdir e vamos criar a pasta primeiro-volume, vamos dar um "Enter".
+
+[02:50] E agora, se nós sairmos com o "Control + D" de dentro do Minikube, vamos fazer o seguinte, vamos dar um kubectl delete -f no nosso pod-volume, e vamos recriar utilizando o mesmo arquivo.
+
+[03:05] Porque agora nós criamos a pasta e vamos ver o que vai acontecer.
+
+[03:10] Que ele vai deletar, sem nenhum mistério, e agora nós recriamos com o pod-volume.yaml.
+
+[03:18] Vamos dar um kubectl describe pod em cima desse pod-volume e a princípio ele inicializou tudo sem nenhum problema.
+
+[03:30] E nós conseguimos, inclusive, agora dar o nosso kubectl get pods e está aqui em execução os dois. Os dois containers dentro desse Pod, no caso.
+
+[03:40] Mas será que eu preciso sempre acessar e criar manualmente, seja lá qual for o meu host, para criar o meu diretório?
+
+[03:47] Na verdade não, o que eu poderia ter feito aqui é o seguinte, vamos voltar, vou deletar mais uma vez o nosso pod-volume para nós entendermos o que vai acontecer agora.
+
+[03:58] Então, ele foi deletado e agora nós vamos fazer isso aqui, vamos acessar mais uma vez esse arquivo do nosso pod-volume e vamos fazer o seguinte experimento, eu vou colocar no path ao invés de primeiro-volume, eu vou chamar de segundo-volume. (AP: ver arquivo "./Arquivos-k8s/kubernetes-parte2-Aula2/pod-volume (Linux) (DirectoryOrCreate).yaml".)
+
+[04:25] E agora o que vai acontecer? Essa pasta não existe, mas, eu posso falar para o Kubernetes fazer o seguinte, se esse diretório não existir eu posso utilizar a criação, então DirectoryOrCreate, caso esse diretório não exista, ele vai ser criado automaticamente.
+
+apiVersion: apps/v1
+kind: Pod
+metadata:
+    name: pod-volume
+spec:
+    containers:
+      - name: nginx-container
+        image: nginx:latest
+        volumeMounts:
+            - mountPath: /volume-dentro-do-container
+              name: segundo-volume
+         - name: jenkins
+           image: jenkins/jenkins:alpine
+        volumeMounts:
+            - mountPath: /volume-dentro-do-container
+              name: segundo-volume
+  volumes:
+   - name: segundo-volume
+     hostPath:
+       path: /home/segundo-volume
+             type: DirectoryOrCreate
+
+[04:43] Então, kubectl apply -f e vamos executar aqui o nosso "pod-volume (Linux) (DirectoryOrCreate).yaml" e ele vai criar.
+
+[04:52] Se nós dermos um kubectl get pods aqui, ele vai estar em criação, se nós dermos um kubectl describe pods no nosso pod-volume e que vai acontecer? Ele já inicializou, então se nós viermos aqui agora em execução, sem nenhum problema.
+
+[05:08] E vamos conferir, vou acessar o nosso Minikube e vamos dar um cd/home e um ls, está aqui o nosso segundo volume criado de maneira dinâmica.
+
+[05:19] Então, vai funcionar da mesma maneira, os nossos testes, nós vamos conseguir fazer utilizando o kubectl exec -it no nosso pod-volume e também vamos falar aqui que nós queremos utilizar o nosso nginx-container executando o bash.
+
+[05:40] Dentro dele podemos acessar o nosso diretório volume dentro do container e criar algum arquivo aqui também qualquer.
+
+[05:49] Se nós voltarmos aqui agora ao nosso host e acessar o Minikube com ssh, dentro dele, cd/home e segundo-volume está aqui o nosso arquivo também criado.
+
+[06:02] Então, mesma maneira que vai funcionar, nós só precisamos nos atentar a essa questão da virtualização e também DirectoryOrCreate que nós podemos utilizar para fazer a criação do diretório de modo dinâmico.
+
+[06:14] Então, essa primeira parte que nós vimos de criar volumes para persistir dados entre containers, é isso que nós temos, o Volume, o recurso que o Kubernetes nos dispõe.
+
+[06:26] Mas, nós precisamos também ter maneiras mais específicas de compartilhar e conseguir persistir dados, através desses outros recursos que são um pouco mais complexos. Os Persistent Volumes, os Persistens Volumes Claims e os Storage Classes.
+*** Pergunta do curso da Alura
+João está trabalhando em um novo projeto que necessita de uma aplicação web. Ele decidiu utilizar Kubernetes para orquestrar e gerenciar os containers que executarão a aplicação. Para que a aplicação possa ler e gravar dados persistentes, ele precisa utilizar Volumes.
+
+Com isso em mente, ele criou um arquivo de definição abaixo
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: um-pod-qualquer
+spec:
+  containers:
+    - name: nginx-container
+      image: nginx:latest
+      volumeMounts:
+        - mountPath: /pasta-de-arquivos
+          name: volume-pod
+  volumes:
+    - name: volume-pod
+      hostPath:
+        path: /C/Users/Daniel/Desktop/uma-pasta-no-host
+        type: Directory
+
+Qual será o resultado produzido pelo arquivo?
+**** Independente da pasta /C/Users/Daniel/Desktop/uma-pasta-no-host existir no host, um volume chamado volume-pod será criado e montado na pasta pasta-de-arquivos dentro do container do Pod.
+Alternativa errada! Caso o caminho /C/Users/Daniel/Desktop/uma-pasta-no-host não exista, não conseguiremos criar o nosso Pod. Uma possibilidade seria utilizar o type: DirectoryOrCreate.
+**** O arquivo não funcionará.
+Alternativa errada!
+**** Caso a pasta /C/Users/Daniel/Desktop/uma-pasta-no-host exista no host, um volume chamado volume-pod será criado e montado na pasta pasta-de-arquivos dentro do container do Pod.
+Alternativa correta!
+**** Um volume chamado volume-pod será criado e montado na pasta /C/Users/Daniel/Desktop/uma-pasta-no-host dentro do container do Pod.
+Alternativa errada!
+*** assistir "Aula 03 - Storage Classes e StatefulSets" (principalmente a aula "Utilizando o StatefulSet") uma vez que nessa Aula 02 foi usado Google Cloud Plataform, e na Aula 03 é feita a implementação na máquina Local
+** Aula 03 - Storage Classes e StatefulSets
+*** Pergunta da Alura
+Maria está enfrentando problemas em sua infraestrutura de armazenamento. Ela precisa provisionar um grande número de PersistentVolumes de diferentes tipos dentro de um prazo curto, mas está com dificuldades para gerenciar e monitorar tudo isso, até perceber que a utilização de Storage Classes pode ajudar
+
+Qual das afirmativas abaixo mostra uma vantagem da utilização de Storage Classes?
+**** Storage Classes executam de maneira mais rápida no cluster.
+Alternativa errada! Isso não é uma afirmação válida.
+**** Storage Classes fornecem dinamismo para criação de PersistentVolumes conforme demanda.
+Alternativa correta!
+
+Alternativa correta
+Storage Classes são iguais para todos e quaisquer serviços de cloud providers
+**** Storage Classes são iguais para todos e quaisquer serviços de cloud providers
+Alternativa errada! Cada cloud provider pode ter sua definição específica.
+
+** Aula 04 - Checando status com Probes
+*** O que aprendemos nessa aula
+O Kubernetes nem sempre tem como saber se a aplicação está saudável
+Podemos criar critérios para definir se a aplicação está saudável através de probes
+Como criar LivenessProbes com o campo livenessProbe
+LivenessProbes podem fazer a verificação em diferentes intervalos de tempo via HTTP
+Como criar ReadinessProbes com o campo readinessProbe
+ReadinessProbes podem fazer a verificação em diferentes intervalos de tempo via HTTP
+LivenessProbes são para saber se a aplicação está saudável e/ou se deve ser reiniciada, enquanto ReadinessProbes são para saber se a aplicação já está pronta para receber requisições depois de iniciar
+Além do HTTP, também podemos fazer verificações via TCP
+*** Conhecendo probes
+[00:00] Agora vamos falar de um tópico bem importante, mas, que ao mesmo tempo, vai ser bem fácil de entendermos e colocar a mão na massa. E, a questão agora é a seguinte: nós temos uma requisição que pode chegar para esse serviço e ele, nós sabemos, vai fazer o balanceamento de carga entre os três Pods que temos.
+
+(Ver imagem: "./Imagens/Aula04_video01_img01.png")
+
+[00:20] Vai chegar a requisição pro container dentro desse Pod, ele vai fazer algum processamento e vai exibir o resultado, seja uma página web, seja o retorno de alguma API, o que seja, tanto faz.
+
+[00:31] E ele retorna o Status Code, por exemplo, de 200, que a requisição foi ok ou algum de 300 que seja um redirecionamento, qualquer coisa do tipo. Mas, o que importa é que o SVC pode balancear a carga entre qualquer um destes Pods.
+
+[00:49] O que podemos acabar vendo acontecer? Em algum momento este Status Code recebido tem a possibilidade de ser um erro 500 ou algum erro de 404, de Not Found um erro interno no servidor de 500 e isso significa que a aplicação dentro deste Pod não está respondendo de maneira esperada. Ela não está funcionando da maneira que esperávamos.
+
+[01:19] Mas, a pergunta que fica é: o Kubernetes sabe que o Pod está em funcionamento, mas, a aplicação dentro deste Pod não tem como saber, a princípio, se ele deve reiniciá-la ou não. Então, apesar do Pod estar saudável e funcionando, a aplicação dentro do container deste Pod não está respondendo da maneira esperada.
+
+[01:42] Como assim? Vamos visualizar o caso do nosso portal de notícias. Eu vou abrir a abra do console do navegador e se eu recarregar a página vemos, por exemplo, que quando fazemos uma requisição para localhost:30000, recebemos um código de status 200, ou seja, a requisição foi ok.
+
+[02:01] Tivemos tudo sem nenhum problema, mas, pode ser que se tivermos algum código de 400 pra cima e ali na faixa dos 500 também, essa aplicação não esteja respondendo da maneira esperada. Porque, ou nós tomamos um erro de Not Found ou um erro interno ou um Bad Request, qualquer outra coisa do tipo.
+
+[02:21] E para resolver este tipo de problema, nós temos os Configure Liveness, Readiness e Startup Probes. Vamos falar sobre cada um deles, mas, nós vamos começar falando sobre o Liveness Probes, que é nada mais do que uma prova de vida que a aplicação dentro de um container de um Pod está funcionando.
+
+[02:40] Então, o kubelet vai usar um Liveness Probe como um critério para saber quando reiniciar o container de um Pod. Então, quando cair em algum deadlock ou a aplicação está rodando, mas, incapaz de manter progresso. Os cenários que exibimos aqui, por exemplo.
+
+[02:55] E, nesse cenário , o que podemos fazer, o que podemos visualizar? O kubelet, que é aquele componente que mostrei pra vocês lá dos nossos nodes, eles são responsáveis por, através do nosso Liveness Probe, saber se a aplicação deve ser reiniciada ou não.
+
+[03:15] Então, como que podemos informar ao kubelet utilizando os Liveness Probe, que essa aplicação deve ser retornada caso ela não tenha nenhum status favorável http.
+
+[03:26] Ele tem um pequeno guia para nós, mas, reparem que não precisamos declarar um arquivo só para o Liveness Probe. Dentro dele, da definição do nosso container, podemos definir qual é a prova de vida, como garantimos que este container dentro do nosso Pod está vivo.
+
+[03:44] Então, são essas perguntas que precisamos responder. No próximo vídeo vamos colocar a mão na massa e criar o nosso primeiro Liveness Probe, pra sabermos quando o nosso Pod já está pronto com o container dentro dele para ser reiniciado em caso de falhas.
+*** Configuração adicionada em portal-noticias-deployment.yaml para configurar os gatinhos de reinicialização dos containers de forma automática pelo Liveness Probe
+//Obs: ele entende que respostas ok são as de: 200 <= HttpStatus < 400. Ou seja: Ele indicará falha caso o código de retorno seja menor que 200 ou maior/igual a 400.
+
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 80
+            periodSeconds: 10 //A cada quantos segundos eu quero fazer o teste? R:10 segundos
+            failureThreshold: 3  //qual o número de falhas que escolho para que quando atingido 
+					    //reinicie o container?
+            initialDelaySeconds: 20  // quanto tempo deixado para iniciar os
+                                      // testes? (para deixar o contatiner subir)
+*** Configuração adicionada em portal-noticias-deployment.yaml para configurar o tempo de folga esperado para que o container inicialize
+Ver imagem: "./Imagens/Aula04_video02_img01.png"
+
+ Esse teste serve para saber se a aplicação já está pronta para receber requisições.
+
+//Obs: ele entende que respostas ok são as de: 200 <= HttpStatus < 400. 
+
+[00:00] Estamos de volta ao nosso cenário original porque veremos outro problema que tem a possibilidade de acontecer. Temos algumas requisições chegando ao nosso serviço e ele vai fazer o balanceamento entre cada um desses Pods.
+
+[00:14] Mas, o que temos a possibilidade de ver acontecer? Em algum momento, algum desses Pods, por exemplo, tem a capacidade total de falhar. Eles são suscetíveis a erro, ou um container dentre deste Pod também. E o que vai acontecer?
+
+[00:32] Nós já vimos a possibilidade de definir um Liveness Probe para o container desse Pod e ele vai voltar à execução, ou também, se o Pod, como um todo, tiver falhado, temos a possibilidade de usar Deployments, StatefulSets, ReplicaSets para garantir que este Pod vai voltar à execução.
+
+[00:52] Mas, o que importa é que enquanto ele volta à execução, o Pod já está pronto, mas, o container que, também, já subiu, ainda não terminou, não está pronto para receber essas requisições. Ele ainda não terminou de executar os scripts que ele tem para iniciar ou qualquer outra coisa do tipo.
+
+*(Ver imagem citada no começo do tópico)[01:12] Então, precisamos ter uma maneira de garantir quando o container deste Pod estará pronto para receber as requisições e consigamos parar de fazer essa divisão entre só o nosso segundo e terceiro Pod, para que o primeiro receba um sinal de ok e passe a receber as requisições, novamente.*
+
+[01:31] E a questão para fazermos isso é bem simples. Basta definirmos os nossos Readiness Probes, que são bem fáceis e é, basicamente, definirmos uma situação bem parecida, só vão mudar as consequências.
+
+[01:46] Então, vou colocar um Readiness Probe com a mesma declaração de um Liveness Probe, onde eu vou fazer uma requisição utilizando o verbo get para o meu caminho barra na porta 80 a cada 10 segundos e o failureThreshold, onde vimos que no nosso Liveness Probe significa que se ele não conseguir executar este teste três vezes, ele vai reiniciar a aplicação.
+
+[02:14] Nesse caso significa que se ele não conseguir executar esse teste três vezes, na quarta vez, ele vai enviar as requisições, mesmo assim, então ele vai passar a ignorar esse Readiness Probe. Então, podemos definir que um número maior, como, por exemplo, cinco, dez
+
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 80
+            periodSeconds: 10         
+            failureThreshold: 5     // se ele não conseguir executar esse teste 5 vezes, na sexta vez, ele
+					 // vai enviar as requisições, mesmo assim
+            initialDelaySeconds: 3    // um tempo inicial, podemos colocar, por exemplo, três segundos depois
+						// que o Pod iniciar e o container estiver subido também, nós
+						// precisamos esperar três segundos antes de começar a fazer estes
+						// testes, que ele vai executar a cada 10 segundos, conforme definido
+						// em periodSeconds
+
+** Aula 05 - Como escalar com o Horizontal Pod Autoscaler
+*** O que aprendemos nessa aula
+Reiniciar a aplicação incessantemente através de ReplicaSets/Deployments nem sempre resolverá o problema
+HorizontalPodAutoscalers são responsáveis por definir em quais circunstâncias escalaremos nossa aplicação automaticamente
+Como definir o uso de recursos de cada container em um Pod
+O que é, e como utilizar um servidor de métricas
+Como utilizar um HorizontalPodAutoscaler através de arquivos de definição
+*** Escalando pods automaticamente
+Ver "./Imagens/Aula05_video01_img01.png" até /Aula05_video01_img06.png
+
+[00:04] Nós temos um Pod sendo gerenciado por um service e as requisições vão chegando para esse service e ele vai enviando para o nosso Pod, até aí nada de novo.
+
+[00:13] Mas, o que nós temos a capacidade de imaginar aqui? Vamos colocar um cenário novo, vamos dizer que nós estamos falando do nosso portal de notícias e agora nós estamos recebendo diversas requisições porque nós colocamos uma notícia nova no nosso portal e várias pessoas agora querem ler.
+
+[00:29] Então, mais pessoas vão passar a acessar o nosso portal. Isso quer dizer o que? Que o nosso Pod vai passar a consumir mais recursos porque ele vai precisar lidar com mais requisições e enviar mais respostas. Isso quer dizer que ele vai ter um consumo maior de processamento, memória e afins.
+
+[00:46] Qual é o problema disso? O problema é que se ele ficar consumindo de vários, por vários momentos, muitos momentos esse recurso, esse processamento, essa memória, ele vai passar a demorar responder os nossos usuários.
+
+[01:00] Porque ele vai estar ali meio que lento por faltar recursos para ele conseguir trabalhar de maneira hábil.
+
+[01:07] E pior ainda, nós temos a possibilidade desse Pod parar de funcionar por falta de recurso e por mais que ele esteja dentro de um Deployment ou de um StatefulSet ou de um ReplicaSet e seja reiniciado, ele vai continuar caindo pela falta de recurso. Então, a nossa aplicação fica comprometida.
+
+[01:28] Como que nós podemos resolver isso? Basta nós adicionarmos mais Pods. Com mais Pods agora nós temos mais poderes de processamento para cada um deles e vamos conseguir trabalhar sem nenhum problema.
+
+[01:40] Então, nós conseguimos responder os nossos usuários de maneira hábil e, caso o número de acessos ao nosso portal caia, basta diminuir o número de Pods em execução. Perfeito!
+
+*[01:53] Só que o problema é: será que temos alguma maneira automatizada de fazer isso? Nós temos e quem vai nos ajudar, esse recurso se chama Horizontal Pod Autescaler. Vamos dar uma olhada na documentação para ver o que esse recurso vai fazer por nós.*
+
+[02:13] Se dermos uma lida na documentação do Kubernetes, ele resume para nós que o Horizontal Pod Autoescaler é um recurso capaz de, automaticamente, escalar o número de Pods em um Deployment, em um ReplicaSet, em um StatefulSet, baseado na observação da CPU, então, nós temos um primeiro ponto que vamos precisar nos preocupar.
+
+[02:31] E ele vai fazer isso de maneira automática, que é o que importa para nós. Então, vamos fazer um Horizontal Pod Autoescaler para o nosso Deployment do nosso portal-noticias, baseado num consumo de CPU dele, nós vamos aumentar ou diminuir, para suprir essa demanda, o número de Pods.
+
+[02:50] Só que, antes de começarmos, repara se voltarmos na documentação e lermos mais uma vez, ele faz isso baseado em métricas, como, por exemplo, a utilização de CPU.
+
+[03:02] Só que nós precisamos informar, nós temos essa necessidade de declarar quanto esse container, dentro desse Pod, consome de CPU. Quanto ele pede de CPU para funcionar?
+
+[03:16] Então, nós podemos definir que dentre as informações que ele requer, por exemplo, ele pede por algum recurso, que é a nossa CPU. Então, podemos colocar que este container exige 10 milicores de CPU para funcionar.
+
+(Ver arquivo: "./Arquivos-k8s/kubernetes-parte2-Aula5/portal-noticias-deployment.yaml" a inserção de:
+          resources:
+            requests:
+              cpu: 10m
+)
+
+[03:35] E, como ele pede por esse recurso de CPU, nada mais válido do que colocarmos ele dentro de um campo chamado recursos. E alinhamos tudo para ficar certo.
+
+[03:48] Então, nós estamos falando que cada Pod que tenha um container dentro do resources vai pedir 10 milicores de CPU para funcionar.
+
+[04:00] Então, agora que definimos isso, como fazemos o Horizontal Pod Autoescaler para este Pod? Simples! Assim como os nossos outros recursos da API, se voltarmos à documentação, nós vemos que o Horizontal Pod Autoescaler também é um objeto da API.
+
+[04:17] Então, nós podemos criar para ele um arquivo de definição no terminal, que vou chamar de portal-noticias-hpa.yaml. Dentro dele podemos definir a versão da API, que se olharmos com clareza, vemos que tem ou um autoescaling/v1 ou um autoescaling/vbeta2.
+
+(Ver arquivo: "./Arquivos-k8s/kubernetes-parte2-Aula5/portal-noticias-hpa.yaml")
+
+[04:37] Nós vamos utilizar a v2beta2 porque toda a documentação está começando a ser mais baseada nela. Ela já está em vias, em ficar 100% estável e ela tem novas instruções e mais enxutas também, então, e por isso vamos utilizar ela.
+
+ATENÇÃO: Desde a gravação do curso a versão da API foi atualizada e a que é suportada para o Horizontal Pod Autoscaler é a v2. A beta já está desuso. Sugerimos que vc utilize a v2 autoescaling/v2. para continuar com a videoaula.
+
+[04:55] Então, vamos definir nossa versão da API, o tipo do que nós queremos criar é um HorizontalPodAutoescaler e ele tem um metadata, assim como nos outros recursos e vamos dar o nome para ele de portal-noticias-hpa.
+
+[05:10] Nas especificações dele, nós precisamos nos preocupar com o seguinte: nós queremos que este Horizontal Pod Autoescaler faça o que? A referência ao nosso portal de notícias. Então, eu preciso definir à quem eu quero fazer a referência.
+
+[05:31] Então, qual é o meu alvo que eu quero fazer referência? Mais além, quem eu quero escalar automaticamente? Eu preciso informar qual é a versão da API do meu alvo. Então, qual é a versão do API do meu alvo, que é esse Deployment? É apps/v1.
+
+[05:49] Qual é o tipo do que eu quero escalar automaticamente? É um Deployment. Qual é o nome desse Deployment? É portal-noticia-deployment.
+
+[06:01] E agora, eu preciso informar o seguinte: qual o número mínimo e máximo de réplicas que eu quero ter para esses Pods do meu Deployment? Eu quero manter sempre um número mínimo de uma réplica e nunca vou poder passar, por exemplo, de 10.
+
+[06:17] Então, por mais que chegue 1 trilhão de requisições e eu precise colocar 200 Pods, eu não vou passar, nunca, de 10.
+
+[06:28] E eu preciso, agora, informar quais são as métricas que eu quero definir para esse Horizontal Pod Autoescaler. Então, o que eu quero definir como o tipo de métrica?
+
+[06:37] Eu quero, baseado nos recursos, não nos recursos do Kubernetes em si, e sim nos recursos do sistema, porque temos recursos de processamento, memória e afins; eu quero definir qual eu vou utilizar.
+
+[06:50] Então, qual é esse recurso que eu quero usar como critério? Eu quero utilizar um recurso chamado CPU. E o que eu almejo com esse recurso? Eu quero que baseado na utilização dele, ele mantenha sempre um uso médio de 50%, por exemplo.
+
+[07:10] 50% de que? Por isso que nós definimos esses 10 milicores. Então, se o consumo médio da nossa aplicação desse Deployment chegar a mais de 5 milicores, o nosso Horizontal Pod Autoescaler vai fazer a mágica dele acontecer, ele vai criar mais Pods para que o consumo médio não passe de 50% de 10 milicores, então, para que ele não passe de 5 milicores, ele fique nessa faixa.
+(AP: Pro da próxima aula: queremos *manter um consumo médio de 50% da CPU, que é requisitada por cada Pod, por cada container dentro do Pod.*)
+
+[07:47] Então, vamos fazer isso agora. Salvamos o nosso portal-noticias-deployment com a mudança dele e o nosso Horizontal Pod Autoescaler. Vamos, então, aplicar essas mudanças no PowerShell kubectl apply –f vou passar o nosso portal-noticias-deployment.yaml e agora vou passar o nosso kubectl apply –f e vou passar o nosso portal-noticias-hpa.yaml.
+
+[08:18] Agora, nós criamos. E ele foi criado. Se nós dermos, agora, um kubeclt get hpa, de Horizontal Pod Autoescaler, o que vai acontecer? Que legal!
+
+[08:27] Ele está falando que nós temos o nosso Horizontal Pod Autoescaler, que faz referência a este nosso Deployment do portal-notícias, mas, se temos um olhar de que, por enquanto, ele ainda não reconheceu as nossas réplicas, isso é um primeiro problema, mas, ele também não sabe quanto estamos utilizando daqueles 50% que nós definimos.
+
+[08:50] Vamos dar um comando, de novo, para ver se alguma coisa muda. Temos um positivo, ele já identificou as três réplicas, que por padrão, nós definimos no nosso arquivo. As três réplicas estão em execução, perfeito, mas, ele ainda não consegue identificar quantos por cento do processamento está sendo usado.
+
+[09:11] Vamos tentar mais uma vez e nada. Vamos fazer o seguinte, vamos dar uma olhada, vamos ser abelhudos e vamos descrever o nosso Horizontal Pod Autoescaler chamado portal-noticias-hpa.
+
+[09:25] Olha o que aconteceu. Vamos dar uma olhada no que está descrito após o comando. Ele foi incapaz de pegar as métricas para recurso de CPU. Ele não foi capaz de pegar esses dados da API de métricas. O servidor não pôde encontrar esse recurso pedido. E aqui ele fala que essa métrica foi inválida e nós precisamos definir o que é uma CPU.
+
+[09:50] Então, temos um pequeno problema. O que é esse servidor de métricas que ele falou para nós. Como conseguimos utilizá-lo para fazer o nosso Horizontal Pod Autoescaler funcionar? Isso vamos ver no próximo vídeo.
+
+AP: Adianto a pergunta do curso: Por qual motivo o HorizontalPodAutoscaler pode não conseguir identificar o consumo de recursos dos pods gerenciados?
+R: Não foi definido um servidor de métricas para que haja o funcionamento da maneira esperada.
+
+*** Utilizando HPA no Windows
+(AP: Arquivos citados aqui em: "./Arquivos-k8s/kubernetes-parte2-Aula5-Extra/". Para rodar o script de bash no Windows pode-se usar o Git bash (https://git-scm.com/download/win).)
+ 
+[00:00] Estou aqui no Github na página do metrics-server, que é um repositório do kubernetes-sigs e nós temos as informações necessárias para utilizarmos um servidor de métricas no nosso cluster.
+
+[00:15] Se viermos na documentação, em Kubernetes Metrics Server, temos uma questão bem simples de caso de uso. Nós podemos usar um Servidor de Métricas para definir, basear as nossas informações de consumo de CPU e memória para utilizar o Horizontal Pod Autoescaler e, também, fazer esse ajuste de maneira automática, conforme recursos necessitados pelos containers.
+
+[00:37] Então, é basicamente o que queremos. E como utilizamos ele? É bem simples, é só descermos até a descrição de Deployments, clicar na parte Metrics Server releases e nós vamos baixar a versão v0.37, basta clicar mais embaixo em components.yaml e ele vai fazer o download para nós.
+
+[00:56] Eu vou já arrastar ele direto para dentro do Visual Studio Code e você que está utilizando o Windows comigo, (teremos um vídeo somente para o Linux), vamos precisar fazer o seguinte.
+
+[01:08] Se você reparar o trecho descritivo da apiVersion é nada mais do que um arquivo de definição, que nós já viemos trabalhando, mas, mais abaixo temos a parte toda da definição do nosso Metric Server, que está, exatamente, descrita no API.
+
+//código omitido
+
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+    name: metrics-server
+    namespace: kube-system
+---
+
+//código omitido
+
+
+[01:22] Dentro dele, nós temos essa parte em que ele define os argumentos que serão passados para este Pod do nosso Metric Server.
+
+[01:30] E, no caso do Windows, nós vamos precisar fazer o seguinte: mais aqui embaixo na documentação, ele fala na questão de configuração que, caso nós não tenhamos o objetivo de utilizar, fazer uma verificação de certificados, nós podemos desabilitar com essa flag --kubelet-insecure-tls.
+
+[01:50] No caso do Windows, nós vamos precisar definir essa flag dentro do nosso arquivo de definição. Então, um traço aqui em args e definimos os --kubelet-insecure-tls. Basta, agora, darmos um kubectl apply -f no PowerShell e passar o nosso arquivo recém baixado e editado, que é o nosso componets.yaml.
+
+[02:13] Dando um "Enter" ele vai criar todos os recursos definidos lá dentro e agora, o que vai acontecer? Temos o nosso kubectl get hpa e ele continua um tanto quanto engraçado, isso não é um erro, ele continua falando que não está identificado.
+
+[02:32] Então, mais uma vez, vamos dar um kubectl describe hpa e passar o nosso portal-noticias-hpa. Ele, há 51 segundos tentou, de novo, pegar, mas, ainda não conseguiu, então, o que iremos fazer, o que precisamos fazer? Precisamos esperar ele terminar de carregar todas as informações, para que ele consiga ler todos os detalhes de consumo de CPU.
+
+[02:59] Isso é “um bug", que ele demora a fazer esse reconhecimento, então, assim que ele terminar, voltamos e seguimos com nosso Horizontal Pod Autoescaler.
+
+[03:10] Então, o que temos aqui? Temos que nós estamos utilizando 10% e não 50%, então, como estamos utilizando abaixo do nosso alvo, do nosso limite, temos, apenas, um Pod, uma réplica.
+
+[03:25] Então, como será que ele vai se comportar se nós colocarmos mais recursos sendo consumidos, se nós enviarmos diversas requisições para nossa aplicação do nosso local host, que neste caso, definimos na porta 30000, o nosso portal.
+
+[03:40] Então, eu vou no nosso Visual Studio Code fazer o seguinte: eu tenho um arquivo, que é um scriptshell, que vai enviar diversas requisições para o nosso local host na porta 30000, que é onde foi definido nosso portal de notícias, e vou fazer isso enviando indefinidamente. Só que para executarmos este script com SH, nós precisamos ter alguma ferramenta no Windows, que seja capaz de executá-la.
+
+[04:07] Nesse caso, eu vou utilizar o Git Bash. Então, vou deixar o link de download para vocês fazerem sem nenhum problema da ferramenta e para vocês poderem executar. Eu vou acessar o nosso diretório, que é o nosso kubernetes-alura e para executar ele é bem simples.
+
+[04:24] Eu vou colocar SH, vou colocar o nome do nosso script, que é stress.sh, e eu preciso definir, ele recebe um parâmetro aqui, o nosso intervalo. Eu vou colocar de 0.001 segundos e, por fim, vou colocar para vermos a saída dele, para imprimirmos tudo certo neste arquivo de saída.
+
+[04:45] Dou um "Enter" e ele vai começar a executar. E para sermos mais gananciosos, eu vou abrir o outro Git Bash e vou fazer a mesma coisa, executar dois ao mesmo tempo. Vou acessar o nosso kubernetes-alura e vou executar o SH também, no nosso stress.sh, a cada 0.0001 segundos e salvar em outro arquivo de saída.
+
+[05:09] Agora, nós vamos observar no nosso PowerShell o que? Eu vou colocar para analisarmos o nosso Horizontal Pod Autoescaler com o --watch:
+
+	kubectl get hpa --watch
+
+ e se nós repararmos ele já está com consumo de 30%, em relação ao alvo, e conforme esse consumo for subindo, nós vamos ver a mágica acontecer.
+
+[05:26] Então, em algum momento, esse consumo vai ficar tão visível para o nosso Pod, para o nosso container, que nós vamos precisar criar mais Pods. Então, como mais uma vez, não temos a garantia de quanto tempo ele vai demorar em nos exibir isso, eu vou fazer um pequeno corte no vídeo e quando estiver vendo os resultados, eu volto para comentarmos.
+
+AP: Ver imagem: "./Imagens/Aula05_video02_img01.png"
+
+[05:48] O que está acontecendo é que tivemos esse consumo todo. Eu já vou parar para irmos dando tempo dele voltar ao normal; nós tivemos um consumo que ele foi subindo, ficou 30%, e 30% ainda está abaixo do nosso alvo, ele continuou com um Pod, com uma réplica.
+
+[06:11] Ficou em 100% ele viu que é melhor criar agora mais uma réplica e foi o que ele fez, então, ele se manteve e conforme a demanda foi subindo, ele viu que ainda estava longe do alvo, que era de 50%, e ele criou mais uma réplica.
+
+[06:27] E agora, como eu interrompi toda essa criação e envio de requisições, a ideia é que, aos poucos, ele vai voltar ao estado inicial de uma réplica, porque, todo o nosso recurso, que era cobrado, não precisa mais, porque não estamos mais enviando requisição, e ele vai voltar, automaticamente, para uma réplica.
+
+[06:49] Então, reparem que já caiu aqui, ele atualizou o consumo para 53% e ele vai continuar nessa queda, até voltar para o 10%, que era o padrão dele, utilizando uma réplica, apenas.
+
+[07:03] Então, o que conseguimos fazer: definindo, não o nosso arquivo de stress, mas, o nosso Horizontal Pod Autoescaler, nós definimos que queremos *manter um consumo médio de 50% da CPU, que é requisitada por cada Pod, por cada container dentro do Pod.*
+
+[07:21] Nesse caso, de 10 milicores, e sempre que ficarmos acima desse consumo, ele vai colocar mais Pods, tendo um limite de 10, como definimos, para que esse consumo seja ajustado.
+
+[07:37] Então, o máximo que chegamos foi três, mas, ele agora vai regredir, aos poucos, como não está recebendo mais nada, ele vai ficar abaixo desses 50%, que é a nossa média, e vai voltar para o estado inicial dele, que é de uma réplica, a aplicação está ociosa.
+
+[07:51] Então, por essa aula é só, por esse vídeo. Eu vou, agora, mostrar para o pessoal do Linux como vai ser a pequena diferença na questão do IP, que teremos que utilizar no nosso arquivo e, também, como vai funcionar no Minikube. Então, por esse vídeo aqui é só e eu vejo vocês no próximo e até mais!
+*** Utilizando HPA no Linux
+[00:00] Assim como no Windows, nós também vamos precisar de um servidor de métricas no Linux. E o que ele é, caso você não tenha visto o vídeo anterior ou esteja relembrando agora?
+
+[00:10] Ele nada mais é do que uma aplicação usada para fazer nossa escalabilidade horizontal em conjunto com o nosso Horizontal Pod Autoescaler, baseado no nosso consumo de CPU e memória.
+
+[00:22] Então, ele é o responsável por ser o servidor de métricas, o nome já diz. Ele vai ser responsável por servir essas informações para todos os nossos recursos dentro do nosso cluster.
+
+[00:34] E como fazemos para utilizar esse servidor de métricas? No Windows, nós precisamos utilizar esse arquivo de componentes descrito na documentação, que nós declaramos e definimos e aplicamos no nosso cluster. No caso no Linux, nós estamos utilizando o Minikube e ele, no Linux, tem diversas possibilidades para utilizarmos.
+
+[00:54] Como, por exemplo, se dermos uma olhada na documentação ele já tem uma parte voltada apenas para as extensões, então, se nós executarmos esse comando 
+
+	minikube addons list
+
+reparem o que ele vai nos mostrar. Ele mostra uma série de extensões que podemos utilizar e estão desabilitadas, a maioria.
+
+[01:17] Dentre elas, nós temos o servidor de métricas e para utilizar ele é bem simples, basta habilitá-lo com comando 
+
+	minikube addons enable metrics-server
+
+E, a partir de agora, nós vamos ter isso habilitado, só que, antes de mais nada, antes de habilitarmos, eu vou mostrar para vocês que nós estamos com o mesmo estado que tínhamos no Windows. 
+(Ver imagem: "./Imagens/Aula05_video03_img01.png")
+
+[01:40] Nós temos os nossos Pods, das nossas aplicações, e temos também o nosso Horizontal Pod Autoescaler, já em execução com o arquivo que definimos. Então, agora vamos dar o nosso minikube addns enable metrics-server.
+
+[01:58] E, agora, ele vai habilitar esse recurso para nós. Bem simples. O ponto agora é que assim que ele terminar de sincronizar, nós vamos ter o nosso alvo definido dentro do nosso cluster, quanto de consumo estamos tendo para os containers dos Pods desse Deployment.
+
+[02:16] E como não sabemos quanto tempo ele vai demorar para fazer essa sincronização, eu vou pausar o vídeo e quando ele começar a exibir os resultados, eu volto para nós seguirmos.
+
+[02:25] Pessoal, então foi. Se eu executar o comando kubectl get hpa ele está utilizando 0% dos nossos 50% definido, da nossa média, e ele está utilizando uma réplica, que é o mais próximo que ele consegue manter dentro da nossa média de consumo de 50%, não tem como ele consumir de graça para ficar mais perto da nossa média.
+
+[02:46] Então, o máximo que ele tem é 0% para ficar próximo dos nossos 50%, então, ele está usando só uma réplica. Então, o que vamos fazer agora? Vamos estressar a nossa aplicação e para gente utilizar, fazer esse estresse, eu tenho um arquivo que é o nosso stress.sh e nele precisamos definir o IP do nosso nó.
+
+[03:11] No caso da minha máquina, quando eu criei esse cluster com o Minikube, eu vou abrir uma nova aba do terminal, se dermos um kubectl get nodes -o wide foi aqui que ele definiu para nós esse IP no INTERNAL-IP 192.168.99.106. 
+(AP: Ver imagem: "./Imagens/Aula05_video03_img02.png")
+
+[03:33] Então, é esse IP que vou colocar aqui na porta 30000, que é onde definimos que o nosso portal de notícias está em execução. Então, dito isso, temos o nosso script e vamos executá-lo.
+
+[03:46] Vou colocar o nosso bash e vou passar o nosso arquivo, o nosso script de estresse, para ele executar a cada 0.001 segundos, e vou salvar e sair do out.pxt.
+
+[04:01] Vamos ver a mágica acontecer. Ele vai começar a enviar diversas requisições e agora, no outro terminal (vou colocar os dois lado a lado) vou executar o kubectl get hpa --watch e nós vamos ver a mágica acontecer.
+(AP: Ver imagem "./Imagens/Aula05_video03_img03.png")
+
+[04:19] Eu vou expandir o terminal direito mais um pouco, porque ele é mais relevante e nós vamos ver que ele está utilizando, até então, ainda um Pod, uma réplica dele, porque o consumo ainda está em 0%, mas, aos poucos ele vai começar a atualizar esse valor porque a nossa aplicação está recebendo diversas requisições, então, vamos ver os resultados acontecendo.
+
+[04:41] E o que ele vai fazer? Será que ele vai criar muitos Pods a mais para manter esse consumo médio em 50%? Vamos dar uma pausa no vídeo e assim que ele começar a exibir os resultados voltamos para analisar.
+
+[04:57] O que aconteceu foi que as requisições pararam de ser enviadas (vou maximizar esse segundo terminal à direita, clicando e arrastando com o mouse na extremidade esquerda da tela deste terminal).
+
+[05:02] Ele começou a enviar tantas requisições e o consumo foi ficando tão acima da nossa média esperada de 50% em TARGETS, ficando na faixa de 500%, por exemplo, que ele foi precisando criar mais e mais réplicas, até chegar ao nosso limite de 10, onde ele não pôde mais passar, porque esse era o nosso máximo.
+
+[05:20] E, a partir daí, como no nosso outro terminal eu já parei de enviar as requisições, ele vai passar a diminuir esses recursos.
+(AP: Ver imagem "./Imagens/Aula05_video03_img04.png")
+
+[05:30] Porque como eles não estão sendo mais utilizados da mesma maneira de antes, reparem que ele já caiu pra 5%, a ideia é que ele vai começar a diminuir, aos poucos, o número de Pods que estão em execução, para não ficar nenhum Pod ocioso ali, para manter tudo da maneira mais básica possível.
+
+[05:49] Então, mais uma vez, como agora paramos de enviar as requisições e não sabemos o tempo que ele vai demorar para atualizar, eu vou pausar o vídeo, de novo, para assim que ele voltar e tivermos um resultado mais enxuto, de quantos Pods ele está utilizando, eu volto para analisarmos.
+
+[06:09] E voltamos ao nosso estado inicial de um Pod, apenas, porque nosso consumo voltou para 0%. Perfeito, pessoal!
+
+*[06:17] Então, agora o que conseguimos fazer, tanto no Windows quanto no Linux, nós conseguimos definir, automaticamente, critérios para que nosso cluster consiga automatizar se ele vai colocar mais ou menos Pods conforme o consumo de recursos que nós temos.*
+
+[06:35] E isso de maneira bem simples e fácil, através de um arquivo de definição. Então, nós vamos terminar essa aula agora, onde nós vimos como definir um Horizontal Pod Autoescaler e utilizar um Servidor de Métricas tanto no Windows quanto no Linux.
+*** VerticalPodAutoscaler
+Além do HorizontalPodAutoscaler, o Kubernetes possui um recurso customizado chamado VerticalPodAutoscaler. O VerticalPodAutoscaler remove a necessidade de definir limites e pedidos por recursos do sistema, como cpu e memória. Quando definido, ele define os consumos de maneira automática baseada na utilização em cada um dos nós, além disso, quanto tem disponível ainda de recurso.
+
+Algumas configurações extras são necessárias para utilizar o VerticalPodAutoscaler. Mais informações podem ser obtidas nesse link (https://github.com/kubernetes/autoscaler/tree/master/vertical-pod-autoscaler)
 ** AP
-Tanto o replicaset quanto o deployment roda várias instâncias do pod na mesma porta. Vale lembrar que cada pod tem uma porta diferente.
+Tanto o replicaset quanto o deployment rodam várias instâncias do pod na mesma porta. Vale lembrar que cada pod tem uma porta diferente.
 
 [09:28] *Então, no fim das contas, a boa prática, o mais comum que vocês irão ver quando vocês forem criar Pods é criar eles através de Deployments, que eles já vão permitir todo esse controle de versionamento e também os benefícios de um ReplicaSet.*
+* Dúvidas gerais
+** Pergunta ao ChatGPT 4
+*** o que é um node no estudo de k8s?
+Um "node" no contexto do Kubernetes (k8s) é uma máquina física ou virtual que hospeda os contêineres (aplicações) que são gerenciados pelo cluster do Kubernetes. Cada node é gerenciado pelo plano de controle do Kubernetes e contém os serviços necessários para executar os pods, que são as menores unidades gerenciáveis, responsáveis por hospedar os contêineres.
+
+Os nodes podem ser classificados em dois tipos principais:
+
+1. **Master Node (ou Control Plane Node):** Este é o node que gerencia o estado do cluster Kubernetes. Ele executa vários componentes críticos para o gerenciamento do cluster, incluindo o kube-apiserver, etcd, kube-scheduler e kube-controller-manager. O Master Node toma decisões sobre o cluster, como agendamento de pods, respostas a eventos do cluster, etc.
+
+2. **Worker Node:** Os Worker Nodes são os nodes onde os contêineres de aplicativos são realmente executados. Eles são gerenciados pelos Master Nodes e contêm os serviços necessários para executar os pods, incluindo o kubelet, que comunica com o Kubernetes Control Plane, e o kube-proxy, um proxy de rede que mantém as regras de rede nos nodes e permite a comunicação entre os pods dentro e fora do cluster.
+
+Cada Worker Node pode executar múltiplos pods, e o Kubernetes automaticamente gerencia o agendamento e a execução dos pods nos nodes com base em vários fatores, como recursos disponíveis e restrições de política. Isso permite que o Kubernetes seja altamente disponível e escalável, facilitando o gerenciamento de aplicações contêinerizadas em grande escala.
