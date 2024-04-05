@@ -1,0 +1,397 @@
+55:20
+* Boas práticas em banco de dados relacionais
+** EXPLAIN
+Fornece informações sobre como o MySQL executa instruções:
+- funciona com instruções SELECT, DELETE, INSERT, REPLACE e UPDATE
+- usado com uma instrução explicável, o MySQL exibe informações do otimizador sobre o plano de execução da instrução
+- para SELECT, EXPLAIN produz informações adicionais do plano de execução que podem ser exibidas usando SHOW WARNINGS
+- exemplo de uso:
+	EXPLAIN FORMAT=TREE
+	SELECT * FROM ...
+** utilização de EXISTS ao invés de IN
+*** recomendável
+#+BEGIN_SRC sql
+	SELECT * FROM MINHA TABELA M
+    WHERE EXISTS( SELECT *
+       FROM TABELA_LOG L
+       WHERE L.ID_MINHA_TABELA = M.ID
+          AND TO_CHAR(L.DATA, 'YYYY') = '2023')
+#+END_SRC sql
+*** não recomendável
+na maioria das vezes apresenta melhor performance em relação ao IN:
+#+BEGIN_SRC sql
+	SELECT * FROM MINHA TABELA M
+    WHERE M.ID IN (SELECT  L.ID_MINHA_TABELA 
+       FROM TABELA_LOG L
+       WHERE TO_CHAR(L.DATA, 'YYYY') = '2023')
+#+END_SRC sql
+** Utilize flags do tipo booleano ou inteiro
+Maior performance na busca destes tipos
+** Conversões com UPPER, TO_CHAT e etc em cláusulas WHERE
+Evite fazer conversões de tipo e formato em colunas na cláusula WHERE para realizar filtro de dados. O banco de dados ignora a utilização dos índices automáticos criados para estas colunas
+*** Dica do DBA da nossa empresa
+"Nunca mexa na coluna da esquerda" - nela estamos comparando dado que está vindo do banco com nossa condição. O MySQL pede os indícies que estão na coluna da esquerda.
+*** ChatGPT 4
+A recomendação de evitar conversões de tipo e formato em colunas na cláusula `WHERE` para realizar filtros de dados é baseada em como os sistemas de gerenciamento de banco de dados (SGBDs) otimizam as consultas e utilizam índices. As funções como `UPPER`, `LOWER`, `TO_CHAR` e outras transformações aplicadas diretamente às colunas em uma cláusula `WHERE` podem ter impactos significativos na performance das consultas. Aqui estão os principais pontos que explicam essa recomendação:
+
+### 1. Uso Ineficiente de Índices
+
+Os índices são estruturas de dados que os SGBDs utilizam para acelerar a recuperação de registros. Quando você aplica uma função a uma coluna na cláusula `WHERE` (por exemplo, `UPPER(nome_coluna)`), o SGBD precisa aplicar essa função a cada valor da coluna para determinar se ele satisfaz a condição da consulta. Isso impede que o SGBD utilize eficientemente os índices criados para essa coluna, pois os valores indexados estão no formato original, não no formato transformado pela função. Como resultado, o banco de dados pode acabar realizando uma varredura completa da tabela (`full table scan`), que é muito mais lenta do que uma busca utilizando índices.
+
+### 2. Aumento do Tempo de Execução
+
+Quando conversões ou funções são aplicadas a colunas nas cláusulas `WHERE`, o banco de dados precisa processar essas transformações em tempo de execução para cada linha da tabela, o que pode aumentar significativamente o tempo de processamento da consulta, especialmente em tabelas grandes.
+
+### 3. Planejamento de Consulta Subótimo
+
+Os otimizadores de consulta dos SGBDs criam planos de execução baseados em estatísticas da tabela e índices disponíveis. Quando uma coluna é modificada por uma função na cláusula `WHERE`, o otimizador pode ter dificuldades em estimar corretamente a cardinalidade (número de registros únicos) da operação, levando a planos de execução subótimos.
+
+### Alternativas Recomendadas
+
+- **Indexação Funcional (Se Suportado):** Alguns bancos de dados suportam índices funcionais, que permitem indexar o resultado de uma função aplicada a uma coluna. Isso pode ser útil se você frequentemente precisa filtrar dados com base no resultado de uma função.
+
+- **Padronização de Dados:** Sempre que possível, armazene os dados já no formato que será mais frequentemente consultado. Por exemplo, se você sempre pesquisa por valores de texto em maiúsculas, considere armazená-los em maiúsculas.
+
+- **Critérios de Filtro Alternativos:** Avalie se há outras maneiras de escrever suas condições de filtro que não requerem a transformação de dados, possivelmente utilizando outras colunas ou lógica de consulta.
+
+Adotar essas práticas pode ajudar a manter a eficiência das consultas e a garantir que seu banco de dados possa utilizar índices efetivamente, mantendo uma alta performance.
+** Evite influência da orientação a objetos na modelagem de base de dados
+** Não utilize HAVING para filtrar dados
+Caso necessite filtrar dados em um agrupamento de informações, prefira sempre realizar esta operação na cláusula WHERE ao invés do HAVING
+*** recomendável
+SELECT NOME, TIPO
+FROM MINHA_TABELA A
+WHERE TIPO = 2
+GROUP BY NOME, TIPO
+*** não recomendável
+SELECT NOME, TIPO
+FROM MINHA_TABELA A
+GROUP BY NOME, TIPO
+HAVING TIPO = 2
+** Utilize procedures e views
+Ao executar uma instrução SQL é necessário que o SGBD analise se a sintaxe do comando está correta, se os objetos referenciados sejam realmente existentes, dentre outras análises igualmente necessárias.
+** Tipos são extremamente importantes
+Sempre que tiver dúvidas abrir discussão em alguma thread marcando nosso DBA.
+** Traga no SELECT somente as colunas necessárias
+Esta é uma boa prática obrigatória para desenvolvedores
+** Utilização de Cache
+Considerar cada cenário para utilizar esta opção.
+** Só utilize ORDER BY e DISTINCT se for realmente necessário
+Sempre considerar a possibilidade de delegar a aplicação realizar este papel. 
+** Monitoramento de querys
+Mesmo após a query em produção ou ainda em ambiente de homologação (QA).
+** Cuidado ao utilizar índices em colunas que são atualizadas com muita frequência
+Mesmo tendo boas intenções, o cumprimento do objetivo de melhorar a performance das consultas pode acarretar em perdas de performance em operações de INSERT, DELETE e UPDATE nesta tabela.
+
+Sempre consultar o DBA.
+*** AP 
+O problema é devido à demora devida à atualização do índice, no caso de INSERT, DELETE e UPDATE nesta tabela.
+** Índices em colunas muito presentes em WHERE, JOIN, ORDER BY e TOP
+Sempre verificar a frequênia de utilização delas em cláusulas WHERE, JOIN, ORDER BY e TOP. Esta é sempre uma boa pista de índices que poderiam ser criados.
+** Insira comentáios à vontade
+Ao criar uma tabela ou coluna no banco de dados não economize nos comentários a respeito do seu significado
+** Tabelas sem chave-primária
+Em teoria uma tabela não deveria ficar "isolada" em modelo "relacional".
+*Toda* tabela deve ter pelo menos uma chave-primária.
+** Dedicação de tempo à modelagem
+Vale muito a pena investir tempo no correto planejamento e modelagem da base de dados.
+** Eliminar busca de dados usando LEFT JOIN em tabelas que possam ser substituídas por ENUM's
+** Aplicar verificação anteriores evitando INNER JOIN
+** UPDATE sem WHERE
+não fazer!
+ 	
+* EXPLAIN FORMAT = TREE - Material da Web
+** Obs IMPORTANTE
+tirada do último tópico do "** Site 1" abaixo:
+3. The order in which MySQL joins tables can have a significant impact on query performance, *but the EXPLAIN statement does not always reveal the join order used by the optimizer.*
+** Site 1
+https://www.mydbops.com/blog/demystifying-mysqls-explain-formattree-and-understanding-query-execution/
+*** Explain Plan Insights
+The Explain plan serves as a window into the mind of MySQL's query optimizer. Like a skilled conductor, the optimizer meticulously evaluates various factors to determine the most efficient query plan. It considers the query cost, which involves a comprehensive analysis of IO, CPU, and network resources that will be utilized by the query.
+
+Let’s figure out how the optimizer works under the hood.
+
+*** Optimizer's Decision-Making Process
+The Explain plan gives an approximation of how the optimizer will execute the query. The optimizer’s cost model accounts for the IO, CPU, and network resources that will be used by the query.
+
+This feature is beneficial in query tuning, for example, figuring out whether the query uses an index or whether indexes will be of any use. With this, we can reduce unnecessary full-table scans, minimising disk IO and execution time. To use this, the Explain keyword is added before queries.
+
+For example,
+
+EXPLAIN SELECT node_id,timestamp FROM osm.nodes;	
+
+It's important to note that the Explain plan doesn't provide the actual query result; rather, it offers an estimate. 
+*** Tree format: hierarchical and easy-to-read (introduced in 8.0.16)
+The last format, known as the tree format, shares similarities with JSON but provides a more concise representation of the Explain plan. Although it contains limited data compared to the JSON format, it still offers essential insights into the query execution process. Let's delve deeper into the tree format and explore its specific characteristics and benefits.
+
+Unveiling the Tree Format
+- The tree format was introduced in MySQL version 8.0.16.
+
+- It offers a clear and hierarchical view of the query execution steps taken by the database engine.
+
+- This format makes it easier to identify potential performance issues or bottlenecks in the query.
+
+- With the tree format, you can quickly grasp the order in which operations are executed.
+
+- It provides a user-friendly visualization of the complex query execution flow.
+
+Another concept similar to Explain is Explain analyze, but with a distinct feature. While Explain provides insights into the query execution plan without actually executing the query, Explain analyze goes a step further. It not only reveals the execution plan but also executes the query to obtain actual results. Moreover, Explain analyze utilizes the tree format by default, presenting a clear and detailed view of the query's execution steps and performance metrics.
+
+Let's take a look at an example of how the tree format appears in action.
+
+Database used: OSM
+
+Example:
+SELECT way_id, changeset_id, timestamp, version FROM ways where timestamp between '2011-06-14' and '2014-06-14' order by timestamp;
+
+Output:
+-> Sort: ways.`timestamp`  (cost=50125 rows=482976)
+    -> Filter: (ways.`timestamp` between '2011-06-14' and '2014-06-14')  (cost=50125 rows=482976)
+        -> Table scan on ways  (cost=50125 rows=482976)
+
+In the tree format, the root node displays the total cost of the query, and the execution direction goes from inside to outside.
+
+Regarding supported queries, the Explain plan varies for each format and supports different types of queries:
+
+- Traditional and JSON formats support SELECT, UPDATE, and DELETE queries.
+
+- The Tree format specifically supports SELECT queries.
+
+As a result, the executor will not execute UPDATE and DELETE queries using the Tree format.
+
+*** Reading the Tree Format
+**** Understanding the hierarchical structure of the tree
+In the Explain tree format, the structure resembles a typical tree with three types of nodes: the Root Node, Child Nodes, and Leaf Nodes. The query execution order follows a sequence from the Leaf Node → Child Node → Root Node.
+
+Root Node:
+The Root Node serves as the top-level node of the tree and encompasses the cost of the entire query being executed. However, not all queries display the cost at the top; it depends on the query execution order. For instance, if a query includes a limit clause, it will typically appear at the top as it is executed last in the query.
+
+Child Node:
+Directly below the Root Node, we find the Child Nodes. These nodes represent the various steps that the database engine will undertake to execute the query. Each Child Node corresponds to a specific operation performed during query execution.
+
+Leaf Node:
+At the bottom of the tree, we encounter the Leaf Nodes, which represent individual operations carried out by the database engine to execute the query. These operations can involve table scans, index lookups, or other data retrieval tasks.
+
+Let's check it out with the example below.
+
+EXPLAIN format=tree SELECT node_id, latitude,  changeset_id, timestamp FROM nodes WHERE version=5 ORDER BY timestamp desc;
+Output:
+  Total cost
+ -> Sort: nodes.`timestamp` DESC  (cost=2111.60 rows=20846)  Root node
+    -> Filter: (nodes.version = 5)  (cost=2111.60 rows=20846) Child node
+        -> Table scan on nodes  (cost=2111.60 rows=20846)     leaf node 
+
+The execution order displayed will be read from the leaf node. So a point is made clear, i.e., the cost calculated in the leaf node will be added to the child node, and the total cost will be the sum of the individual costs. To elucidate, the data from the leaf node moves to the child node and eventually reaches the root node, while each level exhibits various steps. Each step will have an individual cost. The total cost estimated will reach the root node or may remain as a total in a parent node.
+
+*** Reading tree format
+Now that we have covered the structure and the view of the Explain Tree format, the next step is to learn how to read it. At first glance, the arrows and nodes might seem confusing, but with a proper understanding, it becomes much easier. Let's explore how to read the Explain Tree format step by step.
+
+Start with the Leaf Node: To comprehend the execution of the query, begin by reading from the leaf node. The leaf node represents the individual operations performed by the database engine to execute the query, such as table scans or index lookups.
+
+Follow from Leaf to Root: After understanding the leaf node, follow the execution flow from the inner node to the outer node. The child nodes are directly below the root node and represent the different steps taken by the database engine to execute the query.
+
+Multiple Child Nodes: In some cases, there might be multiple child nodes that can be identified by statements on the same level. Each step in the execution process will have its individual cost.
+
+To gain a better understanding, let's explain with a complex query and see how the Explain Tree format displays the execution order.
+
+Query:
+
+EXPLAIN format=tree SELECT users.display_name, COUNT(*) AS num_edits FROM users LEFT JOIN changesets ON users.id = changesets.user_id GROUP BY users.display_name ORDER BY num_edits DESC LIMIT 10;
+
+ -> Limit: 10 row(s)
+    -> Sort: num_edits DESC, limit input to 10 row(s) per chunk
+        -> Table scan on <temporary>
+            -> Aggregate using temporary table
+                -> Left hash join (changesets.user_id = users.id)  (cost=27.3e+6 rows=272e+6)
+                    -> Index scan on users using users_display_name_idx  (cost=482 rows=3855)
+                    -> Hash
+                        -> Table scan on changesets  (cost=2.97 rows=70686)
+
+**** Visualization of the tree
+Let's analyze the previous example of the Explain Tree format to understand the execution order of the query: (Ver imagem: "ImagemOrdemDoExplain.jpg")
+
+MySQL's Explain Format=Tree
+Table Scan on Leaf Node: In the example, the table scan on c is represented as the leaf node. This indicates that the table scan was executed first in the query execution process.
+
+Reading from Leaf to Parent Node: As mentioned earlier, the next step is to read from the leaf node towards the parent node, which is the node outside. In this case, there are two nodes on the same level (the table scan and the aggregate using a temporary table). The individual costs of these nodes will be considered in the execution process.
+
+Easy Understanding from Inside to Outside: By following the execution flow from inside to outside, we can easily grasp the sequence of operations. The limit and sort operations are typically executed last in most queries. As a result, they are located at the top of the Explain Tree format.
+*** Harnessing the Power of Explain Plan
+These are some scenarios in which to use the Explain plan.
+
+- Explain plan is recommended in situations where you are uncertain about the query's optimal performance
+
+- To check whether the query uses indexes efficiently or proceeds to a full table scan.
+
+- To check whether the index is working and to discard unnecessary indexes.
+
+- To check the row count instead of using count(), explain may return the rows present in the table.
+
+- To find the cause of a slow-running query and to optimize it.
+*** Maximizing Query Performance and Troubleshooting with Explain Plan
+Benefits:
+
+- To achieve optimal query performance, understand the query execution plan and optimize queries accordingly.
+
+- To identify and address performance bottlenecks, analyze the output to detect full table scans, inefficient join types, or suboptimal index usage.
+
+- To minimize the risk of syntax errors or typos, review the Explain plan before executing queries.
+
+- To diagnose issues, examine the operations performed and data filtering/sorting through the Explain plan.
+
+*** Understanding Limitations and Considerations
+1. Estimated row counts may not always be accurate and can be affected by factors such as data distribution, statistics accuracy, and query complexity.
+
+2. Lack of real-time data due to neglecting real-time factors such as server load, concurrency, and disk I/O performance may result in not reflecting the actual performance of the query at runtime.
+
+3. The order in which MySQL joins tables can have a significant impact on query performance, *but the EXPLAIN statement does not always reveal the join order used by the optimizer.*
+
+Hence, you can leverage the power of Explain Plan to fine-tune your database queries, optimize indexes, and identify performance bottlenecks.
+* Uso do EXPLAIN FORMAT = TREE - ChatGPT 4
+** Fale sobre o uso de EXPLAIN FORMAT=TREE em um select
+#+BEGIN_SRC markdown
+A utilização do `EXPLAIN FORMAT=TREE` no MySQL para uma instrução `SELECT` é uma ferramenta poderosa para analisar e entender como o otimizador de consultas planeja executar uma determinada operação de seleção. Este comando fornece insights detalhados sobre o plano de execução de uma consulta, apresentando a informação em um formato de árvore que é mais intuitivo e fácil de interpretar do que os formatos tabulares tradicionais. Vamos explorar os principais aspectos e benefícios de usar `EXPLAIN FORMAT=TREE` com um `SELECT`:
+
+### Visualização Hierárquica
+
+O `FORMAT=TREE` organiza as etapas da consulta em uma estrutura hierárquica, mostrando como as diferentes partes da consulta se relacionam entre si. Isso inclui como as tabelas são acessadas, as condições de junção, as operações de filtro, as agregações e ordenações. Essa visualização facilita a identificação de como os dados são processados e onde otimizações podem ser aplicadas.
+
+### Detalhamento das Operações
+
+Cada nó na árvore representa uma operação específica ou um passo no plano de execução, como a leitura de uma tabela, a aplicação de um filtro (WHERE), a realização de uma junção (JOIN), ou a ordenação dos resultados (ORDER BY). Isso ajuda a identificar quais operações são mais custosas e como elas contribuem para o plano geral da consulta.
+
+### Estimativas de Custo e Cardinalidade
+
+Para cada operação, o `EXPLAIN FORMAT=TREE` fornece estimativas de custo, que representam a carga de trabalho esperada para realizar essa operação, e de cardinalidade, que é o número estimado de linhas que serão processadas ou retornadas. Essas estimativas são cruciais para entender a eficiência da consulta e identificar pontos de atenção.
+
+### Insights para Otimização
+
+Ao analisar o plano de execução, você pode identificar oportunidades de otimização, como:
+- A necessidade de índices adicionais para acelerar o acesso aos dados.
+- A possibilidade de reescrever a consulta para torná-la mais eficiente, por exemplo, evitando funções que impedem o uso de índices ou refinando condições de junção.
+- Identificar junções ineficientes ou operações de ordenação que poderiam ser otimizadas.
+
+### Exemplo de Uso
+
+Imagine que você tem uma consulta `SELECT` complexa envolvendo múltiplas tabelas e operações. Usar `EXPLAIN FORMAT=TREE` pode ajudá-lo a visualizar exatamente como o MySQL planeja executar essa consulta, permitindo que você veja de forma clara e organizada todas as etapas envolvidas, desde o acesso inicial aos dados até a produção do conjunto final de resultados.
+
+```sql
+EXPLAIN FORMAT=TREE
+SELECT colunas FROM tabela1 JOIN tabela2 ON tabela1.id = tabela2.tabela1_id WHERE condição ORDER BY coluna;
+```
+
+A saída desse comando revelará a estrutura de execução da consulta, desde a leitura das tabelas e aplicação de filtros, até as operações finais de agregação ou ordenação.
+
+### Conclusão
+
+O `EXPLAIN FORMAT=TREE` é uma ferramenta indispensável para desenvolvedores de banco de dados e DBAs que buscam otimizar consultas SQL. Ele oferece uma visão clara e aprofundada do plano de execução, facilitando a identificação de gargalos e oportunidades de otimização. Ao utilizar essa ferramenta regularmente, é possível melhorar significativamente a performance e a eficiência das consultas em um banco de dados MySQL.
+#+END_SRC
+** por "cost" eu posso entender "tempo"?
+#+BEGIN_SRC markdown
+O valor de "cost" em um plano de execução gerado pelo `EXPLAIN` no MySQL (e em muitos outros sistemas de gerenciamento de banco de dados) não representa diretamente o "tempo" de execução, mas está fortemente relacionado a ele. O "cost" é uma estimativa abstrata que o otimizador de consultas usa para avaliar a eficiência de diferentes planos de execução possíveis para uma consulta. Ele é calculado com base em vários fatores internos, incluindo, mas não se limitando a:
+
+- Número estimado de linhas a serem processadas
+- Tipo e eficiência dos índices disponíveis
+- Operações necessárias (como leituras de disco, junções, ordenações, filtros)
+- Estatísticas das tabelas e distribuição dos dados
+
+### Relação entre "Cost" e Tempo
+
+Embora o "cost" não seja uma medida direta do tempo, existe uma correlação geral entre os dois. Um plano de execução com um "cost" menor geralmente será executado mais rapidamente do que um plano com um "cost" maior, tudo o mais sendo igual. Isso se deve ao fato de que um "cost" menor indica que o banco de dados precisa fazer menos trabalho para completar a consulta, o que normalmente resulta em uma execução mais rápida.
+
+### Por Que o "Cost" Não é Igual a Tempo
+
+- **Abstração:** O "cost" é uma medida abstrata que tenta capturar a complexidade de uma consulta e o trabalho necessário para executá-la, mas não leva em conta variações de desempenho do hardware, como a velocidade do processador, I/O de disco, ou uso de memória em tempo real.
+  
+- **Dependência do Ambiente:** O desempenho real e o tempo de execução de uma consulta podem ser influenciados por fatores externos, como a carga do sistema, a configuração do banco de dados, e até mesmo a competição por recursos com outras consultas ou aplicações. Esses fatores podem variar significativamente e não são refletidos no "cost".
+
+- **Estimativas vs. Realidade:** O "cost" é calculado com base em estatísticas e estimativas que o banco de dados mantém sobre as tabelas e índices. Essas estatísticas podem não estar sempre atualizadas ou podem não capturar perfeitamente a distribuição real dos dados, levando a estimativas de custo que não correspondem exatamente ao tempo de execução observado.
+
+### Conclusão
+
+Enquanto o "cost" fornece uma base útil para comparar a eficiência relativa de diferentes planos de execução de consulta, ele não deve ser interpretado como um indicador direto do tempo de execução. Melhorias que reduzem o "cost" de uma consulta geralmente resultam em melhor desempenho, mas o impacto exato no tempo de execução pode variar. Portanto, para avaliações de desempenho mais precisas, recomenda-se medir o tempo de execução real em um ambiente de teste que simule o ambiente de produção o mais de perto possível.
+#+END_SRC
+** ainda sobre explain format = tree: O valor de "cost" é sempre crescente de baixo para cima? Porque?
+#+BEGIN_SRC markdown
+No `EXPLAIN FORMAT=TREE` do MySQL, o valor de "cost" (custo) representa uma estimativa do esforço necessário para executar cada parte da consulta. Essa estimativa é calculada com base em vários fatores, incluindo o tipo de operação realizada (como leituras de tabela, junções, filtros, ordenações), a quantidade de dados que precisa ser processada, e a eficiência dos índices disponíveis.
+
+### Crescimento do "Cost" de Baixo para Cima
+
+Sim, na visualização do plano de execução em formato de árvore gerada pelo `EXPLAIN FORMAT=TREE`, o valor de "cost" tende a ser crescente à medida que você move de baixo para cima na árvore. Isso acontece porque cada nível superior na árvore depende dos resultados das operações nos níveis inferiores e, portanto, incorpora seus custos, adicionando o custo da operação adicional realizada nesse nível.
+
+### Por Que o "Cost" Cresce de Baixo para Cima?
+
+- **Acumulação de Custos:** O custo total de uma operação em um nível mais alto da árvore inclui o custo de todas as operações subjacentes que precisam ser realizadas primeiro. Por exemplo, o custo de uma junção entre duas tabelas incluirá o custo de acessar essas tabelas e o custo adicional de realizar a junção propriamente dita.
+
+- **Operações Dependentes:** Operações mais altas na árvore geralmente dependem dos resultados de operações mais baixas. Portanto, qualquer operação que filtre, ordene, ou de outra forma processe os dados irá adicionar um custo ao custo já existente das operações de que depende.
+
+- **Custos de Processamento Adicional:** Algumas operações, como ordenações e agrupamentos, podem requerer um processamento adicional significativo (por exemplo, a ordenação de um grande número de linhas ou a agregação de dados). Essas operações aumentam o custo total à medida que são adicionadas ao plano de execução.
+
+### Exemplo
+
+Considere uma consulta simples que une duas tabelas e aplica um filtro. O custo de acessar a primeira tabela é o ponto de partida. Ao unir a segunda tabela, o custo da operação de junção é adicionado ao custo de acessar ambas as tabelas. Se um filtro é aplicado após a junção, o custo de executar esse filtro será adicionado ao custo acumulado das operações anteriores. Finalmente, qualquer ordenação ou agregação adicional aumentará ainda mais o custo, refletindo a complexidade crescente e o trabalho adicional necessário para completar essas operações.
+
+### Conclusão
+
+O aumento progressivo do valor de "cost" de baixo para cima no plano de execução reflete a natureza acumulativa do processamento de consultas no MySQL. Ao analisar esses custos, desenvolvedores e DBAs podem identificar as partes mais custosas de uma consulta e buscar maneiras de otimizá-las, como melhorar o design do esquema, adicionar índices onde for benéfico, ou reescrever a consulta para reduzir a complexidade.
+#+END_SRC
+** me dê sugestões de livros que tratam de explain usando tree
+#+BEGIN_SRC markdown
+Livros específicos focados exclusivamente no uso do `EXPLAIN FORMAT=TREE` no MySQL ou em qualquer outra funcionalidade muito específica de um SGBD (Sistema de Gerenciamento de Banco de Dados) podem ser raros, pois os autores tendem a abordar esses tópicos dentro de guias mais amplos sobre otimização de banco de dados e desempenho de consultas. No entanto, existem recursos e livros abrangentes sobre MySQL e otimização de banco de dados que cobrem aspectos importantes do planejamento de execução de consultas, incluindo o uso de `EXPLAIN` e interpretação de planos de execução, que por sua vez podem abordar ou ser aplicáveis ao formato de árvore. Aqui estão algumas sugestões:
+
+### 1. "High Performance MySQL" por Baron Schwartz, Peter Zaitsev, e Vadim Tkachenko
+
+Este livro é considerado uma das melhores fontes para quem deseja aprender sobre otimização no MySQL, incluindo detalhes sobre como o MySQL executa consultas e como usar o `EXPLAIN` para analisar planos de execução. Embora não se concentre exclusivamente no formato de árvore, oferece uma base sólida que pode ajudar a entender como interpretar e utilizar a saída do `EXPLAIN` em diferentes formatos.
+
+### 2. "MySQL 8 Query Performance Tuning" por Jesper Wisborg Krogh
+
+Focado em otimização de consultas e ajuste de desempenho no MySQL 8, este livro oferece insights sobre como identificar gargalos de desempenho e otimizar o desempenho das consultas. Ele abrange o uso de `EXPLAIN` e outras ferramentas de diagnóstico que são essenciais para entender como as consultas são executadas pelo otimizador.
+
+### 3. "SQL Performance Explained" por Markus Winand
+
+Embora não seja específico para MySQL, este livro explica os princípios fundamentais do desempenho de SQL que são aplicáveis a muitos SGBDs, incluindo MySQL. Ele trata da otimização de índices, como as consultas são processadas por SGBDs e como entender e melhorar o desempenho de suas consultas SQL.
+
+### 4. "Optimizing SQL Queries for MySQL" por Ronald Bradford
+
+Este recurso prático aborda estratégias específicas para otimizar consultas SQL no MySQL. Inclui discussões sobre análise e otimização de planos de execução, que podem ajudar a entender melhor como usar o `EXPLAIN`, incluindo o formato de árvore, para otimizar consultas.
+
+### Acessando Documentação Oficial e Recursos Online
+
+Além dos livros, é altamente recomendável consultar a documentação oficial do MySQL, especialmente para recursos e funcionalidades mais recentes como o `EXPLAIN FORMAT=TREE`. A documentação oficial e fóruns dedicados, como o Stack Overflow, frequentemente contêm discussões e exemplos detalhados que podem ser tão úteis quanto qualquer livro, especialmente para funcionalidades específicas e casos de uso avançados.
+
+Embora esses livros possam não abordar `EXPLAIN FORMAT=TREE` diretamente e exclusivamente, eles fornecem conhecimentos valiosos sobre como o MySQL processa consultas e como você pode otimizar o desempenho das suas consultas, o que é essencial para utilizar eficazmente qualquer ferramenta de análise de plano de execução, incluindo o `EXPLAIN FORMAT=TREE`.
+#+END_SRC
+** Porque apresentam resultados diferentes o explain format = tree e a funcionalidade de plano de execução do dbeaver?
+#+BEGIN_SRC markdown
+A discrepância entre os resultados apresentados pelo `EXPLAIN FORMAT=TREE` no MySQL e o plano de execução gerado por ferramentas de terceiros, como o DBeaver, geralmente decorre de como essas ferramentas interpretam e apresentam os dados fornecidos pelo SGBD (Sistema de Gerenciamento de Banco de Dados). Aqui estão algumas razões para essas diferenças:
+
+### 1. **Interpretação dos Dados**
+
+- **MySQL `EXPLAIN FORMAT=TREE`:** Fornece uma representação hierárquica do plano de execução diretamente do motor do MySQL. Ele mostra como o otimizador de consultas do MySQL planeja executar a consulta, incluindo escolhas de junções, utilização de índices, ordenação e filtros. A saída é bastante específica para a implementação interna do MySQL.
+
+- **DBeaver e Outras Ferramentas:** Podem interpretar e reformatar as informações do plano de execução fornecidas pelo MySQL (ou qualquer outro SGBD) para torná-las mais acessíveis ou compreensíveis aos usuários. Essa reinterpretação pode levar a apresentações visuais ou textuais que diferem do formato original `EXPLAIN FORMAT=TREE`, potencialmente agregando ou omitindo detalhes baseados em suas próprias lógicas de visualização.
+
+### 2. **Nível de Detalhamento**
+
+- Algumas ferramentas, como o DBeaver, podem escolher apresentar uma visão simplificada ou mais abstrata do plano de execução para facilitar a compreensão do usuário. Isso pode significar menos detalhes sobre certos aspectos técnicos, como estimativas de custo ou detalhes específicos sobre operações de baixo nível.
+
+### 3. **Versão e Compatibilidade**
+
+- As diferenças nos planos de execução também podem ser atribuídas às versões específicas do MySQL e da ferramenta de terceiros. Recursos mais recentes ou atualizações no otimizador de consultas podem não ser totalmente suportados ou refletidos em ferramentas de terceiros imediatamente após seu lançamento.
+
+### 4. **Funcionalidades Adicionais de Ferramentas de Terceiros**
+
+- Ferramentas como o DBeaver podem oferecer funcionalidades adicionais, como análises ou recomendações de otimização baseadas no plano de execução, que não estão presentes na saída padrão do `EXPLAIN FORMAT=TREE` do MySQL.
+
+### 5. **Customização por Usuário**
+
+- O DBeaver e outras ferramentas similares permitem que os usuários personalizem a forma como desejam ver os planos de execução, o que pode incluir diferentes níveis de detalhamento ou focos de análise. Essa personalização pode afetar a aparência e o conteúdo das informações apresentadas.
+
+### Conclusão
+
+As diferenças entre o `EXPLAIN FORMAT=TREE` e os planos de execução visualizados em ferramentas como o DBeaver são geralmente o resultado de como cada ferramenta processa, interpreta e apresenta as informações fornecidas pelo SGBD. Ambas as abordagens têm seus méritos: enquanto o `EXPLAIN FORMAT=TREE` fornece uma visão detalhada e direta do otimizador do MySQL, as ferramentas de terceiros podem oferecer visualizações mais amigáveis ao usuário e insights adicionais que facilitam a análise e otimização de consultas.
+#+END_SRC
+** TEMPLATE
+#+BEGIN_SRC markdown
+
+#+END_SRC
