@@ -1,0 +1,1987 @@
+https://cursos.alura.com.br/formacao-banco-dados-java
+
+Banco de dados
+Um banco de dados é uma coleção organizada de informações (ou dados) estruturadas, normalmente armazenadas de forma eletrônica em um sistema de computador. Geralmente, essa coleção de informações é controlada por um sistema de gerenciamento de banco de dados (DBMS). Juntos, os dados,o DBMS e os aplicativos associados a eles, são chamados de sistema de banco de dados, comumente abreviados para apenas banco de dados.
+
+* Curso de Java e JDBC: trabalhando com um banco de dados
+https://cursos.alura.com.br/course/java-jdbc-banco-dados
+** Para saber mais: padrão Factory
+
+Para evitar a duplicação de código, usamos a classe ConnectionFactory. Fazer isso é algo tão comum em projetos de programação que se tornou um padrão de projeto, o Factory. Podemos definir o padrão Factory pensando justamente na sua tradução: significa “Fábrica”. Dessa forma, criamos uma classe que terá um método que retorna um objeto.
+
+Assim, ao invés de usar o new a todo momento, fazemos isso apenas uma vez, quando estamos criando o método na classe Factory. Depois, para criar os objetos, apenas chamamos esse método de criação.
+
+Usando os padrões factory conseguimos manter as dependências de um projeto muito mais flexíveis. Como o código é modificado uma única vez em um método, se o jeito de criar o objeto muda ao longo do tempo, fazemos essa mudança uma única vez, reduzindo acoplamento em nosso software.
+
+Na própria API do Java, encontramos vários exemplos do Padrão Factory, como por exemplo, o Calender.getInstance() ou Integer.valueOf("3").
+** DAO
+Para melhorar o código definindo responsabilidades, podemos criar uma classe DAO (Data Access Object), que ficará responsável por toda integração com o banco de dados.
+** HikariCP
+Agora vamos acessar o site mvnreposity.com, o mesmo site em que pegamos o nosso driver SQL.
+
+Neste site, vamos buscar por "hikaricp". HikariCP é uma biblioteca de pool de conexões que podemos usar com nossa aplicação.
+
+Vamos instalar a versão mais recente do HikariCP da zaxxer. Usaremos a versão 5.0.1. Ao clicar na versão podemos copiar o código com as dependências:
+
+<!-- https://mvnrepository.com/artifact/com.zaxxer/HikariCP -->
+<dependency>
+    <groupId>com.zaxxer</groupId>
+    <artifactId>HikariCP</artifactId>
+    <version>5.0.1</version>
+</dependency>
+
+Vamos colocar esse bloco de código no arquivo pom.xml do nosso projeto, logo abaixo da dependência do mysql-connector-java.
+
+Onde vamos configurar esse pool?
+
+Quando pegamos a conexão, usamos o ConnectionFactory. então, vamos abrir a classe ConnectionFactory.
+
+É nesse momento, em que chamamos ConnectionFactory.recuperarConexao() que pegamos de fato a connection. Então, é aqui que vamos configurar nosso pool de conexões.
+
+Vamos alterar a ConnectionFactory e não vamos alterar mais nada do resto das classes.
+
+Para a configuração do DataSouce, vou copiar um bloco de código que já tenho pronto aqui. Isso é algo que não fazemos todo dia, então não precisamos memorizar.
+
+    private HikariDataSource createDataSource() {
+        HikariConfig config = new HikariConfig();
+        config.setJdbcUrl("jdbc:mysql://localhost:3306/byte_bank");
+        config.setUsername("root");
+        config.setPassword("root");
+        config.setMaximumPoolSize(10);
+
+        return new HikariDataSource(config);
+    }
+
+Essa função retorna um HikariDataSource, e a nomeamos de createDataSource(). Em seguida, temos HikariConfig nomeando como config a nossa variável. E temos alguns sets: o setJdbcUrl, que é a nossa string de conexão, mas agora com a diferença que passamos username e password para métodos específicos.
+
+E, por fim, temos setMaximumPoolSize, que define quantas conexões queremos permitir que fiquem abertas para serem reutilizadas, vamos deixar com o valor 10.
+
+Vamos importar as classes da HikariDataSource e HikariConfig, e nosso método passa a funcionar.
+
+No método recuperarConexao(), em vez de usar o DriverManager vamos apagar o código do DriverManager.getConnection e no lugar dele colocaremos createDataSource().getConnection();
+
+package br.com.alura.bytebank;
+
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
+
+import java.sql.Connection;
+import java.sql.SQLException;
+
+public class ConnectionFactory {
+
+    public Connection recuperarConexao() {
+        try {
+            return createDataSource().getConnection();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private HikariDataSource createDataSource() {
+        HikariConfig config = new HikariConfig();
+        config.setJdbcUrl("jdbc:mysql://localhost:3306/byte_bank");
+        config.setUsername("root");
+        config.setPassword("root");
+        config.setMaximumPoolSize(10);
+
+        return new HikariDataSource(config);
+    }
+}
+
+Ao voltar ao menu principal da aplicação e selecionar a opção 1 para listar contas abertas, ele exibiu corretamente a conta que cadastramos!
+
+Agora, com o pool de conexões, temos operações menos custosas e mais fáceis de gerenciar. Lembrando que não é porque a conexão fica aberta no pool que não precisamos fechar no ContaDAO.
+
+Vamos continuar fechando porque quando fechamos é que a conexão volta para o pool, senão ela fica presa.
+
+Minha ideia era mostrar para vocês esse recurso que é muito utilizado em ambientes de produção, ao subir para produção precisamos usar um pool de conexões.
+
+--------
+Dez pessoas querem acessar a nossa aplicação ao mesmo tempo. Porém, temos apenas nove conexões e todas estão ocupadas.
+
+O que vai acontecer quando a décima pessoa se conectar?
+R: O 10º usuário esperará alguma das 9 conexões ficar disponível.
+** Notas
+*** Existe uma interface que representa a conexão (java.sql.Connection), também existe uma que representa o pool de conexões  (javax.sql.DataSource).
+
+*** Realizada a conexão com o banco de dados, chega o momento de executar as operações de consulta, inserção, atualização e deleção (apagamento) de informações. Temos um conjunto de classes e interfaces já preparados para isso. São elas:
+**** Connection 
+Representa uma sessão junto ao banco de dados desejado. Vimos a classe no trecho de código do exemplo anterior e vamos executar as instruções SQL dentro da conexão estabelecida.
+**** Statement
+Tem como objetivo a execução do comando SQL. Temos também a PreparedStatement, que pré-compila o comando e armazena o SQL em um objeto.
+**** ResultSet 
+Esta interface tem por objetivo armazenar o retorno de uma consulta realizada no banco de dados. As informações das tabelas são recuperadas na sequência e podem ser iteradas em loops para a manipulação.
+*** Componentes
+A API JDBC é composta por dois componentes centrais. Em primeiro lugar, podemos falar dos pacotes (Java.sql e Javax.sql) que contêm as classes e interfaces que padronizam a comunicação da aplicação Java com uma base de dados.
+
+Outro item importante são os drivers, verdadeiros responsáveis pela conexão e interação com um banco específico. Um driver JDBC é uma classe que implementa a interface java.sql.Driver. Muitos drivers são totalmente desenvolvidos com o uso de Java, o que colabora para serem carregados de maneira dinâmica.
+Os drivers também podem ser escritos de forma nativa, acessando outras bibliotecas ou outros drivers de sistema que permitam acesso a  uma base de dados determinada.
+** E se der erro no meio de uma transação bancária?
+Criamos o nosso método para realizar transferências, aproveitando os de realizar depósitos e saques, que já existiam. Fizemos os testes e fomos bem sucedidos, ou seja, alcançamos o nosso objetivo.
+
+Mas podemos fazer a pergunta: e se no momento do depósito houvesse um erro? Nós já tínhamos sacado o valor da conta de origem, no entanto, esse valor não seria depositado na conta de destino devido ao erro, o que causaria uma inconsistência.
+
+Em um banco real, se tentamos fazer uma transferência e por algum motivo ocorre um erro, quando olhamos nosso saldo, o valor não é alterado. Então, como podemos replicar esse comportamento no nosso código?
+
+Podemos alcançar esse resultado trabalhando com transações. Uma transação é um recurso de gerência do banco de dados que faz com que uma sequência de operações seja considerada como um único procedimento.
+
+Dessa forma, garantimos que durante uma recuperação de falhas, nenhuma das operações seja tratada isoladamente, pois todas fazem parte de um bloco único e indivisível (atômico), além de conseguirmos promover isolamento entre acessos concorrentes na mesma massa de dados.
+
+Assim, quando ocorre uma transação, todas operações são bem sucedidas. Caso contrário, se ao menos uma delas apresentar um erro, todas as outras serão desfeitas, evitando inconsistências.
+
+Quando todas as operações dão certo, podemos fazer o commit da transação;Se uma delas der errado, precisamos desfazer tudo por meio do rollback.
+
+Vamos atualizar nosso código para usar transações, assumindo o controle desse commit e rollback. Este é um exemplo de como ficaria o nosso método de alterar
+
+#+BEGIN_SRC java
+public void alterar(Integer numero, BigDecimal valor) {
+        PreparedStatement ps;
+        String sql = "UPDATE conta SET saldo = ? WHERE numero = ?";
+
+        try {
+            conn.setAutoCommit(false);
+
+            ps = conn.prepareStatement(sql);
+
+            ps.setBigDecimal(1, valor);
+            ps.setInt(2, numero);
+
+            ps.execute();
+		conn.commit();
+            ps.close();
+            conn.close();
+        } catch (SQLException e) {
+            try {
+                conn.rollback();
+            } catch (SQLException ex) {
+                throw new RuntimeException(ex);
+            }
+            throw new RuntimeException(e);
+        }
+    }
+#+END_SRC
+
+Em primeiro lugar, usamos o método de Connection chamado setAutoCommit() e passamos false como parâmetro. Com essa alteração, informamos que chamaremos explicitamente o commit e o rollback.
+
+Após chamar o método execute(), se a operação obteve sucesso, será chamado o conn.commit( ) e a alteração será realizada no banco. Se commit() não for chamado, a modificação não acontecerá.
+
+Caso ocorra algum erro, o catch será executado e o método rollback()vai desfazer a operação ou operações,se forem mais de uma.
+
+Transações são um recurso poderoso do banco de dados que vale a pena conhecer. para mais informações, recomendo a leitura do artigo sobre transações no SQL: https://www.alura.com.br/artigos/transacoes-no-sql-mantendo-os-dados-integros?_gl=1*ktcfyw*_ga*MTU0Mjg2MDQ4LjE3MDg0NjU5Nzc.*_ga_1EPWSW3PCS*MTcxMTM4MzMwNy4xNy4xLjE3MTEzOTM1NTEuMC4wLjA.*_fplc*V1ZiVGJmWU91JTJCQ2t3d1hBJTJCTVJEeXN6NGZyJTJCTG52SFR5cmxJMiUyQkY2UHFIOElNUyUyRlNwSzFwN3lGT1VpWklyVEpncDVqYVU1TURSRlFWSVpoYU15NjhjNUwwSUIlMkZWMzV2NHlrVDJjNkZkR0FNa0w3S2Y4SyUyRkJBbGdtS3dPcmclM0QlM0Q.
+** Exemplos de uso de prepareStatement
+*** NOTA
+Ademais dos exemplos abaixo que foram dados no curso "Curso de Java e JDBC: trabalhando com um banco de dados", no documento da Alura sobre JDBC temos as considerações:
+**** Executar o comando. Neste ponto, vale a pena ficarmos atentos: quando se trata de uma consulta, usamos executeQuery, quando se trata de um insert, update ou delete, usamos executeUpdate
+**** Tratar o resultado. Quando for o retorno de uma consulta (ResultSet), vamos iterar o objeto. Se for o retorno de insert, update ou delete, devemos avaliar o valor retornado.
+*** SELECT
+    public Conta listarPorNumero(Integer numero) {
+        String sql = "SELECT * FROM conta WHERE numero = " + numero + " and esta_ativa = true";
+
+        PreparedStatement ps;
+        ResultSet resultSet;
+        Conta conta = null;
+        try {
+            ps = conn.prepareStatement(sql);
+            ps.setInt(1, numero);
+            resultSet = ps.executeQuery();
+
+            while (resultSet.next()) {
+                Integer numeroRecuperado = resultSet.getInt(1);
+                BigDecimal saldo = resultSet.getBigDecimal(2);
+                String nome = resultSet.getString(3);
+                String cpf = resultSet.getString(4);
+                String email = resultSet.getString(5);
+                Boolean estaAtiva = resultSet.getBoolean(6);
+
+                DadosCadastroCliente dadosCadastroCliente =
+                        new DadosCadastroCliente(nome, cpf, email);
+                Cliente cliente = new Cliente(dadosCadastroCliente);
+
+                conta = new Conta(numeroRecuperado, saldo, cliente, estaAtiva);
+            }
+            resultSet.close();
+            ps.close();
+            conn.close();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return conta;
+    }
+*** UPDATE
+    public void alterar(Integer numero, BigDecimal valor) {
+        PreparedStatement ps;
+        String sql = "UPDATE conta SET saldo = ? WHERE numero = ?";
+
+        try {
+            conn.setAutoCommit(false);
+
+            ps = conn.prepareStatement(sql);
+
+            ps.setBigDecimal(1, valor);
+            ps.setInt(2, numero);
+
+            ps.execute();
+            ps.close();
+            conn.close();
+            conn.commit();
+        } catch (SQLException e) {
+            try {
+                conn.rollback();
+            } catch (SQLException ex) {
+                throw new RuntimeException(ex);
+            }
+            throw new RuntimeException(e);
+        }
+    }
+*** DELETE
+    public void deletar(Integer numeroDaConta) {
+        String sql = "DELETE FROM conta WHERE numero = ?";
+
+        try {
+            PreparedStatement ps = conn.prepareStatement(sql);
+
+            ps.setInt(1, numeroDaConta);
+
+            ps.execute();
+            ps.close();
+            conn.close();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+* Curso de Persistência com JPA: Hibernate
+https://cursos.alura.com.br/course/persistencia-jpa-introducao-hibernate
+
+OBS IMPORTANTE: A implementação da JPA que esse curso usou foi o Hibernate. O banco de dados usado foi o h2.
+
+Código final do curso em: "./Curso de Persistência com JPA: Hibernate - CodigoFinal/
+** Começando com JPA
+*** JDBC e seus problemas (resposta à pergunta que o William da Nexti fez pra mim na minha entrevista de emprego)
+Para começar o nosso treinamento de JPA, vamos discutir um pouco da motivação, isto é, para que a JPA foi criada - para resolver quais problemas. Além disso, discutiremos sobre o hibernate e outras implementações.
+
+Neste vídeo, também trataremos do JDBC, que é a tecnologia padrão do Java para acessar o banco de dados relacionais. Quem aprendeu a programar em Java, provavelmente, quando for desenvolver sistemas, precisará fazer o acesso ao banco de dados.
+
+Para fazer o acesso do Java com um banco de dados, por exemplo, uma SQL, Oracle, ou qualquer outro banco de dados, a tecnologia padrão utilizada é o JDBC. O Java nasceu em 1995, em 1997 veio o JDBC.
+
+Antes do JDBC, se quiséssemos acessar um banco de dados em Java, era necessário aprender tecnologias complexas de socket e fazer tudo manualmente: abrir uma conexão com banco de dados e fazer toda comunicação utilizando o protocolo específico daquele banco de dados. Era muito trabalhoso e complicado.
+
+O JDBC veio para facilitar esse processo. Ele nada mais é do que uma especificação para fazer acesso a bancos de dados relacionais no Java. Portanto, se trata de uma camada de abstração para acessar, do código Java, o banco de dados, independente de qual seja o protocolo. Em outras palavras, o JDBC veio como uma camada para simplificar o acesso e facilitar fazer trocas de bancos de dados.
+
+A partir disso, não é mais necessário conhecer o protocolo MySQL, do Oracle, saber os detalhes técnicos, nem ficar abrindo o socket e fazendo uma comunicação manual com o banco de dados, basta utilizar o JDBC.
+
+Quem já estudou o JDBC (na Alura temos treinamento de JDBC), sabe que precisamos ter um driver. Esse driver é um JAR, um arquivo com as classes do banco de dados. Ou seja, ele é a implementação do banco de dados em cima da JDBC.
+
+Então, para acessar o MySQL, é necessário baixar o driver do MySQL. Para trocar o banco de dados - usar o PostgreSQL, por exemplo - trocamos o JAR baixando o driver do PostgreSQL, que é outro JAR. Ambos estão implementando o JDBC, de maneira que, no código, o impacto é mínimo.
+
+Ao mudar de um banco de dados para outro, temos poucas mudanças no código. Trocamos basicamente as configurações, mas, a grande parte do código que está fazendo a comunicação com o banco de dados continua igual. Isso facilita muito por não nos prendermos a um só fornecedor, a um banco de dados.
+
+Para não ficar com o código do JDBC espalhado em vários pontos da aplicação, um padrão de projeto bastante utilizado é o "DAO", Data Access Object. Com ele, é possível isolar toda a API do JDBC dentro de uma única classe - de uma única camada - para não ficar com os códigos de Connection, ResultSet, que são classes complicadas do JDBC, espalhadas pela aplicação.
+
+Basicamente, temos alguma classe na aplicação, um Controller, uma Service ou algo do gênero. Nesta classe está contida a lógica de negócios, e, nessa lógica, precisamos acessar o banco de dados. Ou seja, não instanciamos, não chamamos as classes do JDBC, e, sim, uma classe DAO. É na classe DAO que está isolado - abstraído, encapsulado - o código do JDBC, é ela também que faz a ponte com o banco de dados. Então, existia uma divisão de responsabilidades na aplicação.
+
+Olhando de fora da classe DAO, existiria algo aproximadamente assim:
+
+public class CadastroProdutoService {
+
+    private ProdutoDao dao;
+
+        public CadastroProdutoService(ProdutoDao dao) {
+            this.dao = dao;
+        }
+
+        public void cadastrarProduto(Produto produto) {
+            // regras de negocio...
+
+                this.dao.cadastrar(produto);
+        }
+
+Imagine que temos um CadastroProdutoService. Precisaríamos de uma classe DAO e de um método, como CadastrarProduto(). Depois receberíamos o objeto produto. Teríamos também as regras de negócio, validação, cálculos, e então chamaríamos dao.cadastrar.
+
+Olhando de fora, não dá para saber como a classe DAO está funcionando, se ela está usando JDBC, se a persistência é em banco de dados, se é em arquivo, em memória, em um serviço externo, não sabemos se é MySQL, Oracle.
+
+O código está bem fácil de usar: chamamos a DAO, depois o método cadastrar(), passamos o objeto produto, e pronto, não ficamos presos a como foi implementado o método cadastrar(). Assim, não temos acesso à API do JDBC, ela fica bem isolada. Por fora, o código fica bem bonito, mas, por dentro da classe DAO, temos um problema.
+
+(AP: Ver imagem: "./cursoJPA-Aula01_video01.png")
+Em classes DAO, usando JDBC, acabamos tendo um código bem complicado, porque precisamos usar a API do JDBC que é uma API bastante antiga do Java (foi criada em 1997), com bastante verbosidade, e fez com que as pessoas desenvolvessem certa aversão ao Java, pela impressão de que nele é tudo burocrático, complexo.
+
+Então, é necessário lidar com classes, como PreparedStatement, connection, ResultSet. Também é necessário fazer tryCatch(), porque elas lançam checked exception. Além disso, precisamos montar uma SQL manualmente, usar o PreparedStatement para não ter o problema do SQL Injection. Tudo isso deixa o código um pouco complicado.
+
+Esse tipo de código JDBC, embora funcione, apresenta algumas desvantagens que fizeram com que as pessoas pensassem em outras alternativas mais simples. O JDBC tem dois grandes problemas que motivaram o surgimento de tecnologias como o Hibernate e a JPA. O primeiro problema é o Código muito verboso. Por exemplo, para salvar um produto no banco de dados, precisamos de cerca de 30 linhas de código.
+
+Em um código tão grande, é difícil e demorado fazer manutenção. Às vezes, é necessário montar uma Query nativa do banco de dados, e o código vai ficando cada vez mais difícil de entender e de fazer manutenção. Esse é um grande problema, e nem é o pior.
+
+O segundo problema é o Alto acoplamento com o banco de dados. Quando trabalhamos com o JDBC, temos um acoplamento muito forte com o banco de dados. Significa que, qualquer mudança no banco de dados gera um impacto muito forte na aplicação. Por exemplo, se trocamos o nome da tabela, de alguma coluna ou qualquer outro detalhe desses, acabamos impactando a aplicação e teremos que mexer na classe DAO.
+
+O problema é que, pode acontecer de, por exemplo, ao renomearmos a tabela de produto, pode ser que - além da classe ProdutoDao- existam outras classes DAO que façam JOIN com a tabela produto. Ou seja, precisaremos procurar todos os lugares que estão referenciando tabela produto e fazer esse rename. Isso nos leva a um alto acomplamento com banco de dados. Qualquer mudança de um lado, gera impacto grande do outro.
+
+Esses são os dois principais problemas que as pessoas começaram a perceber no JDBC e, a por conta deles, aprimoraram ideias de como reduzir o impacto que esses dois problemas geram. Foi desse processo que surgiu a JPA. No próximo vídeo, discutiremos com calma como foi a criação da JPA e como ela resolveu os problemas do JDBC. Vejo vocês lá!! Abraços!!
+*** Hibernate e JPA
+Já discutimos um pouco sobre o JDBC e os principais problemas que Devs passaram a identificar conforme desenvolviam as aplicações. A existência desses problemas foi, justamente, o que motivou as pessoas a buscarem alternativas, tecnologias que fossem mais simples para fazer a ponte, a ligação com o banco de dados.
+
+Dentre essas tecnologias, surgiu uma biblioteca que ficou bem famosa, chamada Hibernate. O Hibernate foi lançado em 2001 e criado por Gavin King, que tinha como ideia, justamente, tentar simplificar o JDBC. Supondo que temos uma aplicação web, desktop, é precisamos fazer o acesso ao banco de dados, mas não gostamos muito do modelo do JDBC, porque o código fica muito verboso, complexo, muito acoplado ao banco de dados.
+
+Gavin King começou a pensar em uma maneira de simplificar o código e criou essa biblioteca (Hibernate) e em 2001 fez o lançamento. Mas, se percebermos, ela não tem nada a ver com o Java, ela é uma biblioteca que surgiu no mercado e que ele distribuiu gratuitamente. Assim nasceu o Hibernate, uma biblioteca famosa por fazer persistência no banco de dados como alternativa ao JDBC e ao EJB 2.
+
+Na época existia a versão 2.0 do EJB 2, e era uma tecnologia bem complicada de se trabalhar. A ideia do EJB era simplificar o acesso remoto, para ter uma aplicação distribuída (cliente - servidor) e também simplificar alguns detalhes de infraestrutura, como controle transacional, segurança e outros.
+
+Também havia a parte de persistência junto da EJB, mas ela utilizava a JDBC, era um modelo um pouco mais complexo e que favorecia muito a remotabilidade, então, qualquer chamada que se fazia era uma chamada remota, isso tinha um custo de performance. Enfim, vários problemas surgiram e vários padrões também foram criados para resolver esse problema da EJB 2 na parte de persistência. Isso também motivou o Gavin King a criar o Hibernate.
+
+Posteriormente, Gavin King foi contratado pela Red Hat, para continuar os trabalhos no Hibernate. Portanto, o Hibernate é uma teconologia que pertence à JBoss (Red Hat). O Gavin King trabalhou na JBoss e lá deu continuidade ao Hibernate e a outros projetos.
+
+Conforme o tempo passou, foram surgindo novas versões do Hibernate, ele ficou famoso no mundo inteiro, todas as pessoas que trabalhavam com Java queriam utilizar Hibernate nos projetos para não ter que usar a EJB 2 e JDBC. Enfim, virou um projeto mega popular, e foi evoluindo, foram surgindo versões posteriores com novos recursos.
+
+Como se tratava de uma biblioteca do mercado, surgiram também concorrentes. Portanto, estamos falando de uma biblioteca que está famosa, popular, logo, outras bibliotecas passaram a copiar, mas fazendo de outra forma.
+
+Isso gerou um velho problema: imagine que, como Devs, estamos usando uma biblioteca, queremos trocar para outra (uma biblioteca de mercado). Para fazer isso, não é só trocar os JARs, as dependências do projeto, isso causará um impacto considerável no código.
+
+Para todo o código em que estávamos usando o Hibernate, será necessário trocar para essa nova biblioteca, já que são outras classes, outros imports. Se o nosso projeto fosse grande, complexo, pensaríamos duas vezes antes de trocar. A Sun, a Oracle, o Java, não gostam disso, porque significa estar preso a um fornecedor.
+
+Posteriormente, uma padronização da biblioteca foi criada, do modelo de persistência, que ficou conhecida como ORM (Object Relational Mapping) em Java, com a intenção de fazer o mapeamento, a ponte entre o mundo da "orientação a Objetos" com o "relacional" do banco de dados.
+
+Existem esses dois mundos distintos, e a classe DAO ficava um tanto complexa, porque estávamos fazendo essa ponte entre o mundo "orientação a objetos" e mundo orientado ao "modelo relacional" do banco de dados. O Java criou uma especificação chamada de JPA, Java Persistence API, que é a especificação para padronizar o mapeamento a objeto relacional no mundo Java.
+
+Com a JPA, criou-se um padrão para que não ficássemos reféns de uma biblioteca. Os frameworks, as bibliotecas, começaram a implementar a JPA. No código, ao invés de fazer os imports das classes e interfaces do Hibernate, passou-se a fazer a da JPA, que é a especificação.
+
+Portanto, a biblioteca se tornava uma implementação, e, para trocar de implementação, só precisávamos trocar os JARs, uma ou outra configuração, mas o código, em si, continuava intacto, inalterado, por não depender de uma implementação.
+
+A JPA só foi lançada em 2006, então, de 2001 a 2006, precisávamos utilizar o Hibernate ou os seus concorrentes sem a abstração da especificação. O Hibernate foi evoluindo, foram surgindo novos recursos e depois isso foi incorporado na versão 2.0 da JPA, lançada em 2009.
+
+O Hibernate, em 2010, um ano depois, lançou a versão 3.5.0, que era compatível com a JPA 2.0. Portanto, se quiséssemos usar a JPA 2.0, podíamos utilizar o Hibernate como implementação. Se posteriormente quiséssemos trocar por outras implementações, seria fácil, não causaria impacto no projeto inteiro. Essa é a grande vantagem de se utilizar uma especificação ao invés de usar diretamente uma implementação e ficar preso a ela.
+
+No mercado, ficamos com algo parecido com esse diagrama, em que uma seta sai de cada um dos três retângulos (1. Hibernate, 2. EclipseLink, 3. OpenJPA) e aponta para o retângulo que está acima deles: JPA. Ou seja, temos em cima a JPA, que é a especificação, e temos também várias implementações, como o Hibernate, o EclipseLink, OpenJPA, dentre outras implementações. Essas são as três principais da JPA.
+
+Para trabalharmos com a JPA, temos que escolher uma dessas implementações. Isto é, não se usa a JPA "pura", porque ela é só a "casca", a abstração. Nós precisamos de alguém que implemente os detalhes, quem faz esse trabalho são bibliotecas como o Hibernate.
+
+Como o Hibernate foi a primeira biblioteca, ele foi quem começou esse movimento, por isso acabou se tornando a biblioteca padrão, a mais utilizada, mais popular como implementação da JPA. Mas, nada nos impede de usar outras implementações. Se todas estão seguindo a JPA, todas precisam atender ao que está descrito na especificação da JPA.
+
+Além disso, podemos trocar uma implementação pela outra, e tudo que estiver na especificação vai funcionar. Só teremos problemas se estivermos utilizando algo que é específico da implementação. Às vezes, o Hibernate costuma fazer isso, segue a JPA, mas tem alguns recursos que são específicos dele.
+
+Se utilizarmos, está tudo certo, estamos ganhando esse novo recurso. Mas, o lado negativo, já que esse recurso é específico do Habernate. Então, por exemplo, se quisermos trocar o Hibernate pelo EclipseLink, perderemos essa funcionalidade. Assim, temos que tomar esse cuidado e avaliar se vale mesmo a pena essa dependência.
+
+O EclipseLink é a implementação de referência da JPA. Sempre que surge uma nova versão da JPA, o EclipseLink já está implementando, pois, é nele que são feitos os testes e ele sai com a nova versão da JPA. Ele é a implementação de referência, porém, o Hibernate é a principal, a mais popular no mercado. Por isso, neste curso trabalharemos com o Hibernate como implementação da JPA.
+
+Fechamos essa parte de motivação. Nosso objetivo era apenas discutir um pouco e entender o que é a JPA, porque ela foi criada, de que nasceu, o que é o Hibernate, qual a diferença de Hibernate e JPA. Agora que alinhamos esses conhecimentos, no próximo vídeo, partiremos para a prática. Começaremos a aprender como utilizar a JPA e Hibernate no projeto.
+*** Criando um projeto com JPA
+Agora que já conhecemos um pouco da história da JPA, chegou a hora de colocarmos a "mão na massa", de começarmos a trabalhar, na prática, com a JPA, utilizando o Hibernate como implementação.
+
+Utilizaremos o Eclipse como IDE (mas você pode usar a IDE de sua preferência). A ideia é criarmos um projeto com Maven para facilitar as dependências do Hibernate e as outras que decidirmos utilizar durante o treinamento.
+
+Vamos começar selecionando a opção "Create a Maven Project" que está na aba lateral esquerda. Na próxima tela, marcaremos "Create a simple project (skip archetype selection) para que ele “pule” o archetype, e selecionaremos "Next". Em seguida, preencheremos: "Group Id" com "br.com.alura"; "Artifact Id" com "loja", isto é, nós criaremos uma aplicação como uma loja com cadastro de produto e outras coisas. O resto, podemos deixar com a opção padrão, e agora basta apertar "Finish".
+
+Ele criará um projeto utilizando Maven, com uma estrutura de Diretórios e o arquivo pom.xml, onde configuraremos as dependências. O foco do nosso treinamento não é aprender sobre Maven (na Alura existe um treinamento de Maven). Basicamente, lidaremos com o pom.xml, encontraremos as configurações do projeto que preenchemos na tela de criação.
+
+<modelVersion>4.0.0</modelVersion>
+<groupId>br.com.alura</groupId>
+<artifactId>loja</artifactId>
+<version>0.0.1-SNAPSHOT</version>
+
+Precisaremos fazer duas configurações. Por padrão, no Eclipse, se não indicarmos ao Maven qual a versão do Java, ele considerará que é o Java 5. Então, colaremos a Tag build e um plugin do Maven para dizer: quero utilizar o Java na versão 11. Nós disponibilizaremos esse trecho de código para que não seja necessário digitar tudo manualmente.
+
+<build>
+    <plugins>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <version>3.8.0</version>
+            <configuration>
+                <release>11</release>
+            </configuration>
+        </plugin>
+    </plugins>
+</build>
+
+Então, se trata de um plugin para dizer ao Maven que queremos utilizar o Java 11. O que nos interessa é, logo embaixo da tag build, a parte de dependências do Maven. Portanto, abriremos a tag <dependencies> e adicionaremos uma dependência, <dependency>. No nosso caso, queremos utilizar a JPA, que é a especificação, com o Hibernate como implementação.
+
+Basta adicionar apenas uma dependência do Hibernate e, automaticamente, ele adicionará outras dependências da JPA e de todas as outras que o Hibernate precisa. Continuando, precisamos colocar qual é o groupId, no caso org.hibernate. E o artifactId que adicionaremos será o hibernate-entitymanager.
+
+<dependencies>
+    <dependency>
+        <groupId>org.hibernate</groupId>
+        <artifactId>hibernate-entitymanager</artifactId>
+    </dependency>
+</dependencies>
+
+Precisamos passar também qual é a versão da dependência - qual a versão do Hibernate que vamos utilizar. No momento de gravação deste curso, início de 2021, a última versão que estava disponível era a 5.4.27.Final e é a que nós utilizaremos.
+
+<dependencies>
+    <dependency>
+        <groupId>org.hibernate</groupId>
+        <artifactId>hibernate-entitymanager</artifactId>
+        <version>5.4.27.Final</version>
+    </dependency>
+</dependencies>
+
+Se olharmos o projeto, no "Maven Dependencies", perceberemos que ele já baixou uma série de dependências e adicionou ao nosso projeto. Dentre elas, temos o "hibernate-entitymanager", que foi o que acabamos de adicionar, e que, por sua vez, depende de todas as outras dependências, como o "hibernate-core", "hibernate-commons-anotations" e o "javax.persistence-api-2.2.jar", que é a JPA em si. Portanto, aí está a especificação.
+
+De forma bem simples, adicionamos o Hibernate e a JPA como dependência de uma aplicação que está utilizando o Maven. Além do Hibernate, precisaremos de mais uma dependência, que é a dependência do driver do banco de dados que utilizaremos.
+
+No nosso caso, vamos usar o H2, que é um banco de dados em memória, só para não perdermos tempo com instalação e configuração de banco de dados. Mas, é possível usar outros bancos de dados, por exemplo, o MySQL ou o Postgres. Então, vamos seguir colocando mais uma dependência <groupId>com.h2database</groupId>. E o <artifactId> é o h2. A versão do h2 será a 1.4.200.
+
+<dependency>
+    <groupId>com.h2database</groupId>
+    <artifactId>h2</artifactId>
+    <version>1.4.200</version>
+</dependency>
+
+Então, são duas dependências que precisamos adicionar ao nosso projeto quando trabalharmos com Hibernate. A dependência do Hibernate em si, que baixará todas aquelas dependências que ele tem, além da própria JPA, que é a especificação, e a dependência do banco de dados que estivermos utilizando. É possível também modificar para usar o MySQL, Postgres.
+
+Com isso, já temos a nossa aplicação Java com Maven, utilizando as dependências do Hibernate e da JPA. Ele só está marcando um erro. Vamos corrigi-lo apertando o botão direito "Maven > Update Project", na próxima tela apertaremos "Ok". Resolvido, foi algum problema ao baixar as dependências.
+
+Este é o nosso projeto Maven com Hibernate já baixado e adicionado como dependência do Maven, para não precisarmos baixar os JARs manualmente. O próximo passo seria configurar a JPA, criar o arquivo persistence.xml, criar as entidades, fazer o mapeamento e começar a trabalhar com a JPA. Como essa parte é um pouco mais complicada, deixaremos para a próxima aula.
+** Configurações e EntityManager
+*** Arquivo persistence.xml
+Já temos o projeto criado e as dependências do Hibernate e do nosso banco de dados H2 e podemos continuar trabalhando com a JPA. Uma das coisas importantes que temos que fazer em uma aplicação que utiliza JPA é a parte de configuração. Na JPA, as configurações ficam no arquivo .xml. É possível configurar também via código Java, mas, geralmente, ficam no arquivo .xml chamado persistence.xml.
+
+Nesse vídeo, entenderemos como é esse arquivo, quais são as configurações e como elas funcionam. Então, vamos criar esse arquivo no nosso projeto. Como se trata de um arquivo de configuração, colocaremos no "src/main/resources". Mas, ele precisa ficar dentro de uma pasta, então, primeiro criaremos a pasta.
+
+Para isso, apertaremos com o botão direito no "src/main/resources", depois selecionaremos "New > Folder". Na próxima tela, preencheremos "Folder name" com o nome da pasta, que tem que ser "META-INF" (tudo em letra maiúscula). Esse é o nome do Diretório.
+
+Criada a pasta, vamos até ela e selecionaremos "New > Other". Na próxima tela, selecionaremos "XML File" e depois chamaremos o arquivo, em "File name", de "persistence.xml". Agora basta apertar "Finish". Ele criará um arquivo .xml em branco, só com o cabeçalho do .xml que é: <?xml version="1.0" encoding="UTF-8"?>.
+
+E esse é o arquivo .xml. Ele precisa ter o nome persistence.xml e tem que estar na pasta "META-INF", e, como se trata de uma aplicação Maven, fica no "rsc/main/resources". Dentro do .xml vêm as tags de configuração da JPA. Vamos colar a tag raiz (principal) e o cabeçalho de configuração do .xml.
+
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence version="2.2"
+    xmlns="http://xmlns.jcp.org/xml/ns/persistence"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_2.xsd">
+
+</persistence>
+
+Pronto, aqui está a tag raiz persistence e as configurações de namespace do .xml. Não é necessário decorar, podemos pegar da internet ou de algum outro projeto. Dentro do arquivo, existe a tag raiz chamada persistence, e todas as configurações ficam dentro dela. Inclusive, ele já está reclamando, como se dissesse: é obrigatório ter uma tag persistence-unit e ela não está aqui.
+
+Então, vamos adicionar a tag persistence-unit e dividí-la em dois, da seguinte maneira:
+
+<persistence-unit name="">
+
+</persistence-unit>
+
+A tag persistence-unit tem duas propriedades principais. Temos a name, e nela podemos colocar o nome que quisermos. No caso, escolheremos o nome "loja", o mesmo do projeto. Há outra tag importante chamada transaction-type="JTA" com dois valores possíveis: JTA ou RESOURCE LOCAL. Nós utilizaremos a "RESOURCE_LOCAL".
+
+<persistence-unit name="loja" transaction-type="RESOURCE_LOCAL">
+
+</persistence-unit>
+
+A opção pela JTA seria mais adequada para quando estamos utilizando um servidor de aplicação, quando vai trabalhar com EJB, JMS ou outras tecnologias do Java EE, e o servidor se encarrega de cuidar da transação. Como, no nosso caso, se trata de uma aplicação stand-alone, sem servidor de aplicação, então será "RESOURCE_LOCAL". Nós que gerenciaremos a transação. Depois veremos com calma essa parte de transação.
+
+Então, a tag persistence-unit, tem que ficar dentro da tag raiz persistence, e dentro da tag persistence-unit que vão todas as configurações da nossa aplicação. Vamos pensar no persistence-unit como se ele fosse um banco de dados.
+
+Se a nossa aplicação fosse trabalhar com dois, três bancos de dados, deveríamos ter, dentro da tag persistence, duas ou três tags persistence-unit. Ou seja, é um persistence-unit para cada banco de dados.
+
+Dentro da tag persistene-unit nós adicionamos algumas propriedades para ensinar a JPA detalhes referentes ao nosso projeto (banco de dados e coisas do gênero). Então, existe uma tag chamada properties, e dentro dela, cada propriedade que configurarmos, fica em uma tag chamada property que tem um nome e um valor.
+
+    <persistence-unit name="loja" transaction-type="RESOURCE_LOCAL">
+        <properties>
+                <property name="" value=""/>
+            </properties>
+    </persistence-unit>
+ </persistence>
+
+Existem algumas propriedades que são obrigatórias, que precisamos informar para a JPA. Essas propriedades são específicas da JPA, então, elas têm um nome específico. Colocamos "javax.persistence. e a configuração queremos fazer. Se quisermos configurar, por exemplo, o driver do banco de dados, então, se estamos utilizando o H2, precisamos dizer para a JPA qual a classe do driver do H2.
+
+Então, a propriedade se chama javax.persistence.jdbc.driver. Esse é o nome da propriedade. Não é necessário decorar, essas linhas de .xmlficarão disponíveis. É possível também pegar alguma como exemplo na internet ou de outro projeto. Nosso objetivo é apenas entender o que significa cada uma dessas propriedades.
+
+No value, passaremos qual a classe do driver do JDBC. No caso do H2, é "org.h2.Driver". Esse driver mudará de acordo com o banco de dados que quisermos utilizar. Se fosse o MySQL, seria com.mysql.. Se fosse PostgreSQL, org.postgresql.. Ou seja, varia de acordo com o banco de dados.
+
+<property name="javax.persistence.jdbc.driver" value="org.h2.Driver"/>
+
+Essa linha serve para dizer à JPA qual é a classe e onde está o driver do JDBC. Estamos usando a JPA, mas ela nada mais é do que uma camada de abstração em cima do JDBC. Por "baixo dos panos", de forma oculta, a JPA trabalha com o JDBC. Por isso utilizamos as propriedades do JDBC.
+
+Além do driver, precisamos configurar a JPA indicando qual é a URL do banco de dados, isto é, onde está o endereço de conexão com o banco de dados. Esse endereço também varia de acordo com o banco de dados. No caso do H2, será "jdbc:h2:mem:loja". Isto é, queremos que o database no H2 se chame loja.
+
+<property name="javax.persistence.jdbc.url" value="jdbc:h2:mem:loja"/>
+
+Todo banco de dados tem um usuário e uma senha. Portanto, teremos mais duas propriedades, a jdbc.user", e a jdbc.password". Então, essas são as duas propriedades para configurar o usuário e a senha. No caso do H2, será "sa" (geralmente usamos esse usuário no H2), e a senha ficará em branco value"".
+
+<property name="javax.persistence.jdbc.user" value="sa"/>
+<property name="javax.persistence.jdbc.password" value=""/>
+
+Da JPA, são só essas quatro propriedades: qual é o driver do banco de dados; onde está a URL de conexão com o banco de dados; o usuário e a senha. Feito isso, a JPA consegue gerar as conexões para acessar o nosso banco de dados.
+
+Existem propriedades específicas da implementação da JPA que estamos utilizando. Por exemplo, existem propriedades específicas do Hibernate, do TopLink, do OpenJPA, do EclipseLink, enfim, de cada uma das implementações da JPA. Como estamos utilizando o Hibernate, podemos colocar algumas propriedades específicas dele.
+
+Então, vamos adicionar mais uma propriedade que terá o nome "hibernate.dialect". O Hibernate precisa saber qual é a classe que tem o dialeto do banco de dados. Ou seja, saber das particularidades do banco de dados. Por exemplo, no H2 não existe booleano (booleano é inteiro, 0 e 1), no MySQL existe.
+
+Como cada banco de dados pode ter as suas particularidades, o dialeto é o que fará a comunicação correta com o banco de dados. O Hibernate precisa que essa propriedade será fornecida. O valor será a classe do Hibernate que representa o dialeto. No caso do H2, será "org.hibernate.dialect.H2Dialect".
+
+<property name="hibernate.dialect" value="org.hibernate.dialect.H2Dialect"/>
+
+Essas são as principais propriedades de configuração do banco de dados (existe outra propriedade que é interessante configurar, mas adicionaremos posteriormente). O arquivo persistence.xml pode até parecer muito complicado, mas se trata, basicamente, de configuração, e precisamos configurar apenas uma vez.
+
+A ideia é ensinar para a JPA detalhes do nosso banco de dados para que ela consiga se conectar e acessar o banco de dados corretamente. A JPA depende disso para se unir ao JDBC e acessar o banco de dados.
+
+Apenas recapitulando, temos o xml com a tag raiz chamada persistence. Tudo estará dentro desta tag principal persistence. Depois temos os namespaces (padrão da JPA). Em seguida, vem a tag pesustence-unit, que representa uma unidade de persistência (podemos pensar nela como um banco de dados), por isso ela precisa ter um nome (que, no nosso caso, é "loja").
+
+Se tivéssemos vários bancos de dados, teríamos várias tags persistence-unit e conseguiríamos diferenciá-las pelo name, que precisa ser único para cada uma delas. No caso, colocamos "loja", que é o mesmo nome do projeto, mas não é obrigatório, poderia ser qualquer outro.
+
+Adicionamos também o tipo de transação,transaction-type, que é "RESOURCE_LOCAL", no caso de gerenciarmos a transação, ou JTA, se tivermos usando algum Java EE, e o servidor se encarregará de cuidar do controle transacional, que não é o nosso caso.
+
+Dentro da tag persistence-unit, temos properties e as propriedades da JPA: driver do banco de dados; URL; usuário; e senha do banco de dados. Como implementação do Hibernate, temos o dialeto. Depois veremos outras propriedades.
+
+O objetivo do vídeo era conhecer o arquivo de configuração da JPA, as tags, as propriedades e para que servem cada uma delas. Espero que vocês tenham aprendido um pouco. Na próxima aula continuamos trabalhando no projeto, vendo a questão das entidades e como fazer para acessar de fato o banco de dados. Vejo vocês lá!! Abraços!!
+*** Mapeando uma entidade
+Já fizemos as configurações e podemos continuar. Mas antes, vamos corrigir dois detalhes que acabei errando no vídeo anterior. Na propriedade da URL do JDBC, antes do "h2:mem:loja", faltou o prefixo jdbc:. Portanto, o correto é "jdbc:h2:mem:loja". E na propriedade do usuário do banco de dados não é username" e, sim, user". É complicado querer decorar, o melhor é pegar de exemplos na internet ou de outro projeto.
+
+Enfim, temos as informações do banco de dados configuradas para a JPA. A JPA já sabe se comunicar com o JDBC e passar essas configurações na hora em que precisar acessar o banco de dados. Agora configuraremos a parte de persistência. Nosso projeto é uma loja, como faremos para integrar? Como ensinaremos para a JPA a nossa tabela no banco de dados?
+
+No nosso caso, teremos, inicialmente, a seguinte Tabela de produtos:
+
+Produtos	
+id	bigint
+nome	varchar
+descricao	varchar
+preco	decimal
+Vamos imaginar que criaremos essa tabela de produtos no banco de dados e que ela tem essas quatro colunas: uma chamada "id", que é a chave primária do banco de dados (autogerada pelo banco de dados); o "nome", que é um "varchar" (um texto, uma descrição do produto); a "descricao" do produto, que também é um texto, um "varchar"; e o "preco", que é um "decimal".
+
+Então, tendo essa tabela no banco de dados, como ensinaremos e a configuraremos para que seja representada de alguma maneira no código Java? Na JPA, isso será feito por uma classe Java, que na JPA é chamda de entidade. Nós mapeamos todas as tabelas no banco de dados por uma entidade, que nada mais é do que uma classe Java.
+
+Vamos criar a classe que representará um produto no banco de dados. Já que é uma classe Java, ficará no "src/main/java". Apertaremos "Ctrl + N", em "Wizards", digitaremos "class" para filtrar e selecionaremos "Next". Na próxima tela, trocaremos o pacote de "loja" para "br.com.alura.loja", e o nome da classe será "Produto".
+
+Essa será a nossa classe chamada Produto.java, que representará um produto no banco de dados. Vamos apenas adicionar ".modelo" no pacote, isto é, br.com.alura.loja.modelo e podemos prosseguir.
+
+Na JPA, precisamos lembrar que a ideia não é que ela seja uma especificação para um ORM. Com a ORM nós fazemos o mapeamento objeto-relacional. Nós precisamos desse mapeamento, dessa ligação entre o lado da orientação objetos com o lado do mundo relacional do banco de dados. Isso é feito na classe public class Produto {, e é ela que está representando a tabela de produtos, portanto, é assim que a indicaremos para a JPA.
+
+A partir da versão 2.0 da JPA, podemos fazer tudo via anotações. Então, em cima da classe, podemos colocar uma anotação da JPA que é o @Entity. Assim, é como se disséssemos: JPA, está vendo essa classe Produto? Ela é uma entidade, ou seja, existe uma tabela no banco de dados que está mapeando, e que é o espelho dessa classe. Então, é para isso que serve essa anotação @Entity.
+
+Agora, apertamos "Ctrl + Shift + O" para importar. Ele sugeriu duas opções para importar e precisamos escolher com cuidado. Existe a opção javax.persistence.Entity e a org.hibernate.annotations.Entity. A primeira é a anotação da especificação da JPA. A segunda, é a do Hibernate. Então, importaremos a do javax.persistence.Entity, que é a da especificação.
+
+Se não queremos ficar presos ao Hibernate - a uma implementação - e desejamos usar o máximo possível a especificação, porque se um dia quisermos trocá-la, não teremos que mexer em todas as classes. Portanto, precisamos ter cuidado com tudo que importarmos.
+
+package br.com.alura.loja.modelo;
+
+import javax.persistence.Entity;
+
+@Entity
+public class Produto {
+
+Com isso, o Hibernate JPA já sabe que a classe Produto está mapeando uma tabela no banco de dados. Só que, no banco de dados, o nome da tabela é "produtos" no plural. Como é possível dizer isso para a JPA, já que não queremos nomear a classe como "Produtos" no plural e com “p” minúsculo? Algo que contrariaria as convenções do Java.
+
+Eventualmente, se o nome da tabela não for o mesmo da entidade, teremos que ensinar isso para a JPA, porque, por padrão, ela considera que o nome da tabela é o mesmo nome da entidade (no nosso caso, não é). Para fazer essa configuração, adicionaremos mais uma anotação em cima da classe que é o @Table. Apertaremos "Ctrl + Shift + O" para importar e, de novo, selecionaremos javax.persistence.Table.
+
+Na anotação @Table, abriremos parênteses, selecionaremos o atributo name:String - Table com a qual passaremos o nome da tabela que é name = "produtos".
+
+package br.com.alura.loja.modelo;
+
+import javax.persistence.Entity;
+
+@Entity
+@Table(name = "produtos")
+public class Produto {
+
+Com isso, ensinamos a JPA que, embora o nome da entidade seja Produto, o nome da tabela é produtos. Agora ela já sabe que, ao fazer a ligação, ela precisará fazer também a conversão. Dentro da classe, nós temos os atributos, que nada mais são do que o espelho das colunas no banco de dados. A nossa tabela tem quatro colunas (id, nome, descricao e preco) e nós as transformaremos em atributos. Vamos adicioná-los:
+
+private Long id;
+private String nome; 
+private String descricao; 
+private BigDecimal preco; 
+
+Uma curiosidade é que o nome dos atributos é exatamente igual ao nome das colunas no banco de dados. Logo, isso é algo que não precisaremos ensinar para a JPA, ela já assume que o nome da coluna é o mesmo do atributo dentro da entidade. Se fosse diferente, isto é, se o nome da coluna "descricao" fosse "desc", por exemplo, como ensinaríamos para a JPA caso não quiséssemos chamar o atributo de desc e, sim, de "descricao"?
+
+Neste caso, nós colocaríamos, em cima do atributo, uma anotação chamada @Column (e apertaríamos "Ctrl + Shift + O" para importar). Da mesma maneira, existe uma atributo chamado name, seguido dele, passaríamos o nome da coluna no banco de dados "desc". Ou seja, "Column(name = "desc"). É como se disséssemos para a JPA: o nome do atributo é descricao, mas o nome da coluna, @Column, é desc.
+
+Desta maneira, é possível ensinar a JPA quando o nome da coluna for diferente do nome do atributo. No nosso caso, vamos apagar essa anotação, porque o nome da coluna é exatamente igual ao nome do atributo.
+
+Este processo que fizemos tem o nome de mapeamento, isto é, fizemos o mapeamento de uma entidade, ensinamos ao Java e JPA que a classe Produto representa uma tabela, que o nome da tabela é diferente, no banco de dados, do nome da classe. Ensinamos também quais são os atributos que serão mapeados como colunas.
+
+Só temos mais um detalhe importante para a JPA. No banco de dados, a coluna "id" é a chave primária. Nós precisamos informar qual é a "primary key", a chave primária da tabela no mundo relacional. Também precisamos informar para a JPA que, dos quatro atributos, o primeiro, que se chama id, é a chave primária, já que ele não associa automaticamente.
+
+Em cima do atributo id, colocaremos uma notação chamada @Id e apertamos "Ctrl + Shift + O" para importar. No nosso caso, ele importou diretamente do javax.persistence.Id. Como, geralmente, quem cuida do id, da chave primária é o banco de dados e não a aplicação, também precisamos ensinar para a JPA que quem gerará o identificador não é a aplicação e, sim, o banco de dados.
+
+Quando formos salvar um produto, o id estará nulo. Não tem problema, porque é o banco de dados que vai gerar o próximo id. Podemos configurar isso com outra notação, que colocamos em cima do atributo id, que é o @GeneratedValue, isto é, para dizer como o valor da chave primária é gerado.
+
+@Id
+@GeneratedValue()
+private Long id;
+private String nome; 
+private String descricao; 
+private BigDecimal preco; 
+
+Existe um parâmetro que precisamos passar que é a estratégia, strategy, isto é, qual é a estratégia de geração da chave primária. Isso dependerá do banco de dados, alguns usam SEQUENCE, outros não. Então, nas estratégias, temos três opções: IDENTITY; SEQUENCE; e TABLE. Geralmente, utilizamos a IDENTITY, quando não tem SEQUENCE no banco de dados, ou SEQUENCE, quando tem. No nosso caso, será IDENTITY, já que não temos SEQUENCE no H2.
+
+@Id
+@GeneratedValue(strategy = GenerationType.IDENTITY)
+private Long id;
+private String nome; 
+private String descricao; 
+private BigDecimal preco; 
+
+Feito isso, falta apenas gerar os Getters e Setters. Abriremos um atalho com o botão direito e selecionaremos "Source > Generate Getters and Setters". Na próxima tela, marcaremos todos os atributos com "Sellect All" e apertaremos "Generate". Retornando ao Produto.java, selecionaremos o comando "Ctrl + Shift + F" para formatar e está pronto o mapeamento da entidade.
+
+Então, é assim que mapeamos quais classes vão representar tabelas no banco de dados. Depois conheceremos outras anotações. Quando tivermos relacionamentos de tabelas, aprenderemos a mapear também esses relacionamentos. Enfim, veremos tudo isso com calma durante o curso.
+
+Um último detalhe para fecharmos esse vídeo. Pela JPA, em relação a toda entidade, além de precisarmos ir até a classe e adicionar anotações da JPA para fazer o mapeamento, também deveríamos adicionar a classe no persistence.xml. Fora das properties e dentro do persistence-unit, exite outra tag chamada class.
+
+Pela JPA, deveríamos passar todas as classes/entidades do nosso projeto, ou seja, passaríamos o caminho completo da classe, br.com.alura.loja.modelo.Produto. Pela JPA, para cada entidade que mapearmos, além de mapear na classe, temos que adicioná-la no persistence.xml com a tag class.
+
+<class>br.com.alura.loja.modelo.Produto</class>
+
+Porém, se tivermos utilizando o Hibernate, não precisamos adicionar a tag class, porque ele consegue encontrar automaticamente as classes/entidades do nosso projeto. Essa é uma particularidade do Hibernate, pode ser que as outras implementações não façam isso e, portanto, teremos que, manualmente, adicionar o class.
+
+Como estamos utilizando o Hibernate, e esse processo é meio trabalhoso: ao criar uma nova tabela no banco, temos que criar a classe, fazer o mapeamento e adicionar no persistence.xml. Para não esquecermos de nada, não vamos adicionar no nosso código, pois o Hibernate encontrará automaticamente.
+
+Outro detalhe importante, se adicionarmos uma entidade no class, temos que adicionar todas. Se esquecermos alguma, o Hibernate só olhará para as que estiverem declaradas. Ou mapeamos todas, ou nenhuma.
+
+Esse era o objetivo do vídeo de hoje, mostrar como fazemos o mapeamento de uma entidade. Agora, já temos o persistence.xml com as configurações do banco, já temos uma entidade mapeada e, no próximo vídeo, veremos como fazer para cadastrar um produto no banco de dados (dentro da JPA e das classes Java).
+*** Persistindo uma entidade
+Já temos tudo configurado, já criamos o nosso projeto Maven adicionando o Hibernate e o banco de dados H2 como dependência, criamos o persistence.xml, configuramos o nosso banco de dados, as propriedades do JDBC, da JPA, do Hibernate e mapeamos a nossa entidade Produto com a tabela "produtos" no banco de dados. Enfim, está tudo pronto e podemos começar a persistir, carregar e fazer toda a manipulação desses objetos no banco de dados.
+
+No vídeo de hoje aprenderemos, justamente, como fazemos para cadastrar um produto no banco de dados, isto é, se quisermos inserir um objeto produto no banco de dados - na tabela de produtos - como funcionará? Vamos criar uma nova classe e colocar esse código nela. Então selecionaremos o comando "Ctrl + N", depois, "Class" e, por fim, "Next".
+
+Na próxima tela, trocaremos o pacote. No lugar de "modelo" escreveremos "testes", isto é, "br.com.alura.loja.testes", sendo que "testes" se refere à classe onde faremos os testes de acesso ao banco de dados, e o nome da classe será "CadastroDeProduto". Agora basta apertar "Finish" e termos criado a classe CadastroDeProduto. Dentro dela, geraremos um método main escrevendo "main" e apertando "Ctrl + Barra de espaço".
+
+package br.com.alura.loja.testes;
+
+public class CadastroDeProduto {
+
+   public static void main(String[] args) {
+
+     }
+
+}
+
+Agora, vamos imaginar que temos um produto. Vamos criá-lo escrevendo Produto celular = new Produto() (portanto, o atributo é "celular"). Após termos feito o import da classe produto, vamos setar as propriedades desse produto. Então, celular.setNome();, vamos imaginar que seja um celular da Xiaomi, logo celular.setNome("Xiaomi Redmi");.
+
+Prosseguindo, faremos celular.setDescricao("Muito legal"); e celular.setpreco(new BigDeCimal("800"); (sendo que "800" se refere ao preço em reais), agora basta apertarmos "Ctrl + Shift + O" para importar o BigDecimal.
+
+   public static void main(String[] args) {
+         Produto celular = new Produto();
+             celular.setNome("Xiaomi Redmi");
+             celular.setDescricao("Muito legal");
+             celular.setPreco(new BigDecimal("800"));
+
+     }
+
+}
+
+Portanto temos, no Java, o nosso objeto produto. Nós o instanciamos e temos todas as informações preenchidas. Estamos com uma classe com método main, mas, em um sistema real, essas informações seriam preenchidas por um usuário. Existiria uma tela com os campos para ele preencher e, no Java, instanciaríamos os objetos e setaríamos as informações conforme o que o usuário digita na tela.
+
+Agora precisamos descobrir como pegar o objeto celular e fazer o insert na tabela de "produtos". Como isso funcionará na JPA? No JDBC, toda a integração com o banco de dados era feita com uma classe chamada connection, nós precisávamos abrir uma conexão e, a partir dela, fazer todo o trabalho para acessar o banco de dados.
+
+Na JPA, tem algo parecido, que não é bem uma conexão, mas uma interface que faz a ligação do Java com o banco de dados, que é uma interface chamada EntityManager. Essa classe funciona como se fosse o gerente, o "manager" das entidades, ou ainda, o gestor das entidades.
+
+Toda vez que desejarmos acessar o banco de dados, seja para salvar, excluir, atualizar, carregar, fazer um select, ou qualquer outra operação que quisermos fazer no banco de dados com a JPA, nós utilizaremos a interface EntityManager.
+
+Vamos criar uma variável, que, no nosso caso, chamaremos de em. Para instanciar um EntityManager, em teoria, seria new EntityManager(). Mas, temos um problema: EntityManager não é uma classe, é uma interface e por isso não podemos dar new, o certo seria dar new numa classe que implementa a interface.
+
+Na JPA, não criamos manualmente o EntityManager. NA JPA, o padrão de projeto utilizado é o factory. Assim, existe uma factory de EntityManager. Para criar o EntityManager, precisamos do EntityManagerFactory, ele tem o método que faz a construção do EntityManager.
+
+Então, antes de criar o EntityManager, precisamos criar outro objeto, que é o EntityManagerFactory. Nos padrões de projeto, "design patterns", existe esse padrão de projeto chamado factory, e, há uma factory para isolar a criação do EntityManager.
+
+    EntityManagerFactory factory = 
+    EntityManager em = 
+    }
+
+}
+
+Então, precisamos criar o EntityManagerFactory. Nós temos uma variável EntityManagerFactory e a chamamos de factory. Em teoria, continuaríamos fazendo new EntityManagerFactory, mas não é assim. Outra classe foi criada na JPA e se chama Persistence, e ela tem um método estático chamado CreateEntityManagerFactory. Então, basta chamar Persistence.createEntityManagerFactory()
+
+    EntityManagerFactory factory = Persistence.createEntityManagerFactory()
+    EntityManager em = 
+    }
+
+}
+
+O método CreateEntityManagerFactory está esperando um parâmetro que é uma String. Essa String é o nome do persistence-unit. Vamos recordar o persistence.xml. Nós tínhamos nele a tag persistence-unit, onde imaginamos que ela fosse como um banco de dados. Vamos recordar também que, nessa tag, tínhamos o atributo name="loja". Então, é esse nome que passamos para o método CreateEntityManagerFactory.
+
+Se tivéssemos vários bancos de dados na aplicação, teríamos várias tags persistence-unit, cada uma com um name distinto, e, na hora de criar a factory, passaríamos qual é o persistence-unit. Desta maneira, a JPA fica sabendo com qual banco ela deve se conectar. Portanto, temos que adicionar o nome do persistence-unit, que, no nosso caso, é "loja".
+
+    EntityManagerFactory factory = Persistence.
+        createEntityManagerFactory("loja");
+    EntityManager em = 
+    }
+
+}
+
+Agora vamos importar a classe EntityManagerFactory e ela virá do pacote javax.persistence. Então, criamos a factory e podemos criar um EntityManager chamando factory.createdEntityManager(), e um objeto do tipo EntityManager será devolvido.
+
+    EntityManagerFactory factory = Persistence.
+        createEntityManagerFactory("loja");
+
+    EntityManager em = factory.createEntityManager();
+    }
+
+}
+
+Já temos o EntityManager criado e podemos trabalhar com ele. O que queremos fazer é pegar o objeto Produto, que está na variável celular, e fazer um insert no banco de dados, ou seja, queremos inserir um novo registro no banco de dados. Para isso, no objeto EntityManager() existe um método chamado persist().
+
+Existem vários métodos que veremos ao longo do curso, mas o método persist() serve para persistir, salvar e inserir um registro no banco de dados. Precisamos também passar quem é o objeto, no caso, celular.
+
+ EntityManager em = factory.createEntityManager();
+ em.persist(celular);
+    }
+
+}
+
+Terminado, ele fará o insert. Podemos nos perguntar em qual tabela ele fará o insert. Ele já sabe que é a tabela de Produto, pois, o objeto celular é do tipo Produto, e Produto é uma entidade, então, pela entidade, ele fica sabendo de tudo: qual é a tabela, quais são as colunas, quem é a chave primária, como a chave primária é gerada.
+
+Por isso, não precisamos informar nada, basta dizer: EntityManager, persista a entidade celular. Vá à entidade, na classe dela, e descubra tudo. Portanto, o EntityManager fará a ligação para transformar a entidade Produto em uma linha na nossa tabela do banco de dados.
+
+A princípio, está pronto o código. Vamos rodar a classe. Com o botão direito, abriremos um atalho e nele selecionaremos "Run As > 1 Java Application". Agora vamos olhar o Console, e, ao que parece, ele rodou sem nenhum erro. Aparecem alguns logs, em vermelho, que se assemelham a erros, mas, por padrão, ele imprime em vermelho. Está tudo correto, são apenas logs da JPA.
+
+Como conseguimos saber se ele salvou ou não, já que não imprimiu nada? Precisamos nos lembrar das propriedades do persistence.xml, porque existem algumas que são utilitárias e que podemos utilizar aqui. Outra propriedade que podemos utilizar do Hibernate é a hibernate.show_sql e, no value, passamos true.
+
+<property name="hibernate.dialect" value="org.hibernate
+<property name="hibernate.show_sql" value="true"/>
+
+Então, usaremos essa propriedade para falar: Hibernate, toda vez que você gerar um SQL e for ao banco de dados, imprima no Console para mim, por favor. Se quisermos ver o que ele está rodando no banco de dados, habilitamos essa propriedade e conseguimos ver o insert, select, delete enfim, tudo o que está acontecendo no banco de dados, já que não somos nós que geramos o comando do SQL.
+
+É o Hibernate que faz o insert automaticamente baseado nas configurações da entidade. Esta é uma facilidade em relação ao JDBC. No JDBC, precisávamos montar a SQL manualmente, agora não precisamos mais fazer isso. Vamos rodar novamente, porque, na teoria, é para ele imprimir um insert, mas, ele não gerou um insert no final. Ou seja, ele não salvou a nossa entidade no banco de dados.
+
+No persistence.xml, na tag persistence-unit, além do name, nós temos o transaction-type. Nós até comentamos anteriormente que temos dois valores "RESOURCE_LOCAL" ou "JTA". O "JTA" é indicado para se estivermos em um servidor de aplicação, que controla a transação.
+
+Mas, esse não é o nosso caso, estamos como "RESOURCE_LOCAL", ou seja, não temos o controle de transação automático, por isso, ele não fez o insert, porque não delimitamos uma transação. Portanto, ele não começou uma transação e não dispará um insert no banco de dados. Antes de fazer o pesist, temos que chamar em.getTransaction().begin();.
+
+ EntityManager em = factory.createEntityManager();
+
+ em.getTransaction().begin();
+ em.persist(celular);
+    }
+
+}
+
+É como se disséssemos ao JPA e ao EntityManager que pegassem a transação begin() e a iniciasse. Dentro dela, rodaremos quais são as operações . No nosso caso, é apenas uma, o persist(). Terminado, temos que commitar essa transação no banco de dados, em.getTransaction().commit();.
+
+ EntityManager em = factory.createEntityManager();
+
+ em.getTransaction().begin();
+ em.persist(celular);
+ em.getTransaction().commit();
+    }
+
+}
+
+Então, fizemos getTransaction().begin();, depois em.persist(celular); referente ao que queremos fazer de operações, no nosso caso, é apenas uma, e, depois de terminado, fizemos o commit(). Um detalhe importante é que, depois de usar EntityManager, precisamos finalizar com em.close();, para que o recurso não fique aberto.
+
+ EntityManager em = factory.createEntityManager();
+
+ em.getTransaction().begin();
+ em.persist(celular);
+ em.getTransaction().commit();
+ em.close();
+    }
+
+}
+
+Agora que temos a transação, vamos rodar novamente ("Run As > 1 Java Application") e, em teoria, ele deveria gerar um insert no banco de dados. Porém, tivemos uma exception: "ERROR: Table "PRODUTOS" not found;". Significa que a tabela "PRODUTOS" não foi encontrada. Nós não criamos a tabela no nosso banco de dados H2.
+
+Na hora em que o Hibernate foi fazer o insert, ele indica que conseguiu se conectar com o banco, mas a tabela de "PRODUTOS" não está lá, por isso, ele não consegue fazer o insert. Ele, inclusive, mostrou qual seria o insert que teria feito "insert into produtos (id, descricao, nome, preco) values (null, ?, ?, ?)".
+
+Portanto, não existe a tabela. Temos que fazer acessar o banco de dados H2 e criar a tabela manualmente. Rodar um comando CreateTable. Existe um jeito mais fácil de fazer isso que é com a propriedade do Hibernate que podemos adicionar. Uma propriedade para o Hibernate olhar para as nossas entidades e gerar os comandos SQL para criar o banco de dados automaticamente.
+
+Sendo assim, adicionaremos mais uma propriedade e o nome dela é "hibernate.hbm2ddl.auto". Atenção! Escrevemos "ddl", não "dll". Quem está acostumado com windows, onde temos as "dlls", costuma cometer esse erro.
+
+<property name="hibernate.hbm2ddl.auto" value="true"/>
+
+Sobre o valor que devemos passar, temos alguns possíveis. Um deles é o "create" em que, toda vez que criarmos um EntityManagerFactory, o Hibernate vai olhar as entidades e gerar o comando para criar o banco de dados. Portanto, ele vai apagar tudo e criar do zero as tabelas. Após usarmos a aplicação, ele não apagará as tabelas, elas continuarão lá.
+
+Outra opção é o "create-drop", que cria as tabelas quando rodarmos a aplicação e, depois que terminamos de executar a aplicação, ele imediatamente dropa. Há também a opção "update", com a qual ele não vai, em todas as vezes, apagar e criar tabelas, vai apenas atualizar a tabela se alguma mudança surgrir.
+
+Assim, se não existir a tabela, ele cria e se adicionarmos um novo atributo nessa tabela, precisaremos de uma nova coluna e ele fará a atualização para inserir essa nova coluna, mas não dropa a tabela, não apaga os registros, apenas atualiza.
+
+Mas, o "update" só adiciona coisas novas, por exemplo, se adicionarmos uma nova coluna ou uma nova tabela, ele cria. Mas, se apagarmos uma entidade ou um atributo dela, ele não apaga a tabela e nem a coluna, porque isso pode gerar um efeito colateral.
+
+Existe ainda outra opção que é "validate". Ele não mexe no banco, apenas valida se está tudo ok no banco e gera um log. No nosso caso, colocaremos o "update" para que ele “atualize”, ou seja, crie uma tabela se ela não existir, se ela já existir, apenas veja o que mudou. Então, é para isso que serve essa propriedade, para que o Hibernate gere as tabelas, sem que seja necessário conectar ao banco de dados.
+
+<property name="hibernate.hbm2ddl.auto" value="update"/>
+
+Vamos rodar a nossa classe de novo (Apertando o botão direito e, depois, "Run As > 1 Java Application") e agora esperamos que ele tenha inserido corretamente. Ele rodou o comando e viu que não tinha tabela, "Hibernate: create table produtos", e gerou corretamente, conforme está mapeado na entidade. Percebeu que existe um "@Table produtos", "id".
+
+Colocou também que é um "generated by default" pelo banco, "identity", "descricao" é um "varchar", "nome varchar", "preco" é um "decimal(19,2)". Portanto, ele gerou tudo corretamente, conforme está mapeado. Ele olha para a entidade para gerar a tabela. Ao final, rodou o insert, então, salvou no banco de dados. Ele só não imprime os valores que passamos, coloca interrogação.
+
+Finalizamos o nosso código para inserir e integrar de fato com o banco de dados, falar para JPA ir lá, pegar o objeto e salvar no banco de dados. A parte de iniciar transação, criar EntityManager é um pouco complexa e podemos melhorar, extrair para classes, mas isso será assunto para depois.
+*** Faça como eu fiz
+Chegou a hora de você seguir todos os passos realizados por mim durante esta aula. Caso já tenha feito, excelente. Se ainda não, é importante que você execute o que foi visto nos vídeos para poder continuar com a próxima aula.
+
+Os trechos de código do arquivo persistence.xml você pode copiar daqui:
+
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence version="2.2"
+    xmlns="http://xmlns.jcp.org/xml/ns/persistence"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_2.xsd">
+
+    <persistence-unit name="loja" transaction-type="RESOURCE_LOCAL">
+        <properties>
+            <property name="javax.persistence.jdbc.driver" value="org.h2.Driver"/>
+            <property name="javax.persistence.jdbc.url" value="jdbc:h2:mem:loja"/>
+            <property name="javax.persistence.jdbc.user" value="sa"/>
+            <property name="javax.persistence.jdbc.password" value=""/>
+
+            <property name="hibernate.dialect" value="org.hibernate.dialect.H2Dialect"/>
+            <property name="hibernate.show_sql" value="true"/>
+            <property name="hibernate.hbm2ddl.auto" value="update"/>
+        </properties>
+    </persistence-unit>
+</persistence>
+*** ***** Antes de organizar o código - aqui o original que faz tudo para salvar um registro no banco dentro de um único método
+public class CadastroDeProduto {
+	
+	public static void main(String[] args) {
+		Produto celular = new Produto();
+		celular.setNome("Xiaomi Redmi");
+		celular.setDescricao("Muito legal");
+		celular.setPreco(new BigDecimal("800"));
+		
+/* 
+Quando devemos iniciar e comitar uma transação ao persistir uma entidade?
+R: Ao realizar operações de escrita no banco de dados, como insert, update e delete
+*/
+// AP: ---------------------------- *** DAQUI PAR BAIXO OS CARAS QUE EU ACHO IMPORTANTE ***
+		EntityManagerFactory factory = Persistence
+				.createEntityManagerFactory("loja");
+		
+		EntityManager em = factory.createEntityManager();
+		
+		em.getTransaction().begin();     // No Spring, com a injeção de dependência da classe DAO não teríamos essa linha 
+		em.persist(celular);
+		em.getTransaction().commit();      // No Spring, com a injeção de dependência da classe DAO não teríamos essa linha 
+		em.close();
+	}
+
+}
+** Mapeando entidades
+*** Organizando o código
+Na última aula, aprendemos como mapear uma entidade, como fazer as configurações da JPA e o insert no banco de dados utilizando a classe EntityManager. Na aula de hoje, continuaremos fazendo o mapeamento com as entidades e também estudaremos a parte de relacionamento entre entidades. Mas, antes disso, nos dedicaremos um pouco à organização do código.
+
+Nós tínhamos criado a classe CadastroDeProduto de método main apenas para simular que um usuário preencheu as informações "Nome", "Descricao" e "Preco" em um formulário. E precisamos usar algumas classes da JPA para fazer a persistência.
+
+EntityManagerFactory factory = Persistence
+                .createEntityManagerFactory("loja");
+
+        EntityManager em = factory.createEntityManager();
+
+        em.getTransaction().begin();
+        em.persist(celular);
+        em.getTransaction().commit();
+        em.close();
+
+Mas, assim como havíamos comentado sobre o JDBC, que era comum utilizarmos o padrão DAO, com a JPA, isso também é possível e até recomendável organizar o código e isolar toda a API da JPA para não ficar espalhada por um monte de classes do projeto. Então, podemos criar uma classe DAO e começar a organizar o código. Vamos fazer isso.
+
+Nós temos a entidade Produto. Toda a parte de persistência do produto ficará na classe ProdutoDao. Vamos criar uma nova classe apertando "Ctrl + N", selecionando "Class" e "Next". Na próxima tela, alteraremos o pacote para "br.com.alura.loja.dao", e o nome da classe será "ProdutoDao". Agora basta apertar "Finish" para criar a Produto.java.
+
+Será bem parecido com o exemplo da classe DAO no projeto JDBC, mas, ao invés de trabalhar com uma connection, trabalharemos com EntityManager. Então, esta classe terá um atributo do tipo EntityManager, já que precisaremos utilizá-lo em todos os métodos e transformá-lo em um atributo.
+
+private EntityManager em;
+
+Vamos usar a ideia de injeção de dependências para não deixar a classe DAO ser responsável por criar e gerenciar o EntityManager, então, criaremos um construtor apertando o botão direito e selelcionando "Source > Generate Cronstuctor using Fields" e, na próxima tela, marcaremos o "em" (EntityManager) e apertaremos "Generate".
+
+package br.com.alura.loja.dao;
+
+import javax.persistence.EntityManager;
+
+public class ProdutoDao {
+
+    private EntityManager em;
+
+    public ProdutoDao(EntityManager em) {
+        this.em = em;
+    }
+
+}
+
+Quem for instanciar a classe ProdutoDao terá que passar o EntityManager. Portanto, a classe DAO não é responsável por criar e nem gerenciar o EntityManager, ela simplesmente o recebe pronto para ser utilizado. Agora criaremos o método public void cadastrar() que receberá, como parâmetro, um produto, isto é, public void cadastrar(Produto produto).
+
+Este é o método onde cadastraremos um produto no banco de dados utilizando a JPA. Teremos, basicamente, uma única linha this.em.persist(produto);(this, ponto, entity manager, e passamos o produto).
+
+public class ProdutoDao {
+
+    private EntityManager em;
+
+    public ProdutoDao(EntityManager em) {
+        this.em = em;
+    }
+
+    public void cadastrar(Produto produto) {
+        this.em.persist(produto);
+    }
+
+}
+
+A transação,nós deixaremos de fora da classe, justamente para deixar a classe DAO bem limpa, simples e enxuta. O único objetivo dela é fazer a ligação com o banco de dados. Desta maneira, estamos apenas usando o EntityManager, significa que, não criamos e nem fechamos o EntityManager ou gerenciamos transações. Simplesmente, recebemos um EntityManager no construtor que já vem com tudo configurado. Com isso, nossa classe fica bem coesa.
+
+Se recordarmos da classe DAO utilizando JDBC, onde tínhamos umas dez, vinte ou trinta linhas de código, perceberemos que, diferente disso, com a JPA ficamos com uma única linha de código, this.em.persist(produto);. Portanto, com a JPA, nós resolvemos dois problemas do JDBC: código verboso e alto acomplamento com o banco de dados.
+
+Nós ainda temos acomplamento com o banco de dados. Se mexermos em algo no banco de dados, isso gerará impacto na aplicação, mas será um impacto mínimo. Por exemplo, vamos imaginar que tivemos que renomear a tabela, então, nós precisar alterar apenas na entidade, em Produto.java. Vamos ao @Table(name = "produtos") e passamos o novo nome.
+
+Não precisamos alterar a nossa classe DAO e nenhuma outra, porque não temos nenhuma outra referência para o nome da tabela ou das colunas. É muito mais fácil fazer uma mudança no banco de dados, e os impactos são mínimos na aplicação. Então,com a JPA, resolvemos os dois problemas da JDBC.
+
+Continuando, nós criamos a classe ProdutoDao, agora o código está bem simples. Na classe CadastroDeProduto que tem o método main (pensando numa aplicação, essa parte se referiria a um Controller, uma Service). Como não temos aplicação web, é apenas uma aplicação de Java pura, standalone, e, portanto, não teremos determinados recursos ("Nome", "Descricao", "Preco"), porque estamos simulando um usuário.
+
+É em EntityManagerFactory factory = Persistence ( que está em CadastroDeProduto.java) que cuidaremos de toda a a parte de EntityManager, mas, em relação a persistência, nós extrairemos em.persist(celular); para a classe DAO. Portanto, precisaremos de um ProdutoDao dao = new ProdutoDao(em). Quando instanciamos um ProdutoDao, nós temos que passar um em (EntityManager), e ele foi criado em:
+
+EntityManagerFactory factory = Persistence 
+        .createEntityManagerFactory("loja");
+
+E toda a parte de transação é feita na classe, em vez de ficar na classe DAO. Seguindo, em.persist(celular); virará dao.cadastrar(celular); (estamos passando, portanto, o produto celular).
+
+
+        EntityManagerFactory factory = Persistence
+                .createEntityManagerFactory("loja");
+
+        EntityManager em = factory.createEntityManager();
+
+        ProdutoDao dao = new ProdutoDao(em);
+
+        em.getTransaction().begin();
+        dao.cadastrar(celular);
+        em.getTransaction().commit();
+        em.close();
+    }
+
+}
+
+Perceberemos que o código da classe DAO, ProdutoDao.java, ficou simples. O código de CadastroDeProduto.java ficou um pouco grande e podemos simplificar. Por exemplo, em todos os testes que fizermos, sempre precisaremos criar um EntityManager, e para criá-lo, precisamos, antes, criar o factory.
+
+EntityManagerFactory factory = Persistence
+                .createEntityManagerFactory("loja");
+
+        EntityManager em = factory.createEntityManager();
+
+Então, para não ficar com o código de criação do EntityManager e da factory, podemos extraí-lo para uma classe utilitária. Vamos criar uma nova classe apertando "Ctrl + N", depois, selecionando "Class" e "Next". Na próxima tela, trocaremos o pacote de "testes" para "br.com.alura.loja.util" e chamaremos a classe de "JPAUtil". Agora basta apertar "Finish".
+
+Na JPAUtil.java, criaremos um método que será responsável por criar o EntityManager e que fará a utilização da factory. Mas, não desejamos precisar, toda vez que criarmos o EntityManager, criar uma nova factory. Para garantir que a factory está sendo criada uma única vez na aplicação, vamos transformá-la em um atributo estático da classe.
+
+Então, faremos private static final EntityManagerFactory FACTORY = (podemos colocar como "final", porque se trata de uma constante. E "FACTORY" está em maiúsculo, porque é um nome de constante). Agora vamos trazer o código Pesistence.createEntityManagerFactory("loja") para a JPAUtil.java.
+
+package br.com.alura.loja.util;
+
+import javax.persistence.EntityManagerFactory;
+
+public class JPAUtil {
+
+    private static final EntityManagerFactory FACTORY = Persistence
+            .createEntityManagerFactory("loja");
+
+Quando o Java carregar a classe JPAUtil, ele já criará o EntityManagerFactory. Agora, vamos criar um método que devolve um EntityManager, nós podemos chamar de getEntityManager(). Esse é o método que vai criar um EntityManager. Quando precisarmos, em qualquer lugar no projeto, nós chamamos este método. Continuaremos fazendo return FACTORY.createEntityManager();
+
+public static EntityManager getEntityManager() { 
+    return FACTORY.createEntityManager();
+
+}
+
+O objetivo da classe JPAUtil é isolar a criação do EntityManager e esconder também o EntityManagerFactory(). Agora, na classe CadastroDeProduto, podemos tirar os seguintes trechos de código:
+
+EntityManagerFactory factory = Persistence
+                .createEntityManagerFactory("loja");
+
+EntityManager em = factory.createEntityManager();
+
+A única coisa que precisamos passar é o EntityManager, por isso, precisamos criar um. Faremos, EntityManager em = JPAUtil.getEntityManager();.
+
+EntityManager em = JPAUtil.getEntityManager();
+ProdutoDao dao = new ProdutoDao(em);
+
+      em.getTransaction().begin();
+        dao.cadastrar(produto);
+        em.getTransaction().commit();
+        em.close();
+    }
+
+}
+
+
+A criação e a transação do EntityManager, em uma aplicação real, um projeto ou aplicação web, não teria esses elementos. Provavelmente, usaríamos algum framework, como o Spring, que tem injeção de dependências. Logo, receberíamos injetada a classe DAO, que também teria a injeção do EntityManager automaticamente. Portanto, não teríamos nenhuma das linhas anteriores, com exceção da dao.cadastrar(celular);.
+
+Teríamos apenas um atributo da classe DAO que seria injetado. Os frameworks facilitariam o processo. Mas, como não estamos usando nenhum framework, e aprendendo JPA puro, precisaremos das linhas apresentadas anteriormente para criar. Porém, é possível simplificá-las um pouco, e o objetivo do vídeo de hoje era esse.
+
+Assim, o objetivo desse vídeo era simplificar um pouco o código e seguir com o padrão DAO para isolar o acesso, a parte da API da JPA na camada de persistência. Espero que tenham gostado, vejo vocês no próximo vídeo!!
+
+*** Mapeamento de um Enum
+Agora que já organizamos o código, podemos continuar com a parte de mapeamentos. Precisaremos fazer uma mudança na entidade Produto. Na tabela de "produtos" - no cadastro de produtos - pediram que adicionássemos mais informações.
+
+Então, além do nome, do preço e da descrição do produto, precisamos cadastrar também: a data, isto é, quando esse produto foi cadastrado no sistema; e a categoria, pois temos algumas categorias de produtos que são vendidos na loja e eles precisam estar registrados.
+
+Como são informações referentes ao produto, na própria entidade Produto, vamos adicionar essas novas informações, que são atributos que a JPA vai mapear para colunas no banco de dados. Para a data, podemos utilizar a API de datas do Java 8, então, pode ser um private LocalDate, se desejarmos salvar apenas a data, ou o LocalDateTime para salvar a data e a hora. No nosso caso, será apenas a data de cadastro, logo, private LocalDate dataCadastro.
+
+@Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    private String nome;
+    private String descricao;
+    private BigDecimal preco;
+    private LocalDate dataCadastro
+
+Nós podemos instanciar com LocalDate.now(); (para pegar a data atual). Sempre que um objeto Produto for instanciado, automaticamente preencherá o atributo com a data atual, por exemplo. O LocalDate é mapeado automaticamente no banco de dados, então, o Hibernate já sabe que ele virará uma coluna do tipo Date ou DateTime no banco de dados, sem que seja necessário colocar anotação nenhuma.
+
+O outro campo é a categoria, private Categoria categoria;. A princípio, nos disseram que, por enquanto, a loja só vende produtos de três categorias: celular, informática e livros. Portanto, é fixo a uma dessas três categorias.
+
+@Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    private String nome;
+    private String descricao;
+    private BigDecimal preco;
+    private LocalDate dataCadastro = LocalDate.now();
+    private Categoria categoria;
+
+Onde temos Categoria, poderia ser uma String, mas não é tão interessante, porque podemos passar valores que não são os desejados. Então, podemos criar um enum do Java. Vamos apertar "Ctrl + 1", selecionar "Create enum 'Categoria'". Na próxima tela, deixaremos no próprio pacote de modelo, "br.com.alura.loja.modelo" e apertaremos "Finish". Agora, Categoria será um enum.
+
+Dentro de Categoria.java, nós teremos as três constantes - os três valores possíveis - que são: CELULARES, INFORMATICA, ou LIVROS.
+
+package br.com.alura.loja.modelo;
+
+public enum Categoria {
+
+    CELULARES,
+        INFORMATICA,
+        LIVROS;
+
+}
+
+Na entidade Produto, categoria é um enum. Porém, temos um detalhe importante. Quando formos mapear um enum, temos que tomar cuidado em como o Hibernate e a JPA mapeiam a coluna Categoria para o banco de dados. Até então, estávamos usando os tipos primitivos - padrões - do Java, Long, Int, String, BigDecimal, Double, que são implícitos.
+
+Por exemplo, se for Long, ele colocará um número. Se for String, ele colocará um varchar no banco de dados. A data virará um Date. O BigDecimal virará um decimal. E o enum? Como ele fará o relacionamento dessa coluna no banco de dados? Por padrão, se não indicarmos nada, o que ele vai inserir? Vamos fazer um teste e ver como funcionará.
+
+Vamos gerar os métodos "Getters e Setters" da data de cadastro e da categoria. Só para facilitar, vamos criar um construtor. Então, vamos apertar o botão direito, depois selecionar "Source > Generate Constructor using Fields". Na próxima tela, desmarcaremos o "id", a "dataCadastro", e apertaremos "Generate".
+
+Queremos gerar um construtor para facilitar na hora de instanciar um produto. Para ir direto no construtor ao passar o nome, descrição, preço e categoria, ao invés de setar tudo isso via método setter.
+
+Na nossa classe CadastroDeProduto vai dar erro, porque temos agora que passar as informações, não mais via setter, mas no construtor: o nome; a descrição; o preço; o id não, porque é gerado automaticamente; a data de cadastro também não, porque já está sendo instanciada no atributo; e a categoria, que, como é um enum, nós passamos categoria.CELULARES.
+
+public static void main(String[] args) {
+        Produto celular = new Produto("Xiaomi Redmi", "Muito legal", new BigDecimal("800"), Categoria.CELULARES) 
+
+    }
+
+Mas, o que ele salvará no banco de dados, já que temos um enum? Por padrão, se não indicarmos, a JPA não colocará a coluna Categoria.CELULARES como um varchar, com o texto "CELULARES". Ela vai colocar uma coluna do tipo Int (Inteiro), e o valor que ela preenche lá é o valor da posição da constante. Então, CELULAR será 1, INFORMATICA, 2, e LIVROS, 3. Ela faz isso automaticamente.
+
+1 CELULARES
+2 INFORMATICA
+3 LIVROS
+
+Se adicionarmos um produto com a categoria.CELULARES, ela mandará para o banco de dados - para a coluna de categoria - o número 1. Se adicionarmos INFORMATICA, será o número 2. Se adicionarmos LIVROS, será o número 3. Então, se trata da ordem da constante no enum. Isso um tanto estranho, porque existe um risco de alguém alterar essa ordem, teremos um desordenamento.
+
+Além disso, se surgir uma nova constante, e alguém, ao invés de adicionar ao final, inserir em cima ou no meio, também embaralhará as ordens, e ele não atualizará sozinho, no banco de dados, as colunas dos registros que já existem. Sendo assim, mapear enum pela ordem das constantes é algo arriscado. O ideal é mapear pelo nome da constante.
+
+Significa que não queremos que a coluna seja do tipo inteiro e sim um texto, um varchar, e que ele insira a constante CELULARES, INFORMATICA e LIVROS, de maneira independente da ordem declarada na constante. Sendo assim, se alguém altera a ordem, nada muda no banco de dados.
+
+Para ensinar isso à JPA, que não é mais o padrão, em cima do atributo Categoria, na classe Produto.java, colocaremos a anotação @Enumerated(). E, nessa anotação, temos como opções os parâmetros "ORDINAL" (que é o padrão, a ordem) ou "STRING". Logo, escolheremos STRING, para que ele cadastre o nome da constante no banco de dados, não a ordem.
+
+@Enumerated(EnumType.STRING)
+private Categoria categoria;
+
+    public Produto(String nome, String descricao, BigDecimal preco, Categoria categoria) {
+        this.nome = nome;
+        this.descricao = descricao;
+        this.preco = preco;
+        this.categoria = categoria;
+    }
+
+Vamos rodar o CadastroDeProduto, (Apertando "Run As > 1 Java Aplication"), e olhar o Console. Verificaremos que ele criou a tabela, "Hibernate: create table produtos". Ao analisar as colunas que ele criou, veremos "categoria varchar(255)". Se tivéssemos deixado como "ORDINAL", teríamos um Int, e ele mandaria a ordem da constante. Ele também fez o insert corretamente. Está pronto mais um mapeamento de um atributo do tipo enum.
+
+Nos tipos do próprio Java, Int, String, Long, Float, Double, ou nas classes do Java, como a LocalDate e a BigDecimal, a JPA faz o mapeamento correto automaticamente, ou seja, não precisamos configurar nada. Apenas no caso de enum que, se não configurarmos, ele colocará o "ORDINAL" (pela ordem), mas, o ideal é sempre salvar o nome da constante, aí entra o @Enumerated.
+
+A aula de hoje foi para discutirmos isso e, na próxima, faremos uma mudança em relação à Categoria para transformá-la em uma entidade e deixar o cadastro mais flexível e teremos que discutir um pouco sobre mapeamento de relacionamentos. 
+*** Mapeando relacionamento - ****Sempre que você tem uma entidade que um atributo é uma outra entidade: Isso é um relacionamento e você precisa indicar qual a cardinalidade: @OneToMany, @ManyToMany, etc.
+AP: Agora que já organizamos o código, podemos continuar com a parte de mapeamentos. Precisaremos fazer uma mudança na entidade Produto. Na tabela de "produtos" - no cadastro de produtos - pediram que adicionássemos mais informações.
+Adiantando o texto que vem mais à frente: Então, de produtos para categorias: asterisco, 1. Que quer dizer: muitos para um. Na JPA, para informarmos que a cardinalidade desse relacionamento é "muitos para um", temos uma anotação, @ManyToOne. Ou seja, muitos produtos estão vinculados com uma Categoria. Uma categoria pode ter vários produtos, mas o produto tem uma única categoria.
+-------------------------------
+Pro:
+Na última aula, nós fizemos o mapeamento do enum. Nesta aula, nós precisaremos fazer uma alteração nele. Quando utilizamos enum no Java, passamos as constantes, que no nosso caso são, CELULARES, INFORMATICA e LIVROS, mas elas são fixas conforme o que está no código.
+
+O problema é esse, para o sistema, não existe uma flexibilidade, portanto, se o usuário precisar cadastrar uma nova categoria, teremos que mexer no código fonte da aplicação, fazer um novo build, um novo deploy e subir outra vez a aplicação no ar.
+
+Seria mais interessante se os próprios usuários pudessem cadastrar essas categorias para que fosse mais flexível. No sistema mesmo teria uma tela, um cadastro de categorias. Então, não queremos mais que fique fixo, mas sim deixar via sistema, com uma tabela para armazenar essas categorias. Ao fazer essa alteração, Categoria não será mais um enum, mas, sim, uma entidade, pois teremos uma tabela de Categoria.
+
+A ideia é, justamente, a que está no seguinte diagrama.
+AP: Ver imagem: "./cursoJPA-Aula03_video03.png"
+
+Slide de título: Tabela de categorias. Abaixo, aparecem duas tabelas. Tabela A: produtos. Colunas: id - bigint; nome - varchar; descricao - varchar; preco - decimal; categoria_id - int. Tabela B: categorias. Colunas: id - bigint; nome - varchar. A coluna "categoria_id - int" da Tabela A está relacionada à coluna "id - bigint" da Tabela B por uma linha azul-escura. No começo da linha há um asterísco e, no final dela, o número 1.
+
+Antes tínhamos apenas a tabela de "produtos". Agora, temos também a de "categorias" com duas colunas: o "id", que é a chave primária; e o "nome", referente ao nome da categoria. Existe um relacionamento entre o produto e a categoria. Todo produto pertence a uma categoria.
+
+Então, na tabela de produtos, precisaremos adicionar a coluna "categoria_id", que, na verdade, é uma chave estrangeira, uma FK (Foreign Key) que aponta para o "id" na tabela de "categorias". Agora, precisaremos fazer um mapeamento desse relacionamento, que é algo que não tínhamos visto ainda. A JPA suporta normalmente mapear um relacionamento entre tabelas. Vamos ver como isso ficará.
+
+O primeiro passo, na Categoria.java, é que Categoria não será mais um enum, portanto, trocaremos para class. Apagaremos as constantes, e teremos dois atributos, o id e o nome.
+
+package br.com.alura.loja.modelo;
+
+public class Categoria {
+
+    private Long id;
+        private String nome;
+
+}
+
+A classe Categoria é uma entidade, então precisamos colocar as anotações da JPA, que podemos pegar da classe Produto.java. Então, pegaremos o @Entity e o @Table(name = "produtos"). Vamos copiar e colar, trocando o nome da tabela por "categorias".
+
+package br.com.alura.loja.modelo;
+
+import javax.persistence.Entity;
+
+@Entity
+@Table(name = "categorias")
+public class Categoria {
+
+    private Long id;
+        private String nome;
+
+}
+
+Copiaremos também o @Id e @GeneratedValue(strategy = GenerationType.IDENTITY).
+
+package br.com.alura.loja.modelo;
+
+import javax.persistence.Entity;
+
+@Entity
+@Table(name = "categorias")
+public class Categoria {
+
+        @Id
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+        private String nome;
+
+}
+
+Tudo certo! O nome é String, ele mapeará como varchar, não muda nada. Só precisamos agora dos Getters e Setters. Criaremos também um construtor, assim como fizemos na entidade de produto. Então, no atalho, selecionaremos "Source > Generate Constructor". Na próxima tela, desmarcaremos o "id" (porque ele é gerado pelo banco de dados) e deixaremos só o "nome". Agora basta apertar "Generate".
+
+        @Id
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+        private String nome;
+
+        public Categoria(String nome) {
+            this.nome = nome;
+        }
+
+Quando alguém der new na classe Categoria, já tem que passar o nome. Vamos gerar o método getNome() e colocar também um setNome. Em teoria, nós não precisaríamos do Setter, porque, ele já vem na hora de dar new, mas, vamos deixar aqui, caso precise. Já temos a nossa entidade de Categoria mapeada.
+
+
+        public Categoria(String nome) {
+            this.nome = nome;
+        }
+
+        public String getNome() {
+            return nome;
+        }
+        public void setNome(String nome) {
+            this.nome = nome;
+        }
+
+É simples mapear uma tabela do banco de dados, basta criar a classe e colocar as anotações da JPA, declarar os atributos e fazer os mapeamentos usando as anotações da JPA conforme a necessidade. Porém, na classe Produto.java, Categoria agora não é mais um enum, então, apagaremos o @Enumerated(EnumType.STRING).
+
+Agora, teremos um problema, porque a JPA detectará que, na entidade Produto, existe um atributo Categoria, e que seu tipo não é mais primitivo do Java, não é mais um enum e nem uma classe do Java. Ela detectará que esse tipo é uma outra classe do nosso projeto e que essa classe é uma entidade ( @Entity). Então, a JPA automaticamente saberá que isso é um relacionamento entre Produto e Categoria, isto é, um relacionamento de duas entidades.
+
+Desta maneira, temos a obrigação de dizer à JPA qual é a cardinalidade desse relacionamento. Se um produto tem uma única categoria ou várias categorias, é um para um, um para muitos, muitos para um, ou seja, qual é a cardinalidade. Se observarmos o desenho do diagrama, veremos que, de produtos para categorias, temos: muitos para um. Isto é, um produto tem uma única categoria, mas uma categoria pode estar vinculada a vários produtos.
+
+Então, de produtos para categorias: asterisco, 1. Que quer dizer: muitos para um. Na JPA, para informarmos que a cardinalidade desse relacionamento é "muitos para um", temos uma anotação, @ManyToOne. Ou seja, muitos produtos estão vinculados com uma Categoria. Uma categoria pode ter vários produtos, mas o produto tem uma única categoria.
+
+
+    @ManyToOne
+    private Categoria categoria;
+
+    public Produto(String nome, String descricao, BigDecimal preco, Categoria categoria) {
+        this.nome = nome;
+        this.descricao = descricao;
+        this.preco = preco;
+        this.categoria = categoria;
+    }
+
+Existem algumas anotações da JPA para relacionamento, o @ManyToOne, @OneToMany (que é o contrário), @OneToOne e @MayToMany. A escolha dependerá da cardinalidade, do tipo de relacionamento entre as tabelas. Agora, no CadastroDeProduto.java está dando um erro em Categoria.CELULARES, porque Categoria não é mais um enum. Precisamos de uma categoria cadastrada no banco de dados para associá-la com esse produto.
+
+Sendo assim, vamos colocar uma categoria celulares, mas dará um erro de compilação. Vamos selecionar o comando "Ctrl + 1"e criar uma variável local. Nós precisamos da Categoria celulares, então, new Categoria(), e passaremos o nome "CELULARES".
+
+public static void main(String[] args) {
+    Categoria celulares = new Categoria("CELULARES");
+
+Mas, nós precisamos salvar essa categoria no banco de dados antes de salvar o produto, ou teremos problemas. Vamos rodar e ver o problema selecionando "Run As > 1 Java Application". No Console, veremos que deu uma exception "Transient Property Value Exception". Significa que, existe um valor na propriedade que é "transient", não está salvo, não está persistido.
+
+Na próxima aula, nós discutiremos sobre estados da entidade para saber o que é "transient" e como funciona essa transição de estados de uma entidade na JPA. Mas, a questão é: nós temos uma categoria e acabamos de instanciá-la, mas ela não está salva no banco de dados. Na hora em que criamos um produto, nos vinculamos a essa categoria que não está persistida no banco de dados.
+
+E, na hora que chamamos o dao.cadastrar(celular);, a JPA detectou. Ela foi fazer um insert do produto, mas viu que esse produto estava relacionado com uma categoria, mas essa categoria ainda não tinha sido persistida no banco de dados. Assim, ela considera que isso é um erro e lança uma exception.
+
+O correto é salvar a categoria e, depois, salvar o produto. Sendo assim, a categoria já estará gerenciada pela JPA e estará na tabela, terá um id, e será possível fazer o relacionamento. Então, precisamos cadastar no banco de dados a categoria. Nós havíamos criado uma classe ProdutoDAO, podemos criar, também, uma categoria DAO seguindo o mesmo modelo.
+
+Portanto, vamos selecionar com o comando "Ctrl + C" o ProdutoDao.java e colar e renomear para CategoriaDao em "Enter a new name for 'ProdutoDao'". Agora basta apertar "Ok". Vamos abrir o CategoriaDao.java, ele recebe o EntityManager da mesma maneira. Enfim, é a mesma estrutura, as classes DAO serão parecidas. Mas, em CategoriaDao.java, vez de ser um Produto, será uma Categoria. Depois, apertaremos "Ctrl + Shift + O" para importar.
+
+    public CategoriaDao(EntityManager em) { 
+        this.em = em;
+        }
+
+        public void cadastrar(Categoria categoria) {
+            this.em.persist(categoria);
+        }
+
+ }
+
+Está pronta a nossa classe DAO. Agora, em CadastroDeProduto.java, nós criamos a Categoria celulares, o Produto celular, o EntityManager, o ProdutoDao, vamos apenas renomear a variável dao para produtoDao, porque agora precisaremos ter duas classes DAO - dois objetos DAO.
+
+ProdutoDao produtoDao = new ProdutoDao(em);
+
+Nós precisaremos instanciar também o CategoriaDao. Vamos copiar a linha anterior e, ao invés de ProdutoDao, será CategoriaDao. O nome da variável será categoriaDao, e apertaremos "Ctrl + Shit + O" para importá-la. Algo interessante é que podemos compartilhar o mesmo EntityManager entre as várias classes DAO.
+
+CategoriaDao categoriaDao = new CategoriaDao(em); 
+
+Então, nós iniciamos a transação. Logo abaixo, fizemos o commit. Antes de salvar o produtoDao no banco de dados, chamaremos categoriaDao.cadastrar(), passando a categoria celulares.
+
+EntityManager em = JPAUtil.getEntityManager();
+        ProdutoDao produtoDao = new ProdutoDao(em);
+        CategoriaDao categoriaDao = new CategoriaDao(em);
+
+        em.getTransaction().begin();
+
+        categoriaDao.cadastrar(celulares);
+        produtoDao.cadastrar(celular);
+
+        em.getTransaction().commit();
+        em.close();
+    }
+
+}
+
+Agora, sim, salvamos a categoria, CategoriaDao.cadastrar(celulares), no banco de dados, e depois salvamos o produto, produto.Dao.cadastrar(celular), no banco de dados, já que ele está vinculado com essa categoria. Por isso, é provável que não aconteça mais a exception do "transient property value", pois o produto está associado com uma categoria que, sim, está persistida.
+
+Vamos rodar ("Run As > 1 Java Application") e verificar se ele faz o insert corretamente no banco de dados. Ele fez o insert da categoria, "Hibernate: insert into categorias", e o insert do produto, "Hibernate: insert into produtos". Também criou a tabela de categorias, "Hibernate: create table categorias", e a tabela de produtos, "Hibernate: create table produtos".
+
+Ele também fez um "alter table" para adicionar a chave estrangeira na tabela produtos, que agora precisa da coluna do id da categoria. Portanto, ele alterou a tabela e criou a "constraint" foreign key.
+
+É assim que fazemos mapeamento de relacionamento na JPA. Sempre que temos uma entidade, onde o atributo é uma outra entidade, a JPA automaticamente identifica que é um relacionamento, e então, precisamos indicar qual é a cardinalidade. Ela não tem um valor padrão para a cardinalidade, nós que precisamos configurar, e isso dependerá de como escolheremos modelar o banco de dados.
+
+Precisamos saber como está modelado no banco de dados para escolher a anotação de relacionamento. O último detalhe é que, na hora de persistir, temos que ter cuidado, porque, se estamos persistindo com uma entidade e vinculando com outra entidade, essa outra precisa estar persistida antes, ou receberemos uma exception "transiente property value excepetion".
+
+O objetivo da aula de hoje foi discutir um pouco sobre relacionamentos, aprendemos como mapeá-lo e também como funciona a parte de persistência. Espero que tenham gostado. Na próxima aula discutiremos sobre os estados das entidades, como funciona o "transient" para a JPA. Vejo vocês lá!! Abraços!!
+
+** Ciclo de vida de uma entidade
+*** Estados no insert da entidade
+(AP: ver imagem: "./cursoJPA-Aula04_video01.png")
+mas já desejamos sincronizar essa entidade com o banco de dados para ela gerar o id ou vinculá-la a outra.
+
+No momento em que fazemos o commit() ou o flush, a JPA pega todas as entidades que estiverem no estado managed e sincroniza com o banco de dados. Então, tínhamos uma entidade que era transient, está gerenciada e, depois que commitamos, ele perceberá que a entidade não tem id, que ela era transient, ou seja, é necessário fazer um insert dela no banco de dados.
+
+Vamos rodar ("Run As > 1 Java Application) e, no Console, ele deu um insert na categoria, "Hibernate: insert into categorias (id, nome) values (null, ?)", e, na sequência, deu um update, "Hibernate: update categorias set nome=? where id=?", significa que ele atualizou a categoria.
+
+E o motivo de ter atulizado a catagoria é que fizemos o persist(), mas, na sequência, mudamos o nome dela. Como a categoria está gerenciada, se alteramos o atributo, ele saberá que é necessário fazer o update, pois atualizamos alguma informação da entidade. Em outras palavras, se a categoria está gerenciada, "managed", a JPA observará, e se alterarmos ela, a JPA sincronizará com o commit() ou com flush() ao banco de dados.
+
+A partir do momento em que fechamos o EntityManager, isto é, em.close() ou clear() (para limpar as entidades gerenciadas do EntityManager), a categoria muda de estado. Se ela estava salva antes, passa para um estado chamado de DETACHED, que é um estado destacado.
+
+O detached é um estado em que a entidade não é mais transient, porque tem id, já foi salva no banco de dados, porém, não está mais sendo gerenciada. Portanto, se mexermos nos atributos, a JPA não disparará update e nem fará mais nada. Vamos simular esse estado.
+
+Em CadastrDeProduto.java, temos a entidade, o persist(), o atributo e o commit(), ele sincronizou com o banco de dados (fez o insert e o update) e fizemos o em.close() do EntityManager. Se, na sequência, pegarmos a entidade celulares.setNome() e mudarmos o nome de novo, por exemplo, para "1234" e rodarmos o código, ele não deveria fazer um segundo update.
+
+    Categoria celulares = new Categoria("CELULARES");
+
+      EntityManager em = JPAUtil.getEntityManager();
+        em.getTransaction().begin();
+
+        em.persist(celulares);
+        celulares.setNome("XPTO");
+
+        em.getTransaction().commit();
+        em.close();
+
+        celulares.setNome("1234");
+    }
+
+}
+
+Nós mexemos no nome depois de fechar o EntityManager, então, ele não está mais "managed", está no estado "detached". Conferindo no Console, está correto, ele fez um insert e um único update, de quando ainda estava aberto o EntityManager, isto é, quando a entidade ainda estava gerenciada. Se alteramos qualquer coisa abaixo do em.close(), ele vai ignorar.
+
+Esse é o ciclo de vida para quando estamos falando em persistência, em insert, criação de objetos. Estudamos o que acontece quando criamos uma entidade, instanciamos, chamamos o persist(), fechamos o EntityManager ou mexemos em um atributo da entidade. Nesta aula, nós simulamos todas essas etapas no código.
+
+Agora, já entendemos como funciona a parte de criação de uma entidade. No próximo vídeo, discutiremos sobre outros cenários, outras possíveis transições de estados e como podem acontecer. Vejo vocês lá!!
+*** Estados no update da entidade
+(AP: Ver imagem: "./cursoJPA-Aula04_video02.png")
+
+Ainda na parte de transição de estados, quando instanciamos, persistimos a entidade e ela fica no estado de managed, nós encontramos uma situação no último vídeo que é a atualização. Nós não tínhamos visto ainda como atualizar uma entidade. Só havíamos colocado, nas classes DAO, um método para cadastrar uma categoria ou um produto, public void cadastrar(Categoria categoria) {, mas não vimos como faz para atualizar.
+
+Quando fizemos a simulação, já era possível ver uma atualização. Vamos rodar novamente ("Run As > 1 Java Application). Analisando o Console, perceberemos que ele faz o insert e, na sequência, um update, isto é, já está atualizando uma entidade.
+
+Toda vez que a entidade está no estado managed, está gerenciada, qualquer mudança que fizermos em algum atributo,a JPA detectará e, no commit() ou no flush() do EntityManager, ela vai, automaticamente, sincronizar essas mudanças no banco de dados, porque sabe que é necessário fazer o update no banco de dados.
+
+Portanto, é assim que funciona o update no banco de dados, basta pegar uma entidade que esteja no estado managed e alterar os atributos dessa entidade. Quando fizermos o commit() da transação ou um flush() manualmente, esse estado será sincronizado automaticamente com o banco de dados.
+
+Mas, o problema é que não sabemos se a entidade está no estado managed, talvez ela já esteja no estado detached se chamarmos o clear() ou se fecharmos o EntityManager com o close(). Nesta situação, o uptade não acontecerá.
+
+Em CadastroDeProduto.java, nós havíamos alterado o nome, commitamos, fizemos o close() do EntityManager, e alteramos o nome da entidade - da categoria - para "1234", e um segundo update não foi disparado.
+
+
+        EntityManager em = JPAUtil.getEntityManager();        
+        em.getTransaction().begin();
+
+        em.persist(celulares);
+        celulares.setNome("XPTO");    
+
+        em.getTransaction().commit();
+        em.close();
+
+        celulares.setNome("1234")
+    }
+
+}
+
+Depois de fechado o EntityManager, ele está no estado detached, e, neste estado, nada que alterarmos na entidade será sincronizado automaticamente com o banco de dados. Então, surge a questão de como voltar a entidade para o estado managed.
+
+Se ao invés de fecharmos o EntityManager, escrevermos clear(), o EntityManager ainda estárá aberto, quer dizer que ainda podemos trabalhar com ele, porém, com o clear() nós tiramos todas as entidades, todas estão detached. Como fazemos para voltar a entidade para o estado managed? Pois, se quisermos atualizar uma informação em celulares.setNome("1234"); ela não será atualizada.
+
+Ainda considerando o nosso exemplo anterior, fizemos um clear(), alteramos o nome e, agora, vamos dar um flush(), isto é, em.flush();. Vamos também tirar o commit() e trocar por flush(), porque ainda não queremos commitar a transação, mas, queremos sincronizar com o banco de dados. Será que agora ele fará dois updates ou apenas um? Vamos rodar ("Run As > 1 Java Application").
+
+
+        EntityManager em = JPAUtil.getEntityManager();        
+        em.getTransaction().begin();
+
+        em.persist(celulares);
+        celulares.setNome("XPTO");    
+
+        em.flush();
+        em.clear();
+
+        celulares.setNome("1234")
+        em.flush();
+    }
+
+}
+
+No Console, notaremos que ele fez apenas um update , que foi celulares.setNome("XPTO"), quando mudamos o nome para "XPTO". No flush(), ele disparou um insert e um update (que havíamos persistido e mudado o nome), mas demos um clear() e, agora, a entidade não está mais gerenciada. Então, por mais que tenhamos alterado um atributo, quando chamarmos o flush(), ele não vai sincronizar.
+
+Então, o que precisamos fazer se quisermos voltar para o estado managed? Existe outro método que não havíamos estudado ainda, o merge(), que tem como objetivo pegar uma entidade que está no estado detached e retorná-la ao estado managed (gerenciado).
+
+A partir dali, qualquer mudança que fizermos na entidade será analisada e sincronizada ao banco de dados quando realizarmos o commit() da transação ou flush().Vamos simular essa situação. Nós fizemos o clear() e a entidade está no estado detached.
+
+Agora, vamos chamar em.merge(), passando a entidade celulares, que, então, volta para o estado managed. Continuando, alteraremos o nome, e faremos um flush(). Portanto, ela deveria fazer dois updates. Vamos rodar e verificar se isso de fato acontecerá.
+
+
+        EntityManager em = JPAUtil.getEntityManager();        
+        em.getTransaction().begin();
+
+        em.persist(celulares);
+        celulares.setNome("XPTO");    
+
+        em.flush();
+        em.clear();
+
+        em.merge(celulares);
+        celulares.setNome("1234")
+        em.flush();
+    }
+
+}
+
+Ao observar o Console, perceberemos que ele nos mandou uma exception, "javax.persistence.PersistenceException" e indicou algo importante: "No default constructor for entity: : br.com.alura.loja.modelo.Categoria". Significa que a entidade Categoria não tem um construtor default.
+
+Retornando à entidade Categoria.java, tínhamos criado o seguinte construtor:
+
+   public Categoria(String nome) {
+         this.nome = nome;
+     }
+
+Com a intenção de, na hora de dar new na categoria, passar também o nome. Mas a JPA precisa que as entidades tenham um construtor padrão. Até então, ela não havia reclamado disso, porque estávamos fazendo apenas insert, mas quando chamamos um merge(), ele faz um select no banco de dados. Ao carregar a entidade do banco de dados e criar o objeto, a JPA precisa do construtor default.
+
+Logo, precisamos inserir o construtor default nas entidades, tanto na Categoria.java quanto na Produto.java. Assim, na Categoria.javateremos:
+
+public Categoria() {
+    // TODO Auto-generated constructor stub
+}
+
+E no Produto.java:
+
+@ManyToOne
+private Categoria categoria;
+
+public Produto() {
+    // TODO Auto-generated constructor stub
+}
+Vamos rodar mais uma vez nossa classe CadastroDeproduto.java e analisar se ele fará dois updates agora. No Console, reopararemos que ele fez um insert, o primeiro update (do nome "XPTO") e fez o select, por causa do merge(), porém, não fez o update referente à mudança de nome para "1234".
+
+Isso aconteceu, porque quando chamamos o método merge() e passamos uma entidade, ele não muda o estado dessa entidade para managed, ele devolve uma nova referência, e esta sim, estará no estado managed. Mas, a que passamos como parâmetro, no nosso caso, "celulares", continua detached.
+
+em.merge(celulares);
+celulares.setNome("1234")
+em.flush();
+
+Por isso, quando mudamos o atributo, não adiantou nada, já que fizemos essa mudança na entidade que ainda está detached. Sendo assim, se desejarmos mudar o atributo, é necessário criar uma nova categoria e atribuir, ou, para mudar de fato o objeto, precisamos fazer celulares = em.merge(celulares); ("celulares", que é o nosso objeto, agora aponta para o retorno do método merge()). Ou seja, o método merge() devolve a entidade no estado managed.
+
+Vamos rodar e analisar o Console. Agora ele fez o insert, o update, o select do mege() e o update da atualização, já que, agora, sim, estamos trabalhando em cima da entidade que está managed. É assim que o método merge() funciona. Comumente, nos projetos, temos um método para atualizar. Funciona assim: temos um método para cadastrar e estamos na categoria DAO e teremos um método para atualizar uma entidade.
+
+    public void cadastrar(Categoria categoria) {
+        this.em.persist(categoria);
+    }
+
+    public void atualizar(Categoria categoria) {
+        }
+
+}
+
+O que esse método faz? Em teoria, ele não precisa fazer nada, pois já recebe a entidade com as informações alteradas, mas, como não sabemos se essa entidade está managed, nós, de certa forma, a forçamos a ficar managed. Então, colocamos this.em.merge(categoria), só para garantir que essa categoria estará no estado managed.
+
+public void atualizar(Categoria categoria) {
+    this.em.merge(categoria);
+}
+
+Não há necessidade de alterar os atributos, porque eles já chegam atualizados, isto é, já chegou uma categoria detached com todos os atributos atualizados, então, quando chamarmos o merge(), ele apenas a coloca no estado managed e, depois, quando fizermos o flush() da transação, ele disparará o update automaticamente.
+
+Aparentemente, não precisamos do método merge(), porque sua função não é atualizar, mas, sim, para o caso de, se por um acaso a entidade estiver detached, o método merge() a voltará para o estado managed. Para atualizar no banco de dados, vamos: carregar a entidade do banco, mudar o atributo, commitar a transação. E, pronto, já está managed.
+
+Quando carregamos do banco de dados, ela já está managed. Então, se alterarmos qualquer atributo e fizermos o flush() ou o commit(), ele fará a sincronização com o banco de dados (fará o updtae automaticamente).
+
+No próximo vídeo, falaremos de outros estados das entidades da JPA. 
+*** Estados no delete da entidade
+(AP: ver "./cursoJPA-Aula04_video03.png")
+Nós estávamos discutindo sobre os estados da entidade da JPA e ainda não estudamos a parte de consultas, que será tema da próxima aula. Mas, apenas para complementar, existe mais uma situação no ciclo de vida, que é quando uma entidade está no banco de dados.
+
+Isto é, já fechamos o EntityManager e abrimos um novo, não temos mais uma referência para a entidade no estado detached, então, como faremos para trazê-la para o estado managed. Basicamente, queremos trazê-la do banco para o estado managed, para isso, precisaremos dos métodos find()/ createQuery(). Nós veremos estes métodos de consulta na próxima aula.
+
+Portanto, existe mais essa transição de estados. Além do managed para o banco de dados, quando estamos commitando ou fazendo um flush() no EntityManager, existe a transição do banco de dados para o managed, quando fazemos uma consulta, uma query. Agora, voltando para o código, em CadastroDeProduto.java, faltou apenas um último estado, que é quando excluímos uma entidade.
+
+Para excluir, temos a seguinte situação: do estado managed, podemos chamar o método remove() do EntityManager e ela passa para o estado REMOVED. Quando o commit() ou o flush() for chamado, ele vai sincronizar o remove() com o banco de dados disparando um delete. Vamos simular essa situação.
+
+Em CadastroDeProduto.java, temos a entidade, persistimos, atualizamos o nome, fizemos um flush(), ele disparou o update, demos um clear(), voltamos a entidade para o estado managed chamando o merge(), atualizamos o nome e fizemos um flush().
+
+Depois disso, ela ainda está managed, porque não fizemos um clear() nem close(), então podemos excluí-la do banco de dados com em.remove(), passando a entidade celulares, e quando fizermos um flush(), ela deve disparar um delete no banco de dados.
+
+celulares = em.merge(celulares);
+celulares.setNome("1234");
+em.flush();
+em.remove(celulares);
+em.flush();
+
+Vamos rodar o código e ver a saída no Console. Ele fez o insert, o update, o select devido ao merge(), mais um update e um delete. Então, a JPA deleta baseada no id, no atributo da chave primária. Com isso, fechamos todos os cenários possíveis, todas as transições de estados de uma entidade JPA.
+
+Quando uma entidade nasce, ela está no estado transient, para salvá-la no banco de dados, temos que movê-la para o estado managed e, então, entra o método persist(). Commitamos a transação ou fizemos um flush() no EntintyManager, ele sincroniza com o banco de dados. Se fecharmos esse EntityManager (ou se dermos um clear()), a entidade vai para o estado detached.
+
+Se temos a entidade detached, podemos chamar o método merge() para trazê-la novamente ao método managed, ou, se ela já está no banco de dados, é possível fazer um find() ou uma createQuery() e, por fim, se quisermos excluí-la do banco de dados, do managed, chamamos o remove() e ela passa para o estado de removed.
+
+Esses são os estados possíveis e as transições que acontecem na JPA. Conforme vamos utilizando o EntityManager e esses métodos, ocorrem transições de estados. Se quisermos complementar a nossa classe DAO, CategoriaDao.java, nós já temos o método cadastrar() e o atualizar(), para fazer um método para excluir, será parecido.
+
+public void remover(Categoria categoria) {
+    this.em.remove(categoria);
+
+A única ressalva é que essa categoria precisa estar no estado managed. Pode acontecer de não termos essa garantia, de não sabermos se ela está managed. Se ela estiver detached e chamarmos para o remove(), será que teremos problemas? Vamos simular o nosso código do método main(). Antes de fazer o remove(), vamos fazer o clear(). Agora ela está detached, e, na sequência, chamaremos o remove() para testar se ele deletará do banco de dados.
+
+celulares = em.merge(celulares);
+celulares.setNome("1234");
+em.flush();
+em.clear();
+em.remove(celulares);
+em.flush();
+
+Vamos rodar e ao analisar o Console, receberemos uma exception, "IlegalArgumentException: Removing a detached instance", ou seja, não é permitido remover uma entidade que está detached, ela precisa estar managed. Em CategoriaDao.java, nós não sabíamos se, no método atualizar(), a classe estava managed e chamamos o merge() para garantir.
+
+Podemos fazer o mesmo no método remover(), chamar o método merge() para forçá-la a ficar managed, e na sequência, fazer o remove(). Então, pegaremos o merge() reatribuindo o objeto, isto é, categoria = em.merge(categoria), e depois fazemos o remove(categoria) em cima da categoria.
+
+public void remover(Categoria categoria) {
+    em.merge(categoria);
+        this.em.remove(categoria);
+    }
+
+É importantíssimo lembrar de reatribuir. Estamos fazendo merge(), mas não guardamos a entidade mergeada, a entidade que está no estado managed, então, estamos mexendo na categoria que ainda está detached, por isso, precisamos reatribuir. Podemos fazer desta maneira,categoria = em.merge(categoria);, só para garantir que a entidade está managed.
+
+Assim fica uma classe DAO com a JPA, temos o cadastrar(), o atualizar() e o remover(), faltam apenas os métodos de consulta, que discutiremos na próxima aula. Espero que tenham aprendido um pouco sobre transições de estados de uma entidade, como elas funcionam, as possíveis transições e as excessões. 
+** Consultas com JPQL
+*** Consultas com filtros
+Agora que já aprendemos a fazer consultas com a JPA, vamos aprofundar um pouco os conhecimentos das aulas anteriores estudando outros recursos de consultas. Nós havíamos criado o método buscarTodos() para carregar todos os produtos, que é um select sem filtro, isto é, carrega todos os registros do banco de dados. Mas, eventualmente, podemos querer limitar, criar um filtro com algum parâmetro.
+
+Então, vamos criar um novo método chamado buscarPorNome(). Supondo que queremos buscar determinados produtos que tenham um determinado nome, nós receberemos, como parâmetro, qual é esse nome.
+
+public List<Produto> buscarPorNome(String nome) {
+        String jpql = "SELECT p FROM Produto p";
+        return em.createQuery(jpql, Produto.class).getResultList();
+
+    }
+
+Agora, nossa query será um pouco diferente, não faremos mais "SELECT p FROM Produto p", porque queremos filtrar. Para isso - semelhante ao SQL - adicionaremos, depois do FROM Produto p, WHERE p. e o nome do atributo, não da coluna na tabela, que, no caso, é nome (e, por coincidência, o mesmo nome da coluna).
+
+Portanto, temos "SELECT p FROM Produto p WHERE p.nome =", e precisamos passar o parâmetro que está chegando no método para essa parte. Uma maneira de fazer isso é adicionando dois pontos, para dizer à JPQL que passaremos um parâmetro dinâmico na query, e, depois, dando um apelido para esse parâmetro. No nosso caso, chamaremos de nome, mas poderia ser qualquer outro nome.
+
+public List<Produto> buscarPorNome(String nome) {
+        String jpql = "SELECT p FROM Produto p WHERE p.nome = :nome";
+        return em.createQuery(jpql, Produto.class).getResultList();
+
+Antes de disparar essa query, temos que substituir o parâmetro que está em: "SELECT p FROM Produto p WHERE p.nome = :nome", pelo que veio em: buscarPorNome(String nome). Para isso, antes de chamar o .getResultList(), podemos chamar o método .setParameter(). Nele, informaremos qual o nome do parâmetro que, no caso, é "nome", e qual é o valor que queremos substituir, que é o nomeque está chegando em buscarPorNome(String nome).
+
+Portanto, nós substituiremos o parâmetro do método no parâmetro chamado nome que está na nossa query.
+
+public List<Produto> buscarPorNome(String nome) {
+        String jpql = "SELECT p FROM Produto p WHERE p.nome = :nome";
+        return em.createQuery(jpql, Produto.class)
+                .setParameter("nome", nome)
+                        .getResultList();
+
+Um detalhe importante é que em setParameter("nome", nome) nós não usamos dois pontos, como fizemos anteriormente no JPQL. Poderíamos ter quantos parâmetros quiséssemos. Por exemplo, para filtrar por outro parâmetro, poderíamos fazer AND p.categoria = e passaríamos o valor. Enfim, poderíamos ter vários parâmetros e usar AND ou OR, semelhante ao SQL.
+
+Terminado, poderemos fazer uma query filtrando por algum atributo. Em cadastroDeProduto.java, no método main(), ao invés de buscarTodos(), vamos usar o buscarPorNome(), passar o nome que escolhemos, "XIAOMI Redmi", e conferir se ele fará a busca. Vamos rodar e olhar o Console. Analisando o select no Console, encontraremos "Where produto0_.nome=?", significa que ele filtrou corretamente pelo nome.
+
+Essa maneira de passar o parâmetro é chamada de Named parameter, onde passamos o parâmetro pelo nome. Mas há outra forma de fazer que é passando ?1, isto é, "SELECT p FROM Produto p WHERE p.nome = ?1". E em .setParameter("nome", nome), ao invés de passar um apelido,"nome", passamos o 1, isto é, .setParameter(1, nome).
+
+Ou seja, é possível ter um parâmetro posicional, com interrogação 1, 2, 3 e assim por diante, já que podemos passar vários parâmetros, cada qual com um número distinto. As duas abordagens funcionam.
+
+Agora, vamos retornar à nossa entidade Produto.java e recordar que o Produto tem um atributo Categoria. Neste caso, Categoria é um relacionamento, outra entidade. É possível filtrar um produto pela categoria? Pelo nome, não do produto, mas da categoria? A resposta é sim.
+
+Na classe ProdutoDao.java criaremos outro método e chamá-lo de buscarPorNomeDaCategoria(), significa que agora filtraremos pelo nome da categoria, não mais do produto.
+
+    public List<Produto> buscarPorNomeDaCategoria(String nome) {
+        String jpql = "SELECT p FROM Produto p WHERE p.nome = :nome";
+        return em.createQuery(jpql, Produto.class)
+                .setParameter("nome", nome)
+                .getResultList();
+    }
+
+A nossa query mudará um pouco. Como se trata de um relacionamento, precisaremos fazer um join, isto é, fazer uma consulta por um join com a tabela de Categoria. Então, no JDBC, no SQL puro, seria por join. Na JPA, conseguimos encontrar uma maneira simplificada, se recordarmos que se trata de uma consulta orientada a objetos.
+
+Portanto, basta fazer "SELECT p FROM Produto p WHERE p.categoria.nome = :nome", sendo que categoria se refere ao relacionamento.
+
+String jpql = "SELECT p FROM Produto p WHERE p.categoria.nome = :nome";
+
+A JPA entenderá que a categoria é um atributo da classe produto e, neste caso, um relacionamento. Então, ele quer filtrar por um atributo dentro do relacionamento, desta maneira, a JPA automaticamente gerará um join, isto é, ela já sabe que deve filtrar pelo relacionamento e faz o join automaticamente, evitando que seja necessário fazer manualmente, como seria no SQL.
+
+O JPQL é um SQL simplificado, orientado a objetos, não ao modelo relacional. Vamos verificar se funciona indo na classe CadastroDeProduto.java. Nela, em lugar de buscarPorNome(), faremos buscarPorNomeDaCategoria(). Também precisamos trocar o nome do produto pelo nome da categoria, que é "CELULARES".
+
+    List<Produto> todos = produtoDao.buscarPorNomeDaCategoria("CELULARES");
+
+Agora vamos rodar e conferir se ele encontrará os produtos. Analisando o Console, notaremos que ele fez o select e encontrou o "Xiaomi Redmi". Ele também gerou o join automaticamente: "cross join categorias", "where produto0_.categoria_id=categoria1", "and categoria1_.nome=?". Significa que ele está filtrando pelo nome da categoria, que é o relacionamento.
+
+Anteriormente no persistence.xml, para o Hibernate imprimir o SQL, tivemos que colocar property name="hibernate.show_sql" value="true"/>. Existe outra propriedade parecida com essa, a "hibernate.format_sql", que serve ele identar o código SQL quando for imprimir, principalmente em consultas. Portanto, podemos usar essa propriedade para que o Hibernate formate o SQL.
+
+Em CadastroDeProduto.java, vamos rodar outra vez a nossa classe main. Observando o Console, perceberemos que agora o SQL está "quebrado". Ele faz o select, coloca as colunas que serão selecionadas, o from, o join, o where, enfim, com tudo identado fica mais fácil de visualizar. Portanto, podemos usar essa propriedade para facilitar a leitura dos comandos SQL quando o Hibernate for acessar o banco de dados.
+
+No insert ele também quebrou a linha, dividindo em colunas, values, então, fica um pouco mais fácil de visualizar. Espero que tenham gostado da aula e aprendido a fazer consultas com JPQL e a filtrar os resultados com o atributo de um relacionamento.
+
+Para isso, basta navegar, e se a categoria tivesse outro relacionamento, poderíamos continuar navegando: p.categoria. xpto.nome, isto é, ponto + nome do atributo, e o Hibernate gerará dois, três, cinquenta ou mais joins segundo o necessário para efetuar a consulta.
+* Curso de Java e JPA: consultas avançadas, performance e modelos complexos
+https://cursos.alura.com.br/course/java-jpa-consultas-avancadas-performance-modelos-complexos
+Conteúdo final do projeto em "./Curso de Java e JPA: consultas avançadas, performance e modelos complexos - Projeto final"
+
+** Mais relacionamentos
+AP: No que se refere a categorizar os 'one/many' to 'one/many' - ver como ficam os registros salvos no banco: para essa id do cara da direita, eu posso ter quantos ids se referenciando a ele pelo id da esquerda, *dentro do banco inteiro*? E vice versa. Posso ter mais de um id dessa tabela fazendo referência a esse outro id (no banco inteiro)?? Isso dirá se ele é um "one" ou um "many".
+
+Exemplo: caso da relação cliente/pedido: para o pedido de id: 12L, dentro de todo o banco, para quantos client_ids teriam a possibilidade de estarem sendo mencionados no campo client_id desse pedido de id=12L? R: um.
+Trocando a análise de campo: para o client_id=111L: quantas linhas dentro da tabela pedido poderiam citar client_id=111L? Um ou muitos? R: muitos.
+
+
+Exemplo:
+Ver imagem: "./cursoJPAAvancado-Cardinalidade_Aula01_Video02_Imagem01.png"
+[00:11] E Pedido está relacionado com Cliente, um many to one (primeiro elemento mencionado: pedido (many), segundo elemento mencionado cliente (one), todo pedido pertence a um cliente, um cliente pode estar vinculado a mais de um pedido. 
+
+E agora nós precisamos relacionar o pedido com o produto, em um pedido eu terei vários produtos. Se formos analisar, pensando no banco de dados, precisaremos ter essa tabela aqui.
+
+*** Relacionamentos many-to-many
+(Para comentário 00:30 abaixo ver a imagem: "./cursoJPAAvancado-Cardinalidade_Aula01_Video02_Imagem02-Many_To_Many.png")
+[00:30] Uma nova tabela, que é justamente a tabela que faz essa junção entre um pedido e um produto. É aquela famosa tabela de join, de relacionamento de *muitos para muitos*, porque um pedido pode ter vários produtos, mas um mesmo produto pode estar presente em vários pedidos, então é um relacionamento muitos para muitos.
+
+[00:49] Se fosse um relacionamento muito para muitos simples, conforme está demonstrado nesse diagrama, nós teríamos essa tabela "itens_pedido", essa tabela seria apenas a tabela de join, então teria apenas o ID do pedido e o ID do produto. Ela seria populada, por exemplo, o pedido 1 está vinculado com o produto 1, o pedido 1 está vinculado com o produto 2, o pedido 1 está vinculado ao produto 3, e por aí vai.
+
+[01:12] Porém, se fosse fazer esse mapeamento na JPA, seria algo simples, bastaria vir na entidade Pedido, por exemplo, e colocaríamos aqui um private List<>, já que são vários, private List <Produto>, que é a nossa entidade Produto. Chamaria aqui de private List <Produto> produtos;.
+
+[01:30] Em cima desse atributo, como Produto é uma outra entidade, lembre, precisamos colocar a anotação da cardinalidade, nós colocaríamos @ManyToMany. Eu estaria falando: JPA, de Pedido para Produto, é muitos para muitos. A JPA já ia assumir que teria uma tabela de join.
+
+[01:52] A JPA tem um padrão de nomenclatura, mas se quiséssemos trocar o padrão dessa tabela, não é o @Table, o @Table é só em cima de entidade. Nós teríamos que colocar aqui uma outra anotação, que é o @JoinTable(). Aqui nós conseguimos personalizar qual é o nome da tabela, quais os nomes das colunas de join, o "produto_id", "pedido_id", enfim.
+
+AP/Pro:
+// Abaixo cita-se porque não é possível usar uma tabela many to many simples... até a linha de cima seria o caso de usarmos o código da imagem "./cursoJPAAvancado-Cardinalidade_Aula01_Video02_Imagem03-Many_To_Many_Simples.png"
+A Ideia é complementada abaixo em: [03:48] Não será um @ManyToMany, vamos mudar um pouco aqui. Precisamos ter uma nova entidade. Sempre que você tiver um relacionamento muitos para muitos que precise de mais colunas, o ideal é você criar uma nova entidade para representar essa tabela de uma maneira mais apropriada. Aqui eu vou apagar. Teremos uma outra entidade, chamada <ItemPedido>, que é justamente aqui a ideia, "itens_pedidos".
+Ver: imagens "./cursoJPAAvancado-Cardinalidade_Aula01_Video02_Imagem05-Tabela_Item_pedido.png" e
+"./cursoJPAAvancado-Cardinalidade_Aula01_Video02_Imagem06-Tabela_Pedido.png"
+
+[02:16] Então esse é o mapeamento many to many simples, onde a tabela tem apenas as duas colunas, o ID das duas tabelas que ela referencia. Porém, no nosso caso, o relacionamento, ele é many to many, ele é muitos para muitos, só que a nossa tabela, ela vai precisar de mais colunas.
+
+[02:33] Por exemplo, eu preciso saber a quantidade do produto. Então, nesse pedido eu estou comprando o produto XPTO, mas em qual quantidade? É uma, são 2, são 5, são 30? Eu preciso saber isso. Outra coisa que eu preciso saber também é qual é o preço do produto.
+
+[02:49] Você pode perguntar, “Mas Rodrigo, já não tem aqui o ID do produto? E na tabela do produto já não tem o preço?” Verdade, só que esse preço pode sofrer um reajuste, futuramente ele pode aumentar, mas na data daquele pedido, ele tinha um determinado valor, em um determinado pedido ele custava 100 reais, hoje foi reajustado, custa 180, mas quando eu fiz o pedido, cada unidade custava 100 reais.
+
+[03:10] Eu preciso ter meio que um histórico do preço do produto naquela venda, naquele pedido. Percebe? Como eu terei mais atributos, mais colunas, mais informações nesse relacionamento, a nossa tabela, ela fica dessa maneira.
+
+[03:25] Ela muda um pouco de figura. Ela terá um ID próprio, e terá que ter um relacionamento com o pedido e com o produto. Eu preciso saber: esse item pedido, de qual produto ele se referencia, e a qual pedido ele se referencia. E tem as outras colunas, no caso, o preço unitário e a quantidade. Por conta disso, o mapeamento não vai ficar dessa maneira.
+
+[03:48] Não será um @ManyToMany, vamos mudar um pouco aqui. Precisamos ter uma nova entidade. Sempre que você tiver um relacionamento muitos para muitos que precise de mais colunas, o ideal é você criar uma nova entidade para representar essa tabela de uma maneira mais apropriada. Aqui eu vou apagar. Teremos uma outra entidade, chamada <ItemPedido>, que é justamente aqui a ideia, "itens_pedidos".
+
+[04:14] Eu preciso criar essa nova entidade. "Ctrl + 1", "Create Class", no pacote "modelo" mesmo. Vou copiar o @Entity, o @Table, o mesmo esquema, mapear a entidade agora, você já sabe como funciona. O nome da tabela é @Table(name = "itens_pedido"), conforme nos foi passado. Aqui dentro, vamos trazer, vai ter um @Id, vou copiar de "Pedido".
+
+[04:43] O ID desta tabela também será gerado automaticamente. O item pedido, ele tem o preço unitário, então private BigDecimal precoUnitario;, que é o preço na data da venda do produto. Ele vai ter também o que mais? Uma quantidade, private int quantidade;. É um inteiro a quantidade dos produtos.
+
+AP: Ver imagem "./cursoJPAAvancado-Cardinalidade_Aula01_Video02_Imagem04-2xMany_To_One.png")
+[05:07] E o relacionamento para produto e para pedido, que nada mais é do que um relacionamento many to one. Então, essa tabela "itens_pedido", embora ela seja uma tabela de muitos para muitos, como ela tem essa característica, se formos parar para pensar, ela é muitos para um para produto e muitos para um para pedido.
+
+[05:24] Então nós vamos mapear exatamente dessa forma aqui, na entidade. Deixa eu copiar aqui, de "Pedido", aquele relacionamento. Aliás, em "ItemPedido" são novos relacionamentos: private Pedido pedido, vou chamar de pedido, e private Produto produto. Então a nossa ItemPedido está relacionada com Pedido e com um Produto. Apaguei sem querer, "Ctrl + Z".
+
+[05:50] E many to one, @ManyToOne. Então esse relacionamento, em si, será many to one, porque virou uma nova entidade. Se não precisasse, seria um many to many. Por padrão, o nome da coluna será "pedido_id", "produto_id", conforme eu desejo aqui. Vamos fazer aquele mesmo esquema, criar o construtor, criar os getters e setters, conforme já fizemos aqui várias vezes.
+
+[06:14] Botão direito, "Source > Generate Constructor". Nesse caso, quando eu criar um "ItemPedido", eu vou passar o ID, a quantidade, o pedido e o produto. Eu não vou passar o preço unitário, porque o preço unitário eu pego do produto, já que, na hora que eu estou instanciando o produto, eu pego o preço dele, naquele momento.
+
+[06:34] Vou gerar aqui. Lembre que a JPA necessita do construtor default. Agora botão direito, "Source > Generate Getters and Setters". Vou gerar os getters e setters. Na teoria, do jeito que eu estou fazendo aqui no projeto, não precisaria dos setters, porque eu já estou recebendo no construtor, mas vou gerar aqui, que é o comum do mercado.
+
+[06:55] Mapeei aqui a minha entidade e agora na entidade "Pedido", ele vai ter um list de itens, então vou chamar aqui de private List<ItemPedido> itens;, e será um @OneToMany. Olha que legal, uma nova anotação, um novo mapeamento. Então o "ItemPedido", ele conhece quem é o pedido, quem é o produto, e o "Pedido" conhece essa lista.
+
+[07:20] Entretanto, daqui para lá é um para muitos, então aqui, no "ItemPedidos", nós usamos essa anotação @OneToMany. Porém, aqui tem um detalhe: com isso aqui, eu estou mapeando agora os dois lados do relacionamento. De "ItemPedido" eu estou mapeando o "Pedido", e de "Pedido" eu estou mapeando o "ItemPedido".
+*** Relacionamentos bidirecionais
+AP:
+Ver: "./cursoJPAAvancado-Cardinalidade_Aula01_Video04_Imagem01-QuandoHouverRelacionamentoBidirecional.png"
+
+[06:49] Só alguns detalhes, algumas dicas, para você não esquecer, e principalmente relacionado com relacionamento bidirecional. Quando você tem esse relacionamento bidirecional, você tem que colocar o mappedBy, geralmente do lado do @OneToMany, é do lado do @OneToMany que você coloca o mappedBy.
+
+Acima sintetizada a explicação abaixo:
+-----------
+[00:00] Olá, pessoal! Continuando aqui então, agora que já mapeamos o relacionamento do pedido com os itens pedidos, aquele relacionamento muitos para muitos, quando tem mais colunas do que as colunas de join entre as tabelas, acabamos ficando com um relacionamento bidirecional.
+
+[00:15] Porque, se pararmos para pensar, a classe ItemPedido, ela já está mapeando o relacionamento com a classe Pedido. Ela já está fazendo aquele mapeamento de "itens_pedido" para "pedidos".
+
+[00:27] Mas, na classe Pedido, também tem o mesmo mapeamento, o mapeamento do mesmo relacionamento, que, no caso aqui, com é o lado contrário, é one to many. Eu também estou mapeando o "itens_pedido", então é de "pedidos" para "itens_pedido", eu mapeei essas duas pontas, de "itens_pedido" para "pedidos" e de "pedidos" para "itens_pedido".
+
+[00:48] Isso configura um relacionamento bidirecional, um relacionamento das duas pontas, os dois lados estão se mapeando. Porém, sempre que isso acontecer, nós temos que tomar um certo cuidado, porque, por padrão, se não indicarmos que esse é um relacionamento bidirecional, a JPA, ela não vai entender, ela vai supor que isso é um novo mapeamento, que é um novo relacionamento.
+
+[01:11] Em vez de termos essas cinco tabelas, as do slide, ela vai gerar uma sexta tabela. Então ela não vai considerar que esse mapeamento private List<ItemPedido> itens;, do "Pedido", é o lado oposto desse mapeamento private Pedido pedido;, da classe "ItemPedido". Ela vai supor que é outro relacionamento e ela vai criar uma sexta tabela, uma segunda tabela de join.
+
+[01:29] Nós podemos até simular isso, podemos abrir aquela nossa classe de teste. Deixa eu abrir ela aqui, está no pacote "testes > CadastroDeProduto". Vou só rodar essa classe para ele gerar aqui no console os logs do hibernate. Vamos olhar nos logs de criação de tabelas.
+
+[01:47] Perceba, ele logou aqui. Ele criou a tabela de categorias. Criou a tabela de clientes, ok, a nossa tabela de clientes. Criou a nossa tabela itens_pedido, que é a tabela de join, ok. Criou a tabela de pedidos e a tabela de produto, aqui embaixo.
+
+[02:08] Contudo, antes, ele criou essa tabela pedidos_itens_pedido. Não existe essa sexta tabela aqui no slide.
+
+[02:14] Aqui está o problema. Ele criou essa tabela aqui justamente por conta do relacionamento de “Pedido” para “ItemPedido”. Então ele já tinha visto o mapeamento de ItemPedido para Pedido, que é o many to one, mas, quando ele chegou aqui, no @OneToMany, que é o lado contrário, ele não sabe que isso é o lado contrário do relacionamento, para ele isso é um novo relacionamento.
+
+[02:36] Por isso ele gerou uma nova tabela. Para isso não acontecer, no lado que tem to many, temos que colocar aqui, abrir parênteses e colocar um atributo, chamado @OneToMany(mappedBy = " "), que é para indicar: olha, JPA, esse relacionamento, ele já está mapeado lá do outro lado. Que outro lado? Na classe ItemPedido, pelo atributo chamado pedido.
+
+[02:59] Aqui nós passamos o nome do atributo que está no outro lado do relacionamento, (mapped By = "pedido"). É só fazer isso e pronto, resolveu o problema. Se rodarmos de novo aquela classe de teste - deixa eu rodar ela aqui. Vamos lá para cima, ver os logs. Criou a tabela de categorias, de clientes, itens_pedido, ok, pedido, produto.
+
+[03:21] Acabou, para baixo é só alter table para ele gerar as chaves estrangeiras, as foregin keys. Agora ele não gerou aquela sexta tabela, a segunda tabela de join, agora ele entendeu que esse relacionamento one to many é o lado oposto do many to one que já está mapeado naquela entidade ItemPedido.
+
+[03:41] Então cuidado quando for fazer um relacionamento bidirecional porque um dos lados é o lado inverso e você terá que colocar o mappedBy. Outra dica, agora de boas práticas. Eu, particularmente, sempre prefiro, quando tem um relacionamento por uma lista, já inicializar a lista aqui na declaração do atributo.
+
+[03:58] Aqui já colocar private List<ItemPedido> itens = new ArrayList<>(); para inicializar essa lista como uma lista vazia, porque senão teremos que sempre ficar fazendo aquele if, if lista foi instanciada? Se a lista é nula, dá new na lista; if a lista é nula, dá new na lista. Então teríamos que fazer isso o tempo inteiro. Para evitar essa checagem, já inicializamos aqui a coleção.
+
+[04:22] Ele sempre vai começar uma coleção vazia, então eu não preciso verificar se está nula, nunca estará nula, sempre estará instanciada e com uma coleção vazia. Uma outra dica de boa prática: como é um relacionamento muitos para muitos, quando formos instanciar esses objetos, temos que lembrar de setar, de, no "Pedido", adicionar nessa lista o "ItemPedido", mas no "ItemPedido", que está sendo adicionado, também temos que setar o "Pedido".
+
+[04:50] Lembre: é bidirecional, os dois lados têm que se conhecer. Para evitar espalhar esse tipo de código, é comum, é uma boa prática, aqui, por exemplo, no nosso caso, na classe "Pedido", criarmos um método e esse método é que vai adicionar um item nessa lista. Nesse método utilitário, ele já faz esse vínculo dos dois lados do relacionamento.
+
+[05:12] Então podemos criar um método aqui, em "Pedido", por exemplo, public void adicionarItem(). Então, na classe de "Pedido", eu tenho um método para adicionar um item, e ele recebe como parâmetro um (ItemPedido item). Aqui dentro, o que eu faço? item.setPedido(this);. No item eu vou setar o pedido como sendo o this, o próprio pedido, a própria classe atual.
+
+[05:39] Eu também vou pegar aqui this.itens, que é a lista, e vou adicionar esse this.itens.add(item);. Dessa maneira eu estou vinculando os dois lados, o item conhece o pedido e o pedido conhece o item, eu adicionei na lista de itens esse novo item. Inclusive, lembra que a nossa classe de "ItemPedido", ela não tem em Pedido pedido, ela não tem um preço unitário?
+
+[06:09] Temos que lembrar de sempre passar esse preço unitário. Podemos ter um método aqui. Na verdade, um construtor. O construtor, eu gerei o construtor padrão e o que recebe os atributos. Nesse construtor que recebe os atributos, eu já não recebo o pedido?
+
+[06:25] E eu não tenho que guardar qual é o preço unitário dele? Eu posso fazer isso direto no construtor para não esquecer, this.precoUnitario = produto, passado como um parâmetro, = produto.getPreco();. Com isso, na hora que eu der um new no "ItemPedido", eu não passo um produto? Eu já passo qual é o preço unitário dele já para não esquecer.
+
+[06:49] Só alguns detalhes, algumas dicas, para você não esquecer, e principalmente relacionado com relacionamento bidirecional. Quando você tem esse relacionamento bidirecional, você tem que colocar o mappedBy, geralmente do lado do @OneToMany, é do lado do @OneToMany que você coloca o mappedBy.
+
+[07:08] Essa string "pedido" que você passa aqui é o nome do atributo do outro lado. É o nome do atributo, aqui é "pedido", então nessa string tem que ser o mesmo nome do atributo. A dica também de inicializar as coleções, não só para one to many, many to many também, sempre que tiver lista, já inicializa a coleção.
+
+[07:25] E você criar um método utilitário nessa classe, para receber o item, que é o elemento desta coleção. E setar os dois lados do relacionamento, para não ter perigo de você esquecer de setar. Geralmente o pessoal esquece de setar esse lado aqui, geralmente o código fica assim.
+
+[07:41] Itens, adiciona esse pedido. Só que o item fica sem o pedido, ele não tem o outro lado vinculado. Então não se esqueça de fazer esse lado do relacionamento. Por hoje, esse era o objetivo do nosso vídeo, entender o esquema do mapeamento bidirecional, que temos que mapear os dois lados do relacionamento, e umas dicas de boas práticas quando lidarmos com coleções e em relação ao mapeamento bidirecional.
+
+[08:08] No próximo vídeo vamos fazer um exemplo, eu vou criar um produto, adicionar um item e ver como é que funciona isso na prática, naquela nossa classe main, vamos testar esse relacionamento e ver se ele vai inserir tudo certo. Vejo vocês lá, um abraço.
+*** CASCADE
+[10:37] Eu ainda acho que não vai funcionar. Não deu a exception, então funcionou, não é? Não sei, vamos ver. Ele fez um insert da categoria, fez um insert do produto, fez o insert do cliente, selecionou o produto do banco de dados, o produto de ID 1, selecionou o cliente de ID 1 e agora é o que me interessa.
+
+[10:59] Fez o insert na tabela de pedido. Só que ele fez um insert só na tabela de pedido. Só que lembra, faltou ele fazer um insert - deixa eu ver se está aberto aqui.
+
+[11:09] Ele fez um insert na tabela de pedido, só que ele não fez o insert aqui na tabela "itens_pedido". Então ele não salvou o relacionamento, ele não salvou os itens, salvou um pedido solto, sem itens. Está errado, está incompleto. Por que ele não salvou? Porque, de novo, o que eu estou salvando neste teste?
+
+[11:27] Eu estou salvando o pedido, o pedidoDao.cadastrar(pedido), eu não salvei o item pedido. Poxa, Rodrigo, vou ter que criar um ItemPedidoDao, vou ter 300 classes Dao no projeto? É, a princípio sim. Só que, na verdade, nesse caso, não precisa, porque o item pedido, ele é vinculado a um pedido, sem um pedido não faz sentido existir o item pedido.
+
+[11:50] Então o item pedido, ele é dependente diretamente do pedido. Nós podemos usar um recurso da JPA. Na classe "Pedido", na nossa entidade, essa private List<ItemPedido>, invés de eu ter que salvar o "pedido" no banco de dados e depois salvar separadamente, no banco de dados, o ItemPedido, eu posso pedir para a JPA já salvar.
+
+[12:11] JPA, estou salvando um pedido no banco de dados, já salva junto, já faz um insert junto na tabela de join, na tabela "ItemPedido". Aqui, na anotação @OneToMany, além do atributo (mappedBy = "pedido"), tem um outro atributo muito importante chamado cascade, que é para falarmos para fazer o efeito cascata: tudo o que acontecer com o "pedido", faça também no ItemPedido.
+
+[12:33] Mas eu tenho que dizer qual é o tipo de cascade que eu quero, se é quanto tiver um persist, só quando tiver um persist no pedido faz no ItemPedido? Remove? Merge? Qual é o tipo de cascade? Nesse meu caso, eu vou colocar (mappedBy = "pedido", cascade = CascadeType.ALL).
+
+[12:48] Tudo o que eu fizer no pedido, faz também no ItemPedido. Isso vale também para a exclusão, se eu excluir um pedido, não faz sentido eu ter um item pedido voando, se eu matei, se eu deletei o pedido, apaga todos os itens pedidos, não faz mais sentido ter um item pedido sem o pedido, um não existe sem o outro. Então eu vou colocar cascade = CascadeType.ALL.
+
+[13:09] Um novo recurso que acabamos de aprender. Vamos voltar para a nossa classe de teste, vamos rodar. Agora eu acredito que deva funcionar. Olha só, vamos voltar tudo para o começo. Vamos lá: fez um insert na categoria, fez um insert no produto, fez um insert no cliente, carregou o produto 1, carregou o cliente 1, fez o insert no pedido e fez o insert no item pedido.
+
+[13:35] Como eu só tenho um único item no pedido, ele só fez um único insert. Se eu tivesse, naquela lista, adicionado mais itens, para cada um ele faria um insert aqui. Funcionou corretamente. Só tem um problema, que eu acabei de perceber: o nome da coluna está precoUnitario. Está camel case, igual o do Java, não está com underline.
+
+[13:56] Na realidade, a JPA, quando vai mapear as colunas do banco de dados, quando é uma coluna de relacionamentos, por exemplo, o "cliente", por padrão, ela já coloca o _id. Mas para os atributos que não são de relacionamento, para os atributos que têm o nome composto, igual "valorTotal", ele não coloca o underline para separar, ele coloca o mesmo nome do atributo, então ele coloca camel case. Mas eu não quero assim.
+
+[14:26] No meu banco de dados, eu quero separar com underline. Aqui, nós não estamos seguindo a convenção, tem que usar aquela anotação @Column. Vou importar do javax.persistence e o name dessa coluna, (name = "valor_total").
+
+[14:42] Então, se não formos seguir a convenção, temos que configurar. E no "itemPedido", o preço unitário: @Column(name = "preco_unitario"), não quero usar camel case, eu quero usar snake case, que é o underline para separar. Vamos rodar de novo, só para ver se ele fez essa mudança? Vou rodar aqui. Cadê o console? Olha lá: "preco_unitario". E o pedido "valor_total".
+
+[15:12] Só um detalhe, só para ficar certo, igual na nossa tabela, igual está no slide de modelagem do banco de dados. Foi um pouco mais chato esse vídeo, vocês viram, como, de novo, o foco do treinamento é JPA, não temos spring boot, não temos nenhum framework MVC, nenhuma biblioteca. É JPA puro.
+
+[15:32] Então, para testarmos as coisas, fazemos via método main e é a parte chata, tem que instanciar essas classes na mão, não dá para fazer ingestão de dependências aqui, não tem controle de transação automático, então para testar é um pouco chato. Mas nós vimos que funcionou, o que nos interessa é a JPA, é a parte dos relacionamentos, mapeamentos, e funcionou tudo corretamente.
+
+[15:53] Com isso nós fechamos aqui os testes do relacionamento many to many. Ele inseriu corretamente na tabela de pedido e na tabela de join, na tabela de relacionamento. Espero que vocês tenham gostado. Na próxima aula, nós continuaremos estudando outros assuntos da JPA. Vejo vocês lá, um abraço.
+*** Pergunta sobre CASCADE
+Propagar as operações realizadas em uma entidade em seu relacionamento
+R: O cascade cria um efeito cascata nas operações realizadas em uma entidade
+** Consultas avançadas
+*** SELECT new
+[04:50] Porém, a JPA, ela tem um recurso. Quando você quer fazer um relatório, você quer fazer uma consulta, um select de um relatório e não quer devolver um array de object, tem um recurso, o select new. Então você pode fazer String jpql = "SELECT new ". É como se eu estivesse dando new em uma classe. Qual classe? RelatorioDeVendasVo.
+
+[07:43] Deu um problema na minha query, vamos dar uma olhada. Ele disse que não conseguiu localizar a classe "RelatorioDeVendas". Porque eu esqueci de um detalhe importante. No select new - cadê a classe "PedidoDao"? Tem que passar o caminho completo da classe, então tem que passar o pacote dela.
+
+[07:59] package br.com.alura.loja.vo;. Vou dar um "Ctrl + C", vou colar aqui SELECT new br.com.alura.loja.vo.RelatorioDeVendasVo. Tem que ser o nome completo da classe, incluindo o pacote. Vamos rodar novamente o main. Vamos dar uma olhada.
+
+[09:20] Isso é muito utilizado quando você precisa fazer relatórios, como esse relatório de vendas. Você tem que trazer informações fazendo group by, usando funções, e trazer várias colunas de várias tabelas misturadas. Select new é a solução para essa situação. Espero que vocês tenham gostado. No próximo vídeo vamos discutir mais um recurso de consultas. Vejo vocês lá.
+
+Obs: A classe DTO deve conter um construtor compatível com a consulta JPQL
+** Performance das consultas
+*** Entendendo Eager e Lazy
+AP: Obs: Quando eu falo de serem feitos os JOINs em queries abaixo, eles acontecem pois foi feita a requisição da informação no objeto enquanto ainda está aberto o entity Manager. Ver tópico abaixo sobre o erro LazyInitializationException que acontece pois estava fechado o entity manager numa requisição que era LAZY.
+
+[00:00] Olá, pessoal! Estamos de volta ao treinamento de JPA. Na aula de hoje vamos discutir um pouco sobre consultas, ainda discutir um pouco sobre consultas, mas focando na parte de performance. Como trabalhamos com a JPA, é comum acabarmos esquecendo de observar as consultas que ela está gerando.
+
+[00:17] Nós vamos escrevendo JPQL, vamos testando a aplicação, vemos que está tudo funcionando, só que esquecemos de dar uma analisada nos comandos SQL que foram gerados, se não tem nenhum tipo de problema, nenhum tipo de consulta excessiva, algo que pode gerar algum impacto em performance nas aplicações.
+
+[00:33] Isso acaba acontecendo muito. É muito comum encontrar aplicações que têm problemas de performance por conta da camada de persistência, por conta de queries mal planejadas, que geram esses gargalos. Para entender isso, o que vamos fazer? Já para adiantar e não perder muito tempo, eu criei mais uma classe de teste. Eu chamei ela de "PerformanceConsultas", bem parecida com as outras que nós já fizemos.
+
+[00:56] Só que aqui, no meu popularBancoDeDados, eu já estou criando tudo. Eu já estou criando as três categorias, os três produtos, um cliente.
+
+[01:03] Criando dois pedidos, dentro de cada pedido adicionando alguns itens. E salvando tudo isso no banco de dados.
+
+[01:10] Então na "PerformanceConsultas", logo aqui embaixo, eu já tenho esse banco de dados todo populado com essas informações. Para começarmos a brincadeira, o que eu vou fazer? Vou fazer uma consulta simples, eu quero buscar um pedido pelo ID. Para agilizar também, eu não vou usar a classe Dao, eu vou fazer a consulta direta com o entity manager. em.find().
+
+[01:34] A classe é em.find(Pedido.class, 1l); e o ID é 1l. Quero trazer o pedido de ID 1. Vou jogar esse código em uma variável local, vou chamar a variável de Pedido. Fiz uma consulta e embaixo vou dar um system.out.println() e vou imprimir a data do pedido, (pedido.getData()). Vamos rodar e ver o que vai acontecer. No console, aqui são os inserts. Tudo o que ele fez antes, mas o que interessa está aqui, a partir daqui.
+
+[02:08] Ele fez o select conforme o esperado. Fez o select, como no caso estou fazendo um find, ele carrega a entidade inteira. Fez um from aqui e tal. E fez o where. Filtrou pelo ID. Porém, perceba essa parte.
+
+[02:23] Esse é o problema que eu não gostei nesse ponto. Ele fez um join com a tabela de cliente. Perceba que, nessa consulta, eu estou buscando um pedido e eu quero imprimir só a data desse pedido. Então, por que essa consulta está fazendo um join com a tabela de cliente? Eu não estou exibindo os dados do cliente desse pedido, eu estou exibindo apenas uma informação do pedido.
+
+[02:47] Mas, mesmo assim, não importa, a JPA vai sempre fazer um join com a tabela de clientes. Isso tem a ver com o mapeamento do relacionamento. Se entrarmos na classe "Pedido" e dermos uma olhada no relacionamento @ManyToOne, está mapeamento do relacionamento com o cliente. Perceba que é um relacionamento @ManyToOne.
+
+*[03:07] Na JPA, existe uma característica em relação a esses mapeamentos de relacionamento, que diz respeito a como ele deve ser tratado em uma consulta. Por padrão, na JPA, todo relacionamento que é "to one", ou seja, "many to one" ou "one to one", que é um outro relacionamento, de um para um, automaticamente, a JPA, ela sempre vai fazer um select, vai incluir um join para carregar esse registro sempre que você carregar a entidade principal.*
+
+[03:42] Sempre que eu fizer um select, fizer um find, na entidade "Pedido", a JPA sempre vai carregar o cliente junto. No caso, ela carregou fazendo um join. Então esse que é o problema. Nem sempre eu quero carregar os relacionamentos to one. Nessa minha entidade, até que está tranquilo, porque eu só tenho um único relacionamento to one.
+
+[04:04] Mas é comum você encontrar entidades que tem 3, 5, 8, 10 relacionamentos many to one ou one to one. Para cada um desses relacionamentos, a JPA iria fazer um join para carregar todas essas informações, sendo que não necessariamente você precisaria de todas essas informações. Isso pode gerar um gargalo no sistema, você carregar coisas demais, coisas desnecessárias.
+
+[04:28] Agora, a nossa entidade "Pedido", ela também tem um relacionamento, que é essa lista List<ItemPedido>. Porém, se analisarmos no SQL, ele não fez join com a tabela de item pedido.
+
+*[04:42] Isso porque o relacionamento ItemPedido, a cardinalidade dele, ele é "um to many". Os relacionamentos "to many", "one to many" ou "many to many", ele não tem essa característica de quando você carrega o pedido, a JPA carregar junto essa lista, justamente por conta de ser uma lista.* Como é uma lista, pode ser pesado, você poderia sobrecarregar o sistema com inúmeros registros carregados para a memória do computador.
+
+[05:10] Então tudo o que to one é carregado automaticamente, tudo o que é "to many" não é carregado automaticamente. Em que momento ele carrega essa lista List<ItemPedido> então? *Somente se você fizer um acesso a essa lista*. Vamos simular esse acesso. Invés de darmos um System.out.println(pedido.getData()); em "PerformanceConsultas", vou dar um System.out.println(pedido.getItens().size());.
+
+*[05:31] Vou imprimir o size, o tamanho da lista. Então agora eu mudei o System.out de "PerformanceConsultas", ao invés de imprimir a data do pedido, eu estou imprimindo quantos itens tem nesse pedido.
+
+*[05:54] Agora eu estou acessando a lista de pedidos, que é um relacionamento to many. Vamos rodar o código e ver o que vai mudar aqui. Perceba que agora mudou um pouco, ele fez aqui em cima, aqui acabaram os inserts do "populaBancoDeDados". Ele fez o "select" do pedido.*
+
+[06:15] Fez o "join" com o cliente, é um relacionamento to one. E, na sequência, fez um outro "select", que foi quando eu acessei aquela lista de itens.
+
+[06:24] Ele fez um outro "select" para carregar os itens. Só que na entidade "ItemPedido" - vamos dar uma olhada nela. Tem um many to one para o pedido e um many to one para o produto.
+
+[06:36] Ele vai fazer um join com "Pedido" e vai fazer um join com "Produto". Foi isso o que ele fez no console. Ele fez o "select", fez um "join" com produto.
+
+[06:46] E fez também um "join" com a categoria, porque o "Produto", se abrirmos a classe "Produto", tem um to one com a Categoria. Percebe o efeito cascata? Tudo o que for to one, ele carrega. Carregou uma entidade, acessou uma lista dela, essa entidade tem relacionamentos to one? Ele carrega os to one.
+
+[07:05] Esses to ones têm outros relacionamentos to ones? Ele carrega os to ones, e vai um milhão de informações sendo carregadas pela memória, sendo que às vezes você nem precisava carregar tudo isso para a memória. Esse é o comportamento padrão da JPA, ela tem uma estratégia de carregamento dos relacionamentos. Essa estratégia, ela tem dois possíveis comportamentos, chamados de eager ou lazy.
+
+[07:32] *Todo relacionamento to one, o padrão é ele ser eager, ele faz o carregamento antecipado. Então você carregou o pedido antecipadamente, mesmo que você não acesse nada do cliente, que é um relacionamento to one, a JPA vai carregar esse relacionamento. Já os relacionamentos to many, por padrão, o comportamento é chamado de lazy, que é o carregamento preguiçoso, o carregamento tardio.*
+
+[07:56] Quando você carrega um pedido, ele não carrega essa lista de pedidos, *ele só carrega essa lista se você acessar alguma informação desta lista.* Eu acessei o método .size, por exemplo. Não tem como, ela terá que saber qual é o tamanho desta lista, terá que disparar um select para carregar. (AP: Se fizer uma solicitação do size() *em algum lugar do código*, ele fará o JOIN no SELECT, *que ele não faria se não fosse solicitado esse .size()*)
+
+[08:11] Então existem essas duas estratégias de carregamento, o carregamento eager, que carrega junto com a entidade, por mais que você não utilize aquele relacionamento, e o carregamento lazy, que só carrega se for feito o acesso. *Por padrão, todo relacionamento to one é eager, é carregado junto automaticamente com a entidade. E os relacionamentos to many são lazy, só são carregados se você fizer o acesso.*
+
+[08:36] Isso pode gerar problemas de performance na sua aplicação. Uma mudança, que vamos fazer agora, que é uma boa prática, é: todo relacionamento to one, a boa prática é você abrir um parêntese no @ManyToOne e existe um parâmetro chamado (fetch = ), que é como você controla esse carregamento. Perceba, ele tem dois valores, "EAGER" e "LAZY".
+
+*[08:59] A boa prática é: todo relacionamento to one, coloque o carregamento para ser lazy, (fetch = FetchType.LAZY), porque por padrão, ele é eager. Se você carregou o pedido, não importa, ele sempre vai carregar o cliente, se ele for um relacionamento to one, então mudamos para lazy.*
+
+[09:15] No List<ItemPedido>, é um to many, já é lazy o padrão, você não precisa mudar. Então vamos alterar os relacionamentos to one para serem lazy, *só vou carregar se eu fizer o acesso. (AP: Mesmo se for LAZY, se for solicitado acesso ao dado posteriormente no código java ele fará o JOIN - como se não tivesse sido passado o LAZY)*. Na entidade "Cliente" não tem nenhum relacionamento, beleza. Na entidade "Produto" tem a Categoria, vou colocar @ManyToOne(Fetch = FetchType.Lazy).
+
+[09:37] Na "Categoria" não tem nenhum relacionamento. "Cliente" ok. "Produto" ok. "ItemPedido", na "ItemPedido", está relacionado com o Pedido e está relacionado com Produto, carregamento lazy, eu só vou carregar se eu fizer o acesso. Isso é uma boa prática. Vamos rodar aquele código novamente, aquele main do "PerformanceConsultas". Se eu rodar aqui, o que será que vai mudar? Vamos dar uma analisada.
+
+[10:06] Aqui acabou os "inserts". Ele fez o "select" porque eu chamei o find. Mas perceba, ele não fez mais o join com o cliente, ele só carregou as informações do pedido. Um join a menos, menos dados que eu trago do banco de dados, mais rápida será essa consulta, menos dados trafegados pela rede.
+
+[10:25] Na sequência, como eu acessei a lista, não teve jeito, ele carregou a lista. Só que perceba, na lista, ele só carregou, só fez o "select" do item pedido, ele não fez mais os joins com o produto e nem com o pedido.
+
+[10:38] Porque colocamos o carregamento como lazy. Como eu não acessei, do item eu não acessei o produto e do item eu não acessei o pedido, ele não fez mais nenhum select aqui para baixo. Então esse é o padrão recomendado, relacionamentos lazy, a regra é essa, tudo tem que ser lazy.
+
+[10:57] Relacionamentos to many já são lazy, você não precisa colocar, agora, os to one, são eager por padrão, então você tem que trocar para lazy. Essa é uma boa prática, porém pode gerar um efeito colateral. A partir do momento que nós trocamos o relacionamento para ser lazy, podemos ter algum impacto na nossa aplicação. No próximo vídeo nós discutiremos melhor que impacto é esse. Vejo vocês lá.
+*** Efeito colateral do tópico acima: fechar a conexão do entityManager antes de fazer acesso ao elemento que era LAZY. Solução: usar JOIN FETCH
+[00:00] Olá, pessoal! Agora que já colocamos todos os relacionamentos como lazy, os relacionamentos to one, nós já percebemos que, nas consultas, acabou ficando mais rápido, ficaram menos informações sendo carregadas, porque a JPA vai evitar fazer os joins. Sempre que você carregar, por exemplo, o "Pedido", ele não vai carregar o "Cliente".
+
+[00:19] Isso resolve esse problema, deixa mais performática a aplicação e evita gargalos, porém isso pode gerar um efeito colateral. No vídeo de hoje vamos discutir justamente sobre isso. Para mostrar esse problema, vamos pegar aquele nosso main da "PerformanceConsultas" e eu vou alterar aqui. Ao invés de imprimir os itens do pedido, eu vou imprimir o nome do cliente, System.out.println(pedido.getCliente(). getNome());.
+
+[00:44] Se eu rodar desse jeito, vamos rodar aqui, "Run As > Java Application". Vamos ver o resultado. Perceba, ele fez o "select" do pedido e não carregou o cliente
+
+[00:56] Mas, na linha seguinte, como eu mandei ele imprime o nome do cliente, ele precisou disparar o "select" para buscar esse cliente. Então funcionou corretamente, trouxe aqui o nome do cliente certo.
+
+[01:06] Porém, nem sempre vai ser esse resultado. Quando eu acessar a informação, a JPA vai e dispara o "select" para carregar as informações que estavam faltando, que estavam como lazy, porque pode acontecer de, nesse momento, quando eu for dar esse system out, o entity manager já estar fechado.
+
+[01:28] Se simularmos dessa maneira, em.close();. Teremos um problema, porque quando chegar nessa linha do System.out, a JPA vai detectar pedido.getCliente()- opa, é um relacionamento lazy, eu não carreguei ainda, vou disparar o select para carregar do banco de dados.
+
+[01:46] Mas o entity manager - lembra que o entity manager é a nossa ponte com o banco de dados - ele já foi fechado. Então a JPA não vai conseguir disparar esse select para carregar essa informação. Vamos rodar aqui e ver o que vai acontecer. Rodei. Vou maximizar aqui o console. Olha lá.
+
+[02:02] Ele fez o "select" do pedido, fechou o entity manager. Quando eu tentei acessar o nome do cliente, exception.
+
+[02:09] É uma exception bem famosa do hibernate, que é a tal da "LazyInitializationException". Ele fala aqui: “olha, eu consegui inicializar um proxy, eu não conseguir carregar a entidade cliente de ID 1, porque não havia sessão, o entity manager já estava fechado”. Esse é o efeito colateral que eu havia comentado.
+
+[02:31] Talvez vocês estejam pensando, “Rodrigo, é só não fechar o entity manager, já que você vai fazer um novo select aqui embaixo, não feche o entity manager”. Porém, nem sempre isso será possível. Aqui nós conseguimos fazer isso porque, de novo, estamos testando com o método main, temos total controle do entity manager.
+
+[02:50] Se eu sei que vou precisar carregar uma informação, eu não fecho o entity manager. Porém, em uma aplicação real, uma aplicação web em uma API, pode acontecer de, no momento de você acessar uma determinada informação, o entity manager já estar fechado, porque é muito comum nas aplicações web, o entity manager, o escopo dele, o tempo de vida dele, durar apenas pouco tempo, durar apenas a chamada de um método.
+
+[03:16] Por exemplo, a classe Dao. Eu iniciei a chamada de um método na classe Dao, o entity manager é criado. Saí do método, fiz o return, o entity manager é fechado.
+
+[03:27] Se dali para frente você, em qualquer ponto da aplicação, no seu controller, no seu service, em qualquer outro lugar, na sua página, na exibição da view da sua aplicação, se você tentar acessar uma informação que é lazy, que não havia sido carregada antes, pode ser que o entity manager já esteja fechado e você tome essa exception, que é o "LazyInitializationException".
+
+[03:46] Em projetos reais, é muito comum isso acontecer, você tomar essa exception, porque o entity manager já foi fechado. Às vezes você nem tem o controle, é o próprio servidor de aplicação, é o próprio frameworK que está gerenciando o entity manager, não foi você que instanciou e que fez o close, então você nem sabe onde foi fechado.
+
+[04:06] Como você resolve essa situação? Em um primeiro momento, o que você iria fazer? Iria tirar o (fetch = FetchType.LAZY) de Cliente de "Pedido", ia voltar para eager. Porém, isso é ruim, porque sempre que você carregar o pedido, você vai trazer o cliente junto, e não necessariamente sempre que você carregar o pedido você quer trazer as informações do cliente.
+
+[04:24] A solução é você usar uma ideia que é chamada de query planejada. A ideia é: se em um determinado ponto da aplicação você não precisa imprimir nada, não precisa trazer nenhuma informação do cliente ou do relacionamento que é lazy, por exemplo, se eu comentar essa linha do System.out.println - na verdade, invés de eu comentar, se eu der um (pedido.getData());, eu carreguei um pedido, estou acessando a data de um pedido.
+
+[04:51] É uma informação do próprio pedido, não estou acessando informação de nenhum relacionamento. Perceba, vai funcionar normalmente e ele não vai fazer o join. Agora, se no seu código você precisa acessar uma informação que é lazy, então a ideia é: na sua consulta, já traga essa informação junto. Ou seja, já carregue o pedido com o cliente junto, porque aqui eu preciso dos dados do cliente.
+
+[05:20] Então a solução aqui acaba sendo um pouco mais chata, não podemos mais usar o método .find, porque no find eu não consigo dizer para a JPA: JPA, nessa consulta, nesse find, carregue o pedido e carregue junto o cliente. Para resolver esse problema, teremos que montar uma query.
+
+[05:34] Por exemplo, vamos abrir o "PedidoDao", agora eu quero trabalhar com a classe "PedidoDao" mesmo. Na classe "PedidoDao", eu tenho o meu método de buscar por ID, eu teria que criar um outro método, que faz uma consulta no pedido carregando junto o cliente. Isso é a tal da query planejada.
+
+[05:54] É uma query onde eu planejo essa query, eu já penso bem no que eu preciso trazer de informação e já carrego tudo o que eu precisar, para evitar fazer outros selects, para evitar tomar um lazy initialization exception se o entity manager estiver fechado. Como fazemos isso? Vamos criar um novo método.
+
+[06:12] public, o retorno dele é um objeto public Pedido. Vou chamar esse método de public Pedido buscarPedidoComCliente(), algo assim. Ele recebe como parâmetro o ID desse cliente, (Long id). Parecido com o método de buscar por ID. Vai depender do que é a sua consulta, se terá filtro ou não.
+
+[06:31] Imagine que eu estou buscando por ID, só que quero carregar o cliente junto. A ideia é fazermos o seguinte, return em.createQuery(). Agora não é mais um find, porque o find, ele só carrega a entidade em si, não tem como controlar os relacionamentos. em.createQuery(" ", ) e vou passar a minha query aqui.
+
+[06:54] Vou já passar a query direto aqui invés de criar uma string, e vou colocar que o retorno é um objeto do tipo (" ", Pedido.class).getSingleResult();, já que eu estou filtrando pelo ID, só virá um único resultado. E qual será a minha query aqui? Seria uma query tradicional, de buscar pelo ID.
+
+[07:13] Seria algo assim, em.createQuery("SELECT p FROM Pedido p WHERE p.id = :id", Pedido.class). Preciso criar um parâmetro aqui e antes do .getSingleResult() eu preciso setar esse parâmetro, .setParameter(). Parâmetro 1, qual é o valor - parâmetro 1 não, parâmetro ("id", ), porque eu coloquei :id, então aqui é ("id", ).
+
+[07:40] E é o ID que foi passado como parâmetro. Essa seria a consulta. Mas essa consulta, ela é a mesma coisa que o find, ela não carrega os relacionamentos. Então, na consulta, para dizermos para a JPA, olha, JPA, nessa consulta, já carregue determinado relacionamento junto, porque eu vou precisar dessa informação e eu não quero tomar um lazy initialization exception.
+
+[08:01] Você tem que usar uma palavra aqui. Aqui, antes do where, é SELECT p FROM Pedido p JOIN FETCH. Só que é um join diferente, é um join com a palavra fetch. Não é um join porque você quer filtrar alguma coisa do relacionamento, é um join fetch. Eu já estou falando: JPA, já faça o fetch, já carregue, já busque junto esse relacionamento. Qual?
+
+[08:23] SELECT p FROM Pedido p JOIN FETCH p.cliente WHERE e o nome do atributo, que é .cliente. Essa palavra mágica, o join fetch é que faz essa mágica de carregar um relacionamento, que é lazy, nessa consulta, apenas nessa consulta. É como se ele virasse eager. Então, nessa consulta, ele virá com a entidade principal.
+
+[08:43] Então vamos voltar para o nosso código. Em "PerformanceConsultas" agora eu preciso criar um "PedidoDao", PedidoDao pedidoDao = new PedidoDao(), passo o entity manager como parâmetro, (em);. E agora eu vou fazer aquela consulta. pedidoDao.buscarPedidoComCliente(1l);, eu passo o ID, quero trazer o pedido de ID 1.
+
+[09:08] Fechei o entity manager, em.close();. Vou atribuir o buscarPedidoComCliente em uma variável, que eu esqueci, Pedido pedido = pedidoDao.buscarPedidoComCliente(1l);. Na linha debaixo, após fechar o entity manager, estou acessando uma informação do cliente. Vamos ver se agora vai funcionar sem dar a exceção. Maximizei o console, olhe.
+
+[09:27] Funcionou. Fez os "inserts" e, no mesmo "select", ele já trouxe os dados do pedido, mas como eu coloquei o join fetch, ele também já trouxe os dados do cliente.
+
+[09:39] Fez o "from" e fez um "inner join" aqui. Carregou os dados corretamente. Então, mesmo que o entity manager esteja fechado, na minha consulta eu já trouxe essa informação, ele não vai disparar outro select, já veio carregado. Essa que é a ideia, para isso que serve esse tal de join fetch.
+
+[09:57] Será bem comum você encontrar esse tal de join fetch em projetos que você for trabalhar. E ele será útil quando você tiver um relacionamento que é lazy e na mesma consulta, naquele mesmo momento, você já quer carregá-lo, você quer que ele seja eager, mas não na aplicação inteira, apenas nessa consulta em específico.
+
+[10:14] Com isso você deixa mais organizada a sua aplicação, onde você precisa carregar um determinado relacionamento, você carrega, onde você não precisa, você não carrega. Você só traz as informações necessárias em cada tela da aplicação e evita sobrecargas, evita esses problemas de gargalos de consultas, que são muito, mas muito comuns nas aplicações, porque costumamos só fazer a funcionalidade, implementamos a funcionalidade, funcionou, está valendo.
+
+[10:43] Já integra, já vai para a próxima demanda, e nem olhamos o que está acontecendo. Então lembre-se, sempre que usamos um frameworK, nós precisamos conhecer o que ele está fazendo por debaixo dos panos, senão viramos refém daquele framework, caímos em armadilhas, como essa. Nós geramos a query, mandamos, testamos na aplicação, funcionou, nem olhamos o que foi o SQL gerado pelo hibernate.
+
+[11:04] Então habilite, durante o desenvolvimento, esse log do SQL, para ele imprimir no console. Dê uma olhada no SQL final que ele está gerando, veja se ele não está gerando um milhão de selects, porque isso é mega comum nas aplicações. E, se estiver gerando, siga a boa prática: todos os relacionamentos to one, coloque como lazy, e as consultas, você planeje.
+
+[11:26] Só cuidado: se você já tem um sistema em andamento e você troca, coloca tudo como lazy, é provável que dê erro em um monte de lugar. Um monte de lugar começará a dar lazy initialization, porque tem lugares que você estará acessando os relacionamentos que estão lazy com o entity manager já fechado.
+
+[11:42] Então cuidado: quando trocar para lazy, certifique-se de que os lugares que estão fazendo essa consulta e, se for o caso, você terá que ir na sua classe Dao, na sua classe repository da vida e criar novos métodos para carregar as informações necessárias. 
+
+
+** Outros tópicos
+*** Simplificando entidades com Embeddable
+[00:00] Olá, pessoal! Nessa aula vamos conhecer alguns recursos a mais da JPA para complementar o nosso treinamento. Eu estou aqui com a nossa entidade "Cliente" e vou fazer uma pequena alteração nessa classe. Até então só temos três atributos aqui, o ID, o nome e o CPF.
+
+[00:17] Mas, obviamente, essa classe provavelmente vai crescer e vai ter novos atributos, então vou precisar de outras informações do cliente: telefone, endereço, e-mail, enfim. No endereço em si, os dados do endereço, logradouro, rua, bairro, CEP, estado. Então essa classe vai começar a crescer e ficar com vários atributos.
+
+[00:39] Talvez você já tenha se esbarrado com isso, uma classe que tem 30, 40, 60, 100 atributos. Uma maneira de você começar a organizar esse código é tentar agrupar esses atributos que são comuns e extrair para classes. Por exemplo, ao invés de deixar um nome e CPF aqui na classe Cliente, e outros dados pessoais, eu poderia criar uma classe chamada dados pessoais e lá dentro eu coloco os atributos que são de dados pessoais.
+
+[01:06] Os atributos do endereço, rua, logradouro, CEP, bairro, UF, ao invés de deixar tudo solto na classe Cliente, eu podia ter uma classe endereço e esses atributos estarem lá dentro. Então o "Cliente", ele será composto desses outros objetos. Vamos fazer essa mudança e ver como isso vai funcionar perante à JPA.
+
+[01:26] Então eu vou criar uma classe aqui no pacote do "modelo", "Ctrl + N", "class", e eu vou chamar essa classe de "DadosPessoais". Na classe "Cliente", eu vou extrair o nome e o CPF, vou dar um "Ctrl + X", vou jogar para os "DadosPessoais". Extrai para cá. Eu preciso extrair também os getters e setters, agora os getters e setters vão ficar em "DadosPessoais", vou dar um "Ctrl +X", vou jogar para "DadosPessoais".
+
+[01:56] Em "DadosPessoais" eu não vou colocar os métodos setters, só os getters, vou gerar um construtor para receber logo esses dois parâmetros. Construtor, que recebe o nome e o CPF. Ok, está aqui a nossa classe "DadosPessoais". O "Cliente" agora, ele vai ter o construtor que recebe o Cliente(String nome, String cpf), só que ele não atribui mais a atributos da classe.
+
+[02:22] Ao invés de ter os atributos soltos aqui, eu vou ter um atributo do tipo privateDadosPessoais dadosPessoais;. Vou deixar dessa maneira.
+
+[02:34] Quando eu instancio um Cliente, eu passo o nome, eu passo o CPF e eu atribuo esse parâmetro, this.dadosPessoais = new DadosPessoais (nome, cpf); e passo o nome e o CPF que chegou no construtor.
+
+[02:49] Então todo o acesso ao nome e ao CPF, e às outras informações de dados pessoais, ficam encapsuladas nessa classe de "DadosPessoais". Em "Cliente", eu só vou precisar ter um get DadosPessoais. Poderia ter um método get nome aqui, que delegava, que o return seria dadosPessoais.getNome, facilitaria também de fora, mas para simplificar aqui, eu vou deixar sem.
+
+[03:11] Está aqui a nossa classe. Porém, temos um problema. Como a JPA vai mapear esse atributo DadosPessoais? Porque agora, esse atributo, DadosPessoais, não é mais um tipo primitivo, não é uma classe do Java, não é string, não é int, não é big decimal, não é local date. E não é uma entidade, eu não tenho uma tabela "DadosPessoais", eu tenho a tabela "Cliente", nome e CPF são colunas da tabela "Cliente".
+
+[03:37] Eu não vou colocar @Entity aqui, não vai ter um @Id. Eu só quero separar as classes. Só que precisamos dizer isso para a JPA, precisamos falar: JPA, entra nessa classe "DadosPessoais" e considera que esses atributos, embora eles estejam em "DadosPessoais", considere que eles pertencem a mim, a classe Cliente”, considere que são colunas da tabela de "Clientes".
+
+[04:00] Então tem como você organizar o código e indicar isso para a JPA. Você só vai precisar fazer o seguinte, em cima da classe DadosPessoais, não vai ter um @Entity, mas vai ter uma outra anotação, que é o @Embeddable, essa anotação do "javax persistence". Eu estou falando: JPA, essa classe é embutível, eu consigo embuti-la dentro de uma entidade. Você precisa indicar isso para a JPA.
+
+[04:25] E na classe Cliente, em cima do atributo DadosPessoais, @Embedded: embute para mim os atributos dessa classe aqui, do meu atributo "DadosPessoais". Esse é um recurso bem interessante da JPA, os atributos embeddable, você consegue organizar o código, quebrar em classes separadas, ao invés de encher uma classe com 300 milhões de atributos.
+
+[04:52] De resto, tudo continua igual, não muda nada. Obviamente, como eu fiz essa mudança, vai dar pau. Por exemplo, deu pau na classe "PerformanceConsultas" por conta do getNome, do getCpf, que mudou. Agora o "Cliente", ele não tem mais um getNome, ele tem um getDadosPessoais.getNome.
+
+[05:12] Se você quiser evitar esses erros de compilação, provavelmente se você fizer essa mudança, vão estourar uma série de erros de compilação no seu projeto. Vou fazer aquele método delegate. Eu disse que não ia fazer, mas vou fazer aqui só para mostrar de exemplo. Eu posso ter aqui, no "Cliente", um método public String getNome(), porque já tinha um monte de classes chamando o getNome do "Cliente".
+
+[05:35] Ao invés de ser um return this.nome, vai ser um return this.dadosPessoais.getNome();. Pronto, olha lá, voltou a compilar. Então isso é um método delegate, ele está delegando essa chamada do getNome para o atributo dadosPessoais. Posso fazer a mesma coisa para o CPF. public String getCpf(), return this.dadosPessoais.getCpf();. Pronto.
+
+[06:04] Não tinha nenhum lugar chamando getCpf, mas se tiver não vai dar mais problema. Vamos rodar essa classe "PerfomanceConsultas"? Só para ver se tudo continua funcionando, se ele vai criar as tabelas corretamente. Deu erro.
+
+[06:15] Vamos dar uma olhada. O construtor default, esqueci. Na classe embeddable, eu gerei esse construtor, mas tem que ter um construtor default por causa da JPA, ela exige um construtor default. Vamos rodar aqui novamente.
+
+[06:30] Rodou, carregou aqui o registro. Vamos ver os create tables, estão lá para cima. Create table clientes.
+
+[06:39] O ID, cpf, nome. Ela continua trazendo os campos CPF, o campo nome, embora esteja em outra classe, ela fez o embeddable, o embedded, ela embutiu esses atributos como se pertencesse à classe "Cliente". Esse é um recurso bem interessante, talvez você se esbarre com ele.
+
+[06:59] Se não conhecia, passe a utilizar. Ele é bem útil quando você tem principalmente telefone e endereço, quando você não tem uma tabela de endereço ou de telefone, está tudo misturado em uma mesma tabela. Como está tudo na mesma tabela, o natural é encher de atributos a classe que está mapeando aquela tabela.
+
+[07:18] Mas você pode quebrar em classes pequenas, para organizar o código, deixar mais coeso e mais simples de dar manutenção, usando esses recursos de embeddable e embedded da JPA.
+*** Mapeamento de herança
+[00:00] Olá, pessoal! Continuando então, vamos estudar outro conceito importante, que eventualmente é comum nas aplicações, o conceito de herança. Às vezes você tem que modelar as classes baseado em herança e eventualmente ser entidade da JPA. A JPA, ela tem suporte para mapeamento de herança no banco de dados. Vamos simular e ver como é que funciona isso.
+
+[00:21] Vamos imaginar a nossa classe, a nossa entidade "Produto", imagine que agora eu quero ter subprodutos. Agora eu tenho um produto, mas eu quero também ter, além das informações que já tem no produto, id, nome, descrição, preço, data de cadastro e categoria, eu quero ter mais informações que são específicas de cada tipo de produto.
+
+[00:41] Por exemplo, se for um livro, vai ter o nome do autor, o número de páginas, a editora. Se for um produto de informática, qual é a marca, o modelo do aparelho, enfim. Só que no Java, eu não quero deixar todas essas possibilidades dentro da mesma classe "Produto", então eu vou criar subclasses, utilizar herança. Vamos fazer isso aqui.
+
+[01:03] Eu vou criar uma nova classe, no pacote de "modelo", chamada "Livro". Aqui eu quero representar um livro. E um livro, ele é um produto, então eu vou usar herança: public class Livro extends Produto. Tudo o que tem no "Produto", o "Livro" tem, só que a diferença é que o "Livro", ele tem mais dois atributos.
+
+[01:22] Tem o autor, que é uma sting, private String autor;, e tem um private Integer numeroDePaginas;. Tem esses dois atributos. Vou gerar aqui os getters e setters, fazer aquele mesmo esquema, "Source > Generate getters and setters...", selecionar tudo, ok. Vou criar o construtor default primeiro, embora a ordem não interesse. Vou gerar aqui o construtor usando todos os atributos e está aqui a nossa entidade.
+
+[02:00] Da mesma maneira, eu quero ter, além da classe "Livro", vou copiar e colar a classe "Livro", eu quero ter a classe "Informatica". "Informatica" nada mais é do que um produto também, e ele tem private String marca; e private Integer modelo;, essa é a única diferença, tem marca, marca, marca, marca, modelo, modelo, modelo. Eu vou gerar de novo aqui os getters e setters.
+
+[02:31] "Source > Generate getters and setters". Ok. Dar uma formatada aqui no código, pronto. Então herança, conforme existe na orientação a objetos. Só que e a JPA? Como é que isso vai funcionar para a JPA? Como é que eu faço o mapeamento de herança? Vai depender de como você quer que seja, como você quer que fique a modelagem do banco de dados.
+
+[02:57] A JPA, ela tem suporte para algumas estratégias. Vamos estudar as duas principais. Por exemplo, uma alternativa, seria você usar essa estratégia aqui, que é chamada de single table.
+
+[03:08] Embora no Java você tenha subclasses, você tem a classe "Produto" só com os atributos comuns e as subclasses "Livro" e "Informatica" herdando de "Produto" e cada uma com os seus atributos em específico, você pode, no banco de dados, ter uma única tabela, um tabelão gigantesco com todos os atributos misturados.
+
+[03:29] Então tem ID, nome, descrição, preço, data, autor, número de páginas, marca e modelo. Percebe? Dá para ficar dessa maneira. Essa aqui, a vantagem é que você tem mais performance, já que é uma única tabela, não são tabelas quebradas, não vai ter join, então é mais performático. A desvantagem é que fica tudo misturado em uma mesma tabela. Mas a JPA suporta esse modelo, se for o que você desejar.
+
+[03:52] Para fazer isso, na classe "Produto", em cima da entidade Produto, que é a classe base, a classe mãe, você coloca uma anotação, que é o @Inheritance(). Para dizer: olha, JPA, essa classe aqui, eu vou usar ela como herança. Nos parênteses, tem o atributo (strategy = ), que você passa (strategy = InheritanceType.SINGLE_TABLE).
+
+[04:15] A estratégia é um tabelão gigantesco. Ele já assume que "Livro" e "Informatica" são duas entidades. Você tem que colocar o @Entity em "Livro", @Entity em "Informatica". Pronto. O @Id não precisa, já está herdando da classe "Produto", esses atributos já serão herdados. Pronto. A anotação @Inheritance é só na classe pai, na classe base.
+
+[04:45] Vamos rodar uma daquelas classes de teste. Cadê? A "TesteCriteria", vou rodar esta aqui. "Run As". Vamos ver como é que ele vai gerar as tabelas para mim. Vamos subir tudo, cadê as tabelas? Categoria, cliente, item pedido, pedido, produto.
+
+[05:04] Ele criou a tabela "produtos". Está lá ID, data, descrição, nome, preço, marca, modelo, autor, número de páginas. Ele criou certo. Porém ele criou mais um atributo, chamado "DTYPE". Por quê? Como é um tabelão, quando fizermos um select, fizermos uma consulta com a JPQL ou com o criteria, o hibernate, ele precisa saber: eu trouxe um registro dessa única tabela, esse registro, ele é uma instância de livro ou de informática?
+
+[05:35] Como só tem uma única tabela, como o hibernate vai saber? Ele precisa que tenha mais uma coluna na classe. Por padrão, ele chama essa coluna de "DTYPE", e ela é um "varchar". O que ele coloca nessa coluna? Se salvarmos um registro, o que ele insere? Ele insere, na coluna "DTYPE" o nome da classe.
+
+[05:57] Então ele vai inserir o registro, se for um objeto do tipo informática, ele insere na coluna a palavra "Informatica". Se for um objeto do tipo livro, ele insere a palavra "Livro". Tem como você personalizar o nome dessa coluna e o tipo, para invés de ser a string com o nome da classe, ser um número, ser só uma letra, enfim, dá para personalizar isso também.
+
+[06:17] É assim que funciona a estratégia single table. Você tem a classe base anotada com um @Inheritance, SINGLE_TABLE a estratégia, e as classes filhas apenas @Entity e o extends normalmente. A outra estratégia seria essa estratégia aqui, que é a segunda mais comum.
+
+[06:38] Você não quer uma tabela gigantesca, você quer uma classe para cada tabela, para cada subclasse, e a classe para a tabela pai, a tabela mãe, a tabela base. Na tabela "produtos", eu tenho só os atributos comuns, e na tabela "informatica" e "livros", eu tenho os atributos específicos, porém tem que ter o ID, que além de ser chave primária, é uma chave estrangeira.
+
+[07:01] Então, quando eu inserir um livro, ele vai dar um insert na tabela "livros" e vai dar também um insert na tabela "produtos". Em "produtos" vai ter, sei lá, ID 33, na tabela "livros" vai estar o mesmo ID, 33. A chave primária é a chave estrangeira da tabela "produtos". Assim, a vantagem é que fica mais organizado, não fica aquele troço gigantesco, bagunçado.
+
+[07:21] A desvantagem é que se eu fizer um select, uma query na tabela "livros", na entidade de livro, ele vai ter que fazer um join com a tabela "produtos" para carregar os dados que estão na tabela, os dados comuns. Então tem join na consulta, dependendo, pode ser um problema de performance. Para trocar, é simples. Na classe "Produto", você troca a estratégia: @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS).
+
+[07:43] Pronto, acabou. Percebe como é fácil trocar a estratégia? É só você trocar no @Inheritance. E nessa estratégia você não precisa mexer em nada, as classes continuam iguais, continuam herdando da classe "Produto" e os atributos específicos em cada classe e os atributos comuns na classe base. Vamos rodar aquela nossa classe "TesteCriteria" e ver o que ele vai gerar.
+
+[08:08] Seguindo, "Cannot use identity" produto. Classe "Produto" deu um problema aqui. Deixa eu dar uma conferida. É TABLE_PER_CLASS mesmo? Na verdade, não é TABLE_PER_CLASS, eu escrevi errado. A estratégia que eu queria mostrar aqui é a JOINED. Essa estratégia aqui é a joined.
+
+[08:27] Vamos rodar novamente o "TesteCriteria". Cadê os create table? Categoria, cliente, olha.
+
+[08:41] Ele criou uma tabela "Informatica", que é para a classe "Informatica", criou as colunas marca, modelo e o ID.
+
+[08:53] Criou a tabela "Livro". Autor, número de páginas e o ID. E a tabela de "produtos". Nela tem só os atributos em comum, data de cadastro, ID, descrição.
+
+[09:03] Então é a segunda estratégia comum, a estratégia joined, que é a estratégia que ele faz o join, você tem a tabela comum e as tabelas filhas, cada uma com os seus respectivos atributos e a tabela comum com os atributos, comuns para todos.
+
+[09:15] Aqui não é table per class, é joined, confundi. Nesse caso, não tem aquela coluna de descriminação. Aqui o nome da tabela ficou "Livro" com L maiúsculo porque eu não coloquei o @Table nas subclasses. Está só o @Entity, por padrão o nome da classe é o mesmo nome que ele vai gerar para a tabela. Se eu quisesse trocar, teria que colocar o @Table, conforme já conhecemos.
+
+[09:39] Então essas são as duas principais estratégias, single table e joined. Essa table per class, tem outras estratégias também, mas não são comuns. As duas principais, que vocês sempre vão encontrar, são essas duas. Vou deixar como um desafio para você dar uma lida no table per class, dar uma pesquisada em qual é a diferença dele para o joined e como é que faz para configurar na JPA, se tem que mudar alguma coisa.
+
+[10:04] Provavelmente você já sabe que sim, porque eu cometi o erro e deu uma exception, então dê uma pesquisada, fica o desafio para você entender o table per class. Mas as duas principais single table e joined. Espero que vocês tenham gostado e no próximo vídeo nós vemos mais um recurso da JPA. Vejo vocês lá.
+*** Mapeamento de chaves compostas
+[00:00] Olá, pessoal! Vamos estudar mais um recurso da JPA. Até então, em todas as nossas entidades, fizemos um mapeamento da chave primária dessa maneira.
+
+[00:10] Declaramos um atributo do tipo private Long id; e colocamos as anotações @Id, @GeneratedValue com a estratégia que depende do seu banco de dados. Esse é o tipo de mapeamento mais comum. Entretanto, às vezes, tem alguns sistemas, alguns bancos de dados, que precisamos mapear uma chave composta, a chave não é um único atributo, são duas ou mais informações. E a JPA, ela dá suporte para esse tipo de situação.
+
+[00:32] Como fazemos para mapear uma chave composta? Vamos fazer isso na classe "Categoria". Vamos imaginar que a "Categoria", a chave da "Categoria", não é mais o ID, é o nome e uma outra informação aqui qualquer. Nós vamos tirar esse @Id, esse @GeneratedValue. Agora, o ID da "Categoria" vai ser a formação entre o atributo nome e um outro atributo aqui qualquer.
+
+[00:59] Então, private String, a categoria, ela tem um nome e ela tem, sei lá, um tipo, alguma coisa do gênero, private String tipo;. E vamos imaginar que eu quero que esses dois atributos sejam a chave primária e não mais só um. Como eu faço para mapear a chave composta na JPA? A ideia seria extrairmos esses dois atributos para uma classe, que é a classe que representa a chave da categoria. Nós vamos extrair então criando uma nova classe.
+
+[01:24] Continuando, "Ctrl + N", "class", vou chamar de "CategoriaId", geralmente o pessoal coloca esse nome. Aqui dentro dessa nova classe é que vamos jogar esses dois atributos, private String nome; e private String tipo;. Aquele mesmo esquema, vou gerar o construtor default, vou gerar o construtor que recebe esses dois parâmetros, "Source > Generate Constructor". Vou gerar os getters e setters, "Source > Generate Getters and Setters", OK.
+
+[02:00] Nós vamos usar aquela mesma anotação @Embeddable, embutível, também podemos usar ela para chave composta, não só para atributos que queremos separar classes e mapear na mesma entidade, @Embeddable. Na "Categoria", agora o atributo que vai representar a chave será um atributo do tipo private CategoriaId id;, vou chamar de id o atributo.
+
+[02:24] E temos que colocar uma anotação, que é o @EmbeddedId. Perceba que é parecido com aquele @Embeddable que nós vimos, dos dados pessoais do cliente, só que aqui é @EmbeddedId. Então a JPA sabe que aqui dentro estão os atributos que formam a chave primária. É dessa maneira que vai funcionar. Agora a "Categoria", quando for criada, vamos ter que fazer aquelas alterações.
+
+[02:49] this.categoriaId = new Categoria - aliás, this.id = new CategoriaId();, eu chamei o atributo de id. Tenho que passar o (nome, );. O tipo, eu vou inventar um aqui fixo, só para não perdermos muito tempo com isso, (nome, "cpto");, mas você pegou a ideia, seria um outro atributo que passaríamos aqui como parâmetro. Mas só para não ter um impacto muito grande, vou fazer dessa maneira.
+
+[03:22] O getNome(), vou fazer um delegate, return this.id.getNome();. Agora tudo está compilando certo. Está aqui, é assim que mapeamos uma chave composta, criando uma classe que segue aquele esquema do embeddable, só que para adicionar na classe não é o @Embedded, é o @EmbeddedId, que é o específico para ID, para a JPA saber que não são atributos comuns e sim a chave primária da classe.
+
+[03:51] Porém, isso vai gerar um efeito, você já deve ter pensando, em todo o lugar que fazíamos um find - aqui, no nosso projeto, não tem, mas vamos fazer uma simulação aqui. Vou fazer aqui, no "CadastroDeProduto", só para agilizar.
+
+[04:08] Seguindo, em e, para fazer um find, em.find(Categoria.class, ). Eu quero buscar a categoria. E agora, como eu passo a chave? Antes nós passávamos assim:1l - deixa só eu quebrar a linha. Passávamos aqui o número, o long que era o ID. E agora? Agora como a chave é uma classe, temos que instanciar um objeto do tipo (Categoria.class, new CategoriaId());.
+
+[04:36] E nós passamos o nome da categoria, ("CELULARES", "xpto"), xpto, que seria aquela de exemplo. Só importar aqui a classe. Então para fazer busca, para fazer consultas, temos que fazer essa mudança, toda consulta agora eu não passo um atributo, eu passo a classe que representa a chave primária e dentro da classe é que tem os valores que representam a chave composta.
+
+[05:05] Dessa maneira que é feito o mapeamento de chave composta, bem tranquilo, nada de mais, a JPA suporta normalmente. @Embeddable. Geralmente, essas classes que têm @Embeddable, é comum colocarmos um implements Serializable.
+
+[05:22] Agora eu não lembro se isso é do hibernate ou se é uma exigência da JPA, mas é comum colocarmos esse atributo aqui. Funciona, tal, mas às vezes pode dar algum tipo de problema, então sempre coloque o Serializable nas classes que têm o @Embeddable.
