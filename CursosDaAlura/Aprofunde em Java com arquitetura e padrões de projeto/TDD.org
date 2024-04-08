@@ -1,4 +1,5 @@
 * Curso de TDD e Java: testes automatizados com JUnit
+https://cursos.alura.com.br/course/tdd-java-testes-automatizados-junit
 ** Testes automatizados
 Segurança ao mexer no código
 Favorece a melhoria do código (refactoring)
@@ -31,3 +32,4 @@ Não faz sentido testar todas as classes (ex: classes com apenas getters e sette
 Classes que tem sentido de serem testadas:
 *** Classes que podem ter alguma mudança
 *** Classes que tem regras de negócio
+	

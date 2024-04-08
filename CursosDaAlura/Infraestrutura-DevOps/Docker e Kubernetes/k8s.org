@@ -1,5 +1,3 @@
-https://cursos.alura.com.br/course/kubernetes-pods-services-configmap
-https://cursos.alura.com.br/course/kubernetes-deployments-volumes-escalabilidade
 * Toda vez que quiser iniciar o cluster no Linux
 rodar antes:
 
@@ -54,7 +52,8 @@ fazer o teste de subir nessa ordem o sistema: configmap's, pod's, svc's
 AP: Quando o professor do curso atualizava um .yaml ele parava o mesmo (kubectl delete) e subi o mesmo novamente. (Em visão de considerar que apesar rodar o kubectl apply já atualiza).
 
 Quando roda kubect get svc, o campo "NAME" é o DNS do serviço.
-* Curso de Kubernetes: Pods, Services e ConfigMaps
+* Curso de Kubernetes: Pods, Services e ConfigMaps]
+https://cursos.alura.com.br/course/kubernetes-pods-services-configmap
 ** Notas Gerais
 *** Há 2 propostas de implementação de Kubernets
  - Docker Swarm
@@ -1179,7 +1178,7 @@ Caso tivéssemos múltiplos nodes em nosso cluster, tudo funcionaria da mesma ma
 Mais informações podem ser adquiridas em https://kubernetes.io/docs/concepts/services-networking/service/#nodeport.
 
 * Curso de Kubernetes: Deployments, Volumes e Escalabilidade
-https://github.com/alura-cursos/kubernetes-parte2/tree/Aula1
+https://cursos.alura.com.br/course/kubernetes-deployments-volumes-escalabilidade
 ** Aula 01 - Conhecendo ReplicaSets e Deployments
 *** Conhecendo ReplicaSets
 AP: Ver exemplo em: "./Arquivos-k8s/kubernetes-parte2-Aula1/exemplo-replicaset.yaml" (obs: depois eu consegui o arquivo da aula, é o "portal-noticias-replicaset.yaml")

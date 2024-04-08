@@ -3,6 +3,7 @@ Mergulhe em boas práticas com Java (31 horas - 3 cursos)
 https://cursos.alura.com.br/formacao-boas-praticas-java
 
 * Curso de Java e refatoração: melhorando códigos com boas práticas
+https://cursos.alura.com.br/course/java-refatoracao-melhorando-codigos-boas-praticas
 ** Refatoração de código
 10 horas
 *** Refatoração

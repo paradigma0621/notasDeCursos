@@ -1,3 +1,6 @@
+Curso de Java e Clean Architecture: descomplicando arquitetura de software
+https://cursos.alura.com.br/course/java-clean-architecture
+
 * O que é Arquitetura?
 Vamos tentar definir e traçar uma visão geral sobre arquitetura de software, um assunto que pode ser bastante complexo.
 

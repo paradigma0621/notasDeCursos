@@ -2,6 +2,7 @@ DevOps é a disciplina responsável por cuidar de todo esse processo de entrega 
 
 DevOps: não é uma ferramenta, mas um processo que envolve que envolve muitas ferramentas, pessoas, uma cultura.
 * Aulas Gerais
+https://cursos.alura.com.br/formacao-engenharia-software
 ** Pergunta da Alura que fecha o curso
 O termo DevOps foi mencionado pela primeira vez em 2009, em uma palestra chamada de 10+ Deploys Per Day, por uma dupla que trabalhava no Flickr. O termo vem da junção das palavras Development e Operations, mas qual é a real definição desse termo?
 *** É um processo bem definido, que visa acelerar o "time to market" do software
@@ -99,6 +100,7 @@ O servidor é completamente executado por provedor.
 - SNS
 - S3
 * Curso de Integração Contínua: mais qualidade e menos risco no desenvolvimento
+https://cursos.alura.com.br/course/desenvolvimento-software-integracao-continua
 Integração contínua é mais focada no desenvolvedor, enquanto que a entrega contínua envolve pessoas/áreas totalemente diferentes.
 ** O que é integração contínua? 
 Integração contínua, em outras palavras, nada mais é que integrar as atualizações frequentemente na base diária.
@@ -210,6 +212,7 @@ As equipes de desenvolvimento normalmente possuem divisões, como as pessoas do 
 A *entrega contínua* também exige uma mudança no comportamento e na cultura da empresa: as pessoas precisam trabalhar integradas.
 
 * Curso: Entrega Contínua: confiabilidade e qualidade na implantação de software
+https://cursos.alura.com.br/course/entrega-continua-confiabilidade-qualidade
 ** O que é Entrega Contínua?
 *** Diminuindo risco
 Pipeline de deploy:

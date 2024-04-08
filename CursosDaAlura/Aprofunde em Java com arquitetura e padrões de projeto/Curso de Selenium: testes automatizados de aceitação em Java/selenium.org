@@ -1,3 +1,6 @@
+Curso de Selenium: testes automatizados de aceitação em Java
+https://cursos.alura.com.br/course/selenium-testes-automatizados-aceitacao-java
+
 O Selenium é uma ferramenta de automação de testes para aplicações web.
 
 * Teste E2E: Testes de ponta à ponta (end-to-end)

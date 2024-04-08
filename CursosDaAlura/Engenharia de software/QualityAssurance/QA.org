@@ -1,4 +1,6 @@
 * QA
+Curso de Quality Assurance: plano de testes e gestão de bugs
+https://cursos.alura.com.br/course/quality-assurance-plano-testes-gestao-bugs
 ** BDD
 Dado que há um usuário no sistema AluraPic, quando ele digitar o username e a senha incorreta e clicar no botão para confirmar, então deverá receber uma mensagem de senha incorreta.
 

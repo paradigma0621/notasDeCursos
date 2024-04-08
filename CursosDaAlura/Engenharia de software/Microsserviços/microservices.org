@@ -1,4 +1,5 @@
 * Aulas Gerais
+https://cursos.alura.com.br/formacao-engenharia-software
 ** 01_O que são Microsserviços?
 Microsserviços são um abordagem arquitetônica e organizacional do desenvolvimento de software na qual o software consiste em pequenos serviços independentes que se comunicam usando APIs bem definidas. Esses serviços  pertencem a pequenas equipes autossuficientes.
 
@@ -72,6 +73,7 @@ para remover algumas responsabilidade que poderiam ficar no código
 com o service mesh podemos enviar métricas para um painel de controle. Podemos adicionar certificados SSL, etc...
 
 * Curso de: Microsserviços: padrões de projeto
+https://cursos.alura.com.br/course/microsservicos-padroes-projeto
 ** Separando serviços
 *** Serviços de domínio
 - Domain-driven Design
@@ -192,7 +194,7 @@ video complementar: https://www.youtube.com/watch?v=yd6V4w19iJU
 - Determinados problemas NÃO PODEM ser resolvidos na hora (em tempo real)
 - Um serviço emite um evento que será tratado em seu devido tempo
 - Tecnologias como mensagerias (ex: RabbitMQ) e serviços de stream de dados (ex: Kafka) brilham
-*** 
+**** 
 ** Operações
 *** Lidando com logs
 agregar log de todos microsserviços
@@ -215,6 +217,7 @@ status como um todo do sistema
 - construa ou use dashboards de alto nível para ter uma fácil visão do status atual da aplicação
 - depois, tenha dashboards específicos para cada serviço, com mais detalhes
 * Curso de: Microsserviços: explorando os conceitos
+https://cursos.alura.com.br/course/fundamentos-microsservicos-aprofundando-conceitos
 ** Arquitetando microsserviços
 *** Componentes de um microserviço
 De que é composto *um* microsserviços?
@@ -374,6 +377,7 @@ Ou que o API Gateway só aceite requisições de uma lista de IPs.
 Por exemplo: você precisa deixar os seus microsserviços em uma rede virtual, liberar acesso apenas ao API Gateway do IP dele acessar, ter um firewall no seu API Gateway e ter autenticação e autorização na sua aplicação ter HTTPS para a segurança de transporte. Tudo isso junto vai tornar o seu sistema realmente um pouco mais seguro.
 
 * Curso de Microsserviços na prática: entendendo a tomada de decisões
+https://cursos.alura.com.br/course/Microsservicos-pratica-tomada-decisoes
 ** Boas vindas à realidade
 *** Componentes de linguagem - Pergunta da Alura
 Vimos neste vídeo que um microsserviço pode ser composto por mais de um componente. Uma API e um leitor de mensagens da fila, por exemplo.

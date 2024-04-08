@@ -93,8 +93,6 @@ Evita sequências de IF-ELSE.
 Diferente do Strategy, eu não sei qual regra deve ser aplicada. Deve verificar para cada um dos tipos se ele é aplicado ou não.
 * Curso de Design Patterns em Java II: avançando nas boas práticas de programação
 https://cursos.alura.com.br/course/avancando-design-patterns-java
-
-
 Isole o código de bibliotecas com o pattern Adapter
 Torne flexível a mudança de um método com o pattern Decorator
 Simplifique a interface de uso de uma classe com o pattern Facade

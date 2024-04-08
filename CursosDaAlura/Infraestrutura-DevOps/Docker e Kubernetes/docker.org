@@ -67,6 +67,7 @@ Com um arquivo Dockerfile podemos compilá-lo com o comando
 	docker build
 Ao compilar um arquivo Dockerfile temos uma imagem. Para ver um exemplo de de arquivo Dockerfile ver: https://github.com/tianon/docker-brew-ubuntu-core/blob/1a5cb40f41ac4829d8c301ccd2cf3b7a13687a8b/xenial/Dockerfile
 * Curso de Docker: criando e gerenciando containers
+https://cursos.alura.com.br/course/docker-criando-gerenciando-containers
 ** Conhecendo o docker
 *** Conhecendo o problema
 **** Conhecendo o problema

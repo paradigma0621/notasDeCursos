@@ -206,6 +206,7 @@ Isso pode variar, pois as metodologias ágeis são indicadas para diferentes cas
 Não. A metodologia cascata e a metodologia ágil se diferenciam pela sua abordagem. Os métodos ágeis têm um enfoque iterativo e incremental no desenvolvimento de projetos, valorizam a entrega contínua de valor com foco na colaboração entre a equipe de desenvolvimento e o cliente. Por outro lado, o método cascata segue uma abordagem linear, em que cada fase do projeto é concluída antes de passar para a próxima fase. Além disso, o escopo, os requisitos e as etapas do projeto são definidos no início do processo e seguidos rigidamente até a entrega final, o que significa que é menos adaptável às mudanças, ao contrário da metodologia ágil.
 
 ** Curso: Scrum: agilidade em seu projeto
+https://cursos.alura.com.br/course/scrum-agilidade-seu-projeto
 AP: pronúncia: "íscrãm"
 *** O que é Scrum
 Nesta aula, você pôde:
@@ -572,6 +573,7 @@ Por fim, embora ambos aconteçam ao final da sprint, a sprint review vem primeir
 Artefatos = Product backlog, Sprint backlog, Incremento
 *** Scrum na prática
 ** Curso de Equipes ágeis: organizando os papéis em uma equipe
+https://cursos.alura.com.br/course/equipes-ageis-organizando-papeis-equipe
 Duas das metodologias ágeis mais populares são o Scrum e o Kanban.
 *** Falando sobre ágil
 Você provavelmente já encontrou pessoas que afirmam: "Eu apenas trabalho aqui". Essas pessoas existem. Às vezes, elas camuflam suas motivações, seja por preferirem manter em segredo que estão ali somente pelo salário ou pelo status associado à empresa. Se a equipe não demonstra comprometimento, é difícil alcançar uma efetiva adoção do ágil.
@@ -861,6 +863,7 @@ Ambos compartilham o compromisso com os valores e princípios ágeis.
 
 Tanto Agile Coaches quanto agilistas estão envolvidos na promoção de práticas ágeis e na construção de uma cultura ágil em uma organização ou equipe.
 ** Curso de Extreme Programming: metodologia de desenvolvimento ágil de software
+https://cursos.alura.com.br/course/xp-extreme-programming
 XP é uma metodologia ágil.
 *** O que XP resolve?
 **** XP é uma das metodologias ágil

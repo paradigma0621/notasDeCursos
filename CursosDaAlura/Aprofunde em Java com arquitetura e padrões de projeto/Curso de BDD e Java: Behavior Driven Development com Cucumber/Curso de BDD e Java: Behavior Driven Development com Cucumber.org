@@ -1,3 +1,6 @@
+Curso de BDD e Java: Behavior Driven Development com Cucumber
+https://cursos.alura.com.br/course/bdd-cucumber-java
+
 Usar documentos da pasta: "./Aprofunde em Java com arquitetura e padrões de projeto/Curso de BDD e Java: Behavior Driven Development com Cucumber/1821-bdd-cucumber-java-aula6/src/test/java/br/com/alura/leilao/acceptance" 
 e da: "./Aprofunde em Java com arquitetura e padrões de projeto/Curso de BDD e Java: Behavior Driven Development com Cucumber/1821-bdd-cucumber-java-aula6/src/test/resources/features"
 * Pergunta
