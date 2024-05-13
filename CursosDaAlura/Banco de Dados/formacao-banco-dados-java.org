@@ -1542,13 +1542,32 @@ Para isso, basta navegar, e se a categoria tivesse outro relacionamento, poderí
 * Curso de Java e JPA: consultas avançadas, performance e modelos complexos
 https://cursos.alura.com.br/course/java-jpa-consultas-avancadas-performance-modelos-complexos
 Conteúdo final do projeto em "./Curso de Java e JPA: consultas avançadas, performance e modelos complexos - Projeto final"
-
 ** Mais relacionamentos
-AP: No que se refere a categorizar os 'one/many' to 'one/many' - ver como ficam os registros salvos no banco: para essa id do cara da direita, eu posso ter quantos ids se referenciando a ele pelo id da esquerda, *dentro do banco inteiro*? E vice versa. Posso ter mais de um id dessa tabela fazendo referência a esse outro id (no banco inteiro)?? Isso dirá se ele é um "one" ou um "many".
+*** Cardinalidade: @OneToMany, @ManyToOne, @ManyToMany
+(obs: para memorização: ~=quando diz @OneToMany eu posso saber que a classe atual é a 'one' pois assim como no teclado o "@" fica na parte de cima, no arquivo aberto do IntelliJ o nome do arquivo atual fica lá em cima na tab do editor - e se esse é o one, dentro dele ser que seja feita a declaração do que é o 'many' (declarada uma Collection). O mesmo vale pra quando for @ManyToOne: o arquivo aberto atualmente se refere ao 'Many', pois como o "@" fica em cima do teclado, o nome do arquivo fica lá em cima no editor... e dentro desse 'many' será  declarado um objeto no singular do one (não collection)).
 
-Exemplo: caso da relação cliente/pedido: para o pedido de id: 12L, dentro de todo o banco, para quantos client_ids teriam a possibilidade de estarem sendo mencionados no campo client_id desse pedido de id=12L? R: um.
-Trocando a análise de campo: para o client_id=111L: quantas linhas dentro da tabela pedido poderiam citar client_id=111L? Um ou muitos? R: muitos.
+AP: No lado da classe do 'One' há uma declaração de uma List/Collection - exemplo: em Person.java (Domain):
+	@OneToMany(mappedBy = "person")
+	private List<WorkplaceTransfer> workplaceTransferList;
+ou não há declaração algo de objeto nenhum. (Obs que posso tirar do tópico '*** Relacionamentos bidirecionais': quando ocorre a declaração nos 2 lados, ela é bidirecional - então tempos de declarar o "mappedBy" no lado @OneToMany).
 
+AP: E na declaração do @ManyToOne, sempre há uma referência a um objeto no singular (não Collection)
+Exemplo do WorkplaceTransfer acima onde há uma referência na classe de Domain:
+	@JoinColumn(name = "person_id", referencedColumnName = "id")
+	@ManyToOne(optional = false, fetch = FetchType.EAGER)
+	private Person person;
+
+na imagem "./cursoJPAAvancado-Cardinalidade_Aula01_Video02_Imagem04-2xMany_To_One.png" da pasta raiz desse documento: não há referência ao lado do 'One' na classe Produto a ItemPedido, apesar de dentro da classe ItemPedido haver referência a um Pedido:
+	@ManyToOne(fetch = FetchType.LAZY)
+	private Produto produto;
+AP: Ou seja: não necessáriamente é usada a annotation @OneToMany, apesar de sempre ser usada a @ManyToOne.
+
+AP: Em @ManyToMany: há collections nos 2 lados das classes de Domain  (??)
+
+*** Cardinalidade no banco de dados
+AP: No que se refere a categorizar os 'one/many' to 'one/many' - ver como ficam os registros salvos no banco: para esse id do cara da direita, eu posso ter quantos ids se referenciando a ele pelo id da esquerda, *dentro de cada uma das 2 tabelas inteiras envolvidas*? E vice versa. Posso ter mais de um id dessa tabela fazendo referência a esse outro id (dentro da tabela inteira)?? Isso dirá se ele é um "one" ou um "many". Ver exemplo abaixo para ficar mais claro:
+	Exemplo: caso da relação cliente/pedido: para o pedido_id: 12L, dentro de tabela inteira (pedido), para quantos client_ids teriam a possibilidade de estarem sendo mencionados no campo client_id desse pedido de id=12L? R: um.
+	Trocando a análise de campo: para o client_id=111L: quantas linhas dentro da tabela pedido poderiam citar client_id=111L? Um ou muitos? R: muitos.
 
 Exemplo:
 Ver imagem: "./cursoJPAAvancado-Cardinalidade_Aula01_Video02_Imagem01.png"
@@ -1747,19 +1766,22 @@ AP: Obs: Quando eu falo de serem feitos os JOINs em queries abaixo, eles acontec
 
 *[05:54] Agora eu estou acessando a lista de pedidos, que é um relacionamento to many. Vamos rodar o código e ver o que vai mudar aqui. Perceba que agora mudou um pouco, ele fez aqui em cima, aqui acabaram os inserts do "populaBancoDeDados". Ele fez o "select" do pedido.*
 
-[06:15] Fez o "join" com o cliente, é um relacionamento to one. E, na sequência, fez um outro "select", que foi quando eu acessei aquela lista de itens.
+[06:15] Fez o "join" com o cliente, é um relacionamento to one. E, na sequência, *fez um outro "select"*, que foi quando eu acessei aquela lista de itens.
+	Pro/AP: Ou seja: quando no JPA temos uma entidade LAZY, se fizermos um acesso a um desses elementos que ainda não foram carregados "na query principal da entidade", como foi feito no caso dessa aula:
+     1o) primeiro acessou o pedido (Pedido pedido = em.find(Pedido.class, 1L);
+     2o) numa outra linha de código pegou o .size() da lista (System.out.println(pedido.getItens.size());
+     são feitas 2 queries, uma pra linha "1o" e outra quando ele lê a linha do "2o"... sendo que nessa 2a query ele pega JOIN com a tabela do LAZY, e com todas tabelas dentro dessa última que são EAGER (declaradas fetch=EAGER ou com annotation @xToOne).
 
 [06:24] Ele fez um outro "select" para carregar os itens. Só que na entidade "ItemPedido" - vamos dar uma olhada nela. Tem um many to one para o pedido e um many to one para o produto.
 
 [06:36] Ele vai fazer um join com "Pedido" e vai fazer um join com "Produto". Foi isso o que ele fez no console. Ele fez o "select", fez um "join" com produto.
 
-[06:46] E fez também um "join" com a categoria, porque o "Produto", se abrirmos a classe "Produto", tem um to one com a Categoria. Percebe o efeito cascata? Tudo o que for to one, ele carrega. Carregou uma entidade, acessou uma lista dela, essa entidade tem relacionamentos to one? Ele carrega os to one.
-
-[07:05] Esses to ones têm outros relacionamentos to ones? Ele carrega os to ones, e vai um milhão de informações sendo carregadas pela memória, sendo que às vezes você nem precisava carregar tudo isso para a memória. Esse é o comportamento padrão da JPA, ela tem uma estratégia de carregamento dos relacionamentos. Essa estratégia, ela tem dois possíveis comportamentos, chamados de eager ou lazy.
+*[06:46] E fez também um "join" com a categoria, porque o "Produto", se abrirmos a classe "Produto", tem um to one com a Categoria. Percebe o efeito cascata? Tudo o que for to one, ele carrega. Carregou uma entidade, acessou uma lista dela, essa entidade tem relacionamentos to one? Ele carrega os to one. [07:05] Esses to ones têm outros relacionamentos to ones? Ele carrega os to ones, e vai um milhão de informações sendo carregadas pela memória, sendo que às vezes você nem precisava carregar tudo isso para a memória. Esse é o comportamento padrão da JPA, ela tem uma estratégia de carregamento dos relacionamentos. Essa estratégia, ela tem dois possíveis comportamentos, chamados de eager ou lazy.*
 
 [07:32] *Todo relacionamento to one, o padrão é ele ser eager, ele faz o carregamento antecipado. Então você carregou o pedido antecipadamente, mesmo que você não acesse nada do cliente, que é um relacionamento to one, a JPA vai carregar esse relacionamento. Já os relacionamentos to many, por padrão, o comportamento é chamado de lazy, que é o carregamento preguiçoso, o carregamento tardio.*
 
-[07:56] Quando você carrega um pedido, ele não carrega essa lista de pedidos, *ele só carrega essa lista se você acessar alguma informação desta lista.* Eu acessei o método .size, por exemplo. Não tem como, ela terá que saber qual é o tamanho desta lista, terá que disparar um select para carregar. (AP: Se fizer uma solicitação do size() *em algum lugar do código*, ele fará o JOIN no SELECT, *que ele não faria se não fosse solicitado esse .size()*)
+[07:56] Quando você carrega um pedido, ele não carrega essa lista de pedidos, *ele só carrega essa lista se você acessar alguma informação desta lista.* Eu acessei o método .size, por exemplo. Não tem como, ela terá que saber qual é o tamanho desta lista, terá que disparar um select para carregar. (AP: Se fizer uma solicitação do size() *em algum lugar do código, ele fará o JOIN no SELECT, 
+que ele não faria se não fosse solicitado esse .size()*)
 
 [08:11] Então existem essas duas estratégias de carregamento, o carregamento eager, que carrega junto com a entidade, por mais que você não utilize aquele relacionamento, e o carregamento lazy, que só carrega se for feito o acesso. *Por padrão, todo relacionamento to one é eager, é carregado junto automaticamente com a entidade. E os relacionamentos to many são lazy, só são carregados se você fizer o acesso.*
 
