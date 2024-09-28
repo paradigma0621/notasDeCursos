@@ -1,0 +1,93 @@
+* versões/configurações usadas no curso
+- Spring Boot 3.3.0
+- Maven
+- Java 21
+- Dependences
+	- Spring Web
+	- Spring Boot DevTools (para reexecutar o projeto automaticamente)
+	- Spring Security
+* Senha default (quando não é definida nenhuma senha)
+Ao adicionar a dependência do Spring Security ao projeto, por padrão passa a pedir senha. Nesse caso:
+- usuário: user
+- senha: aparece printada no console na hora que sobe o microsserviço
+* definindo usuário/senha: MODO #01
+** preenchendo application.properties
+spring.security.user.name = eazybytes
+spring.security.user.password = 12345
+* Mostrando mensagens de TRACE no console do IntelliJ durante o processamento de uma biblioteca
+Adicione a seguinte linha ao seu arquivo application.properties:
+logging.level.org.springframework.security=TRACE
+
+Usando application.yml: Se você estiver usando um arquivo application.yml, adicione a seguinte configuração:
+logging:
+  level:
+    org.springframework.security: TRACE
+
+Aparentemente esse recurso pode ser aplicado a outras bibliotecas.
+* Processo
+uma vez feito o login, a cada nova requisição: não é mais feita requisição ao Authentication Manager, o Security Context diz que já está logado.
+* Cookies
+** No DevTools
+Ir na aba "Application", na seção "Storage" há o item "Cookies".
+É possível que haja um elemento  de nome "JSESSIONID" com um hash... esse hash é passado para o Security Context - ele avalia se é válido.
+* Configurando as permissões no Bean
+** permitAll()
+@Configuration
+public class ProjectSecurityConfig {
+
+    @Bean
+    SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
+
+        http.authorizeHttpRequests((requests) -> requests.anyRequest().permitAll())
+            .formLogin(Customizer.withDefaults())
+            .httpBasic(Customizer.withDefaults());
+        
+        return http.build();
+    }
+}
+** denyAll()
+@Configuration
+public class ProjectSecurityConfig {
+
+    @Bean
+    SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
+
+        http.authorizeHttpRequests((requests) -> requests.anyRequest().denyAll())
+            .formLogin(Customizer.withDefaults())
+            .httpBasic(Customizer.withDefaults());
+        
+        return http.build();
+    }
+}
+** configurado para permitir alguns e autenticar outros
+@Configuration
+public class ProjectSecurityConfig {
+
+    @Bean
+    SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
+
+        http.authorizeHttpRequests()
+                        .requestMatchers("/myAccount","/myBalance","/myLoans","/myCards").authenticated()
+                        .requestMatchers("/notices","/contact").permitAll()
+                .and().formLogin()
+                .and().httpBasic();
+        return http.build();
+    }
+}
+** configurando para desabilitar o formulariozinho de autenticação 
+Com isso é mostrado um formulário próprio do browser
+http.authorizeHttpRequests((requests) -> requests
+    .requestMatchers("/myAccount", "/myBalance", "/myLoans", "/myCards").authenticated()
+    .requestMatchers("/notices", "/contact", "/error").permitAll())
+    .formLogin(flc -> flc.disable())  //*************************
+    .httpBasic(Customizer.withDefaults());
+** configurando para desabilitar a página do formulariozinho (HTML) de autenticação 
+Com isso não aparece  forma nenhuma de autenticação via web. Pode-se usar a autenticação via Postman do tópico abaixo
+http.authorizeHttpRequests((requests) -> requests
+    .requestMatchers("/myAccount", "/myBalance", "/myLoans", "/myCards").authenticated()
+    .requestMatchers("/notices", "/contact", "/error").permitAll())
+    .formLogin(Customizer.withDefaults()) //No video do curso o professor deixou aqui  como no tópico acima:    .formLogin(flc -> flc.disable())
+    .httpBasic(hbc -> hbc.disable()); //**************
+
+* Autenticando via postman
+Na guia "Authorization" escolhe-se no "Auth Type": "Basic Auth" e digita-se o "Username" e "Password"

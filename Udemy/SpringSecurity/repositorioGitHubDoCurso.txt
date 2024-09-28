@@ -1,0 +1,2 @@
+site: https://github.com/eazybytes/springsecurity6
+repo: https://github.com/eazybytes/springsecurity6.git
