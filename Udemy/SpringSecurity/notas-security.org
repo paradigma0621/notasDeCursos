@@ -1,4 +1,5 @@
-parei em: assistir novamente a aula do 2. **`http.exceptionHandling()`**:
+curso da udemy que usa reactJS:	
+https://www.udemy.com/course/spring-security-6-with-reactjs-oauth2-jwt-multifactor-authentication/?utm_source=adwords&utm_medium=udemyads&utm_campaign=LongTail_la.EN_cc.BR&campaigntype=Search&portfolio=Brazil&language=EN&product=Course&test=&audience=DSA&topic=&priority=&utm_content=deal4584&utm_term=_._ag_112130202920_._ad_467215026650_._kw__._de_c_._dm__._pl__._ti_dsa-1007766171032_._li_9102161_._pd__._&matchtype=&gad_source=1&gclid=Cj0KCQjwsc24BhDPARIsAFXqAB39RnR4k1zL3McyPaS5U-PfGQ52YVJBNWayMr8e5ZjAbTCtWyT2OZUaAo0iEALw_wcB&couponCode=2021PM25
 * erro
 O simples fato de declarar qualquer uma das 2 dependencies e não no application.properties abaixo gera o erro de "** erro gerado"
 
@@ -260,7 +261,6 @@ public class TimeFlowUserDetailsService implements UserDetailsService {
         return new User(customer.getEmail(), customer.getPwd(), authorities);
     }
 }
-
 
 * Encoding x Encryption x Hashing
 ** **Encoding** (com notas de Pro do curso)
@@ -618,10 +618,270 @@ Obs3: é requerida inativadade para invalidar a seção, ou seja, enquanto houve
 
 ** Concurrent Session Control
 We can control the maximum sessions allowed for a user and what should happen in the case of invalid session due to too many sessions for the current user,
+ 
+Se fornecido o código abaixo: ele permiti manter x seções (no exemplo abaixo: "1"), sendo que ao atingir o limite, e, ao fazer novo login, uma outra seção que estava aberta é finalizada:
+http.sessionManagement(sessionConfig -> sessionConfig.maximumSessions(1))
+ 
+Se fornecido o código abaixo: ele permiti manter x seções (no exemplo abaixo: "1"), sendo que bloqueia a abertura de novas seções quando esse limite for atingido:
+http.sessionManagement(sessionConfig -> sessionConfig.maximumSessions(1).maxSessionsPreventsLogin(true))
 
+Se fornecido o código abaixo, idem explicação do caso acima, com a adição que quando atingir o limite de seções abertas: carregará a página "/expiredSession":
 http.sessionManagement(sessionConfig -> sessionConfig.maximumSessions(1).maxSessionsPreventsLogin(true)
         .expiredUrl("/expiredSession"))
+Obs1: lembrar de adicionar a página "/expiredSession" no .permitAll().
 
+Obs2: caso haja definido a configuração da seção "Handling Invalid Session" acima, pode-se passar na mesma lambda as configurações citadas - ficando, por exemplo como:
+http.sessionManagement(sessionConfig -> sessionConfig.invalidSessionUrl("/invalidSession")
+                       				  .maximumSessions(1).maxSessionsPreventsLogin(true))
+** Session Fixation Attacks protection with Spring Security
+
+By default, Spring Security framework takes care of handling the Session Fixation Attacks. We have three options to control the strategy for Session Fixation Protection by following the configurations mentioned in the code snippet.
+
+**changeSessionId:** This option utilizes the session fixation protection provided by the Servlet container. It does not create a new session but instead changes the session ID. Note that this option is only available **in Servlet 3.1 (Java EE 7) and newer containers**. Para essas versões essa é a configuração padrão.
+
+**newSession:** With this option, a new "clean" session is created, without copying the existing session data. However, Spring Security-related attributes will still be copied.
+
+**migrateSession:** This option creates a new session and copies all existing session attributes to the new session. **It is the default in Servlet 3.0 or older containers.**
+
+@Bean
+public SecurityFilterChain filterChain(HttpSecurity http) {
+    http
+        .sessionManagement((session) -> session
+            .sessionFixation((sessionFixation) -> sessionFixation
+                .newSession()
+            )
+        );
+    return http.build();
+}
+
+**none**: We can also set the session fixation protection to **none** to disable it, but this is not recommended as it leaves your application vulnerable.
+
+No código de seu projeto a adição desse parâmetro seria encadeado dentro de uma possível campo existente `sessionConfig`, por exemplo::
+	http.sessionManagement(sessionConfig -> sessionConfig.invalidSessionUrl("/invalidSession").sessionFixation(sessionFixation -> sessionFixation.migrateSession())
+
+* Authentication Events
+For each authentication that succeeds or fails, a **AuthenticationSuccessEvent** or **AbstractAuthenticationFailureEvent**, respectively, is fired by Spring Security framework. Spring Security provided **DefaultAuthenticationEventPublisher** takes care of publishing these events to the listeners. We as developers just need to build listeners to listen to these events and execute business logic based on our requirements.
+
+By using Spring’s **@EventListener** support, we can listen to the Authentication success event and failure event. Below is the sample code to log these events.
+
+package com.timeflowsystem.security.events;
+
+@Component
+@Slf4j
+public class AuthenticationEvents {
+
+    @EventListener
+    public void onSuccess(AuthenticationSuccessEvent success) {
+        log.info("Login successful for the user : {}",
+            success.getAuthentication().getName());   // Debugando essa linha vemos que há informações interessantes no campo 
+							// sucess, como por exemplo: authorities
+    }							
+
+    @EventListener
+    public void onFailure(AbstractAuthenticationFailureEvent failures) {
+        log.error("Login failed for the user : {} due to : {}",
+            failures.getAuthentication().getName(),
+            failures.getException().getMessage());
+    }
+}
+
+* Form Login Configurations for MVC or monolithic apps
+
+For form-based logins, Spring Security already provides a simple login page. But this behaviour can be changed with the following configurations:
+
+.formLogin(formLoginConfig -> formLoginConfig
+    .loginPage("/login")
+    .usernameParameter("userid")
+    .passwordParameter("secretPwd")
+    .defaultSuccessUrl("/dashboard")
+    .failureUrl("/login?error=true").permitAll())
+
+** TODO loginPage
+Specifies the URL to send users to if login is required. The default is `/login`.
+Poderia ser fornecida URL do frontend.
+** usernameParameter
+The HTTP parameter to look for the username when performing authentication. Default is `"username"`.
+** passwordParameter
+The HTTP parameter to look for the password when performing authentication. Default is `"password"`.
+** TODO defaultSuccessUrl
+Specifies where users will be redirected after authenticating successfully if they have not visited a secured page prior to authenticating. This is a shortcut for calling `successHandler(AuthenticationSuccessHandler)`.
+** TODO failureUrl
+The URL to send users if authentication fails. This is a shortcut for
+invoking `failureHandler(AuthenticationFailureHandler)`. The default is `/login?error`.
+Poderia ser fornecida URL do frontend.
+* Alternative approach for handling logins events
+@RequiredArgsConstructor
+public class ProjectSecurityProdConfig {
+
+    private final CustomAuthenticationSuccessHandler authenticationSuccessHandler;
+    private final CustomAuthenticationFailureHandler authenticationFailureHandler;
+
+...
+http.formLogin(flc -> flc. ...
+      .successHandler(authenticationSuccessHandler)   // Alternative approach for handling successful logins
+      .failureHandler(authenticationFailureHandler)); // Alternative approach for handling failure logins
+** CustomAuthenticationFailureHandler
+package com.timeflowsystem.security.handler;
+
+@Component
+@Slf4j
+public class CustomAuthenticationFailureHandler implements AuthenticationFailureHandler {
+
+    @Override
+    public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
+            AuthenticationException exception) throws IOException, ServletException {
+        log.error("Login failed due to : {}", exception.getMessage());
+        response.sendRedirect("/login/denied");
+    }
+}
+
+** CustomAuthenticationSuccessHandler
+package com.timeflowsystem.security.handler;
+
+@Component
+@Slf4j
+public class CustomAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
+
+    @Override
+    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
+            Authentication authentication) throws IOException, ServletException {
+        log.info("Login successful for the user : {}", authentication.getName());
+        response.sendRedirect("/login/success");
+    }
+}
+* Logout (usando cookies)
+** backend
+Por default, a uri para realizar o logout de uma conta é chamar o endpoint: "/logout" do microsserviço Security.
+
+With the below configurations, we can configure what should happen during the logout operation of the user,
+
+.logout(logoutConfigurer -> logoutConfigurer
+    .logoutSuccessUrl("/login?logout=true").permitAll()
+    .invalidateHttpSession(true)
+    .clearAuthentication(true)
+    .deleteCookies("JSESSIONID"))
+
+
+- **logoutSuccessUrl** -> The URL to redirect to after logout has occurred. The default is "/login?logout". This is a shortcut for invoking logoutSuccessHandler(LogoutSuccessHandler) with a SimpleUrlLogoutSuccessHandler.
+- **invalidateHttpSession** – Configures SecurityContextLogoutHandler to invalidate the HttpSession at the time of logout.
+- **clearAuthentication** – Specifies if SecurityContextLogoutHandler should clear the Authentication at the time of logout.
+- **deleteCookies** – Allows specifying the names of cookies to be removed on logout success. This is a shortcut to easily invoke addLogoutHandler(LogoutHandler) with a CookieClearingLogoutHandler.
+
+** frontend
+Um recurso para a limpeza do cache de cookies do navagador é acessando diretamente o endpoint do backend Security através de:
+
+const Logout = () => {
+  window.location.href = USER_ACCOUNT_LOGOUT;  / /Onde poderíamos ter, por exemplo: 'http://localhost:8091/logout'
+  window.location.href = FRONTEND_URL_BASE;  // Onde poderíamos ter, por exemplo: 'http://localhost:3000/' 
+  return (
+	 ...
+
+Obs: a simples ação de fazer um GET usando o react query através da api não limpa o cookie do browser, foi preciso um carregamento completo através da chamada do endpoint de logout.
+
+* Role of SecurityContext & SecurityContextHolder
+** At the heart of Spring Security’s authentication model is the SecurityContextHolder. It contains the SecurityContext.
+
+The SecurityContextHolder is where Spring Security stores the details of who is authenticated. Spring Security does not care how the SecurityContextHolder is populated. If it contains a value, it is used as the currently authenticated user.
+** Role of SecurityContext & SecurityContextHolder
+
+After the authentication process, you may need details about the authenticated entity, such as the username or authorities of the current user. This information remains accessible even after authentication is complete. Once the AuthenticationManager successfully completes the authentication process, it stores the Authentication instance for the rest of the request. The component responsible for storing this object is called the **SecurityContext**.
+
+**SecurityContext** is an interface defining the minimum security information associated with the current thread of execution.
+
+public interface SecurityContext {
+    Authentication getAuthentication();
+    void setAuthentication(Authentication authentication);
+}
+
+The security context is stored in a **SecurityContextHolder**.
+
+**SecurityContextHolder** is a helper class that provides access to the security context. By default, it uses a **ThreadLocal** object to store the security context, ensuring it is always available to methods in the same thread, even if you don't explicitly pass it around. You don't need to worry about ThreadLocal memory leaks in web applications, as Spring Security handles the cleanup.
+
+Additionally, SecurityContextHolder can be configured with different strategies for storing the security context.
+
+** Holding strategies for the security context
+
+To specify which strategy should be used, you must provide a mode setting. Below are the three valid mode settings, common approaches in different scenarios:
+
+- **MODE_THREADLOCAL** — Allows each thread to store its own details in the security context. In a thread-per-request web application, this is a common approach, as each request has an individual thread. This is the *default mode*.
+
+- **MODE_INHERITABLETHREADLOCAL** — Similar to MODE_THREADLOCAL, this strategy also instructs Spring Security to copy the security context to the next thread in the case of an asynchronous method. This ensures that the new thread running the `@Async` method inherits the security context. The `@Async` annotation is used on methods to instruct Spring to execute the annotated method on a separate thread.
+
+- **MODE_GLOBAL** — Makes all the threads of the application see the same security context instance.
+
+As shown in the following code snippet, you can change the strategy to MODE_GLOBAL. You can use the method `SecurityContextHolder.setStrategyName()` or the system property `spring.security.strategy`:
+
+@Bean
+public InitializingBean initializingBean() {
+    return () -> SecurityContextHolder.setStrategyName(
+        SecurityContextHolder.MODE_GLOBAL);
+}
+
+** Load login user details in Spring Security
+
+**Approach 1** — The simplest way to load the currently authenticated user details is via a static call to the SecurityContextHolder:
+
+@RestController
+public class SomeController {
+
+    @GetMapping(value = "/username")
+    public String currentUserName() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentPrincipalName = authentication.getName();
+        return currentPrincipalName;
+    }
+}
+
+**Approach 2** — We can mention the Authentication directly as a method argument, and the framework will correctly resolve it by extracting from the SecurityContextHolder. Instead of Authentication, we can also mention Principal.
+
+@RestController
+public class SomeController {
+
+    @GetMapping(value = "/username")
+    public String currentUserName(Authentication authentication) {
+        return authentication.getName();
+    }
+}
+** Como cosegui setar e ler cofigurações de strategy
+Setando manualmente dentro de um método genérico qualquer:
+	SecurityContextHolder.setStrategyName(SecurityContextHolder.MODE_INHERITABLETHREADLOCAL);
+
+ eu obtia valor nulo para:
+	Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+Foi preciso centralizar a configuração do modo de estratégia de funcionamento do SecurityContextHolder numa classe @Configuration para correto funcionamento:
+
+@Configuration
+public class SecurityContextConfig {
+
+    @PostConstruct  //  This class was needed because setting the strategy in SecurityContextHolder
+                    // directly within the controller class was not working
+    public void init() {
+        SecurityContextHolder.setStrategyName(SecurityContextHolder.MODE_INHERITABLETHREADLOCAL);
+    }
+}
+* Cookies no Postman
+O postman pode funcionar a base de cookies.
+Após uma autenticação usando os processos mencionados nesse documento até então: é criado um cookie que pode ser visualizado em "Cookies" abaixo do botão "Send" do Postman.
+
+Uma vez criado esse cookie, pode-se tirar da guia de autenticação  "Authorization" do Postman a senha (deixar campo "Type" em "No Auth") - ele usa o cookie da memória e consegue fazer a requisição.
+
+Esse cookie que fica ali é compartilhado entre todas as requests salvas no postman.
+
+Após acessar o endpoint o endpoint de logout da seção "* Logout (usando cookies)" descrito acima, esse cookie é removido do postman, e passa a ser requerida nova autenticação para os endpoints requerendo autenticação.
+* No frontend
+const fetchUserAccountLogin = async (
+    bodyParams: opTypes.UserAccountRequestBody
+  ): Promise<string> => {
+    return httpClient
+      .post(getMountedSecurityUrl(constants.USERACCOUNT_LOGIN), bodyParams, { 
+      headers: {							// Adicionado  (Sem essa configuração são passados
+        'Content-Type': 'application/x-www-form-urlencoded',		// Adicionado   username e password vazios pro frontend)
+      },								// Adicionado
+      withCredentials: true, 						// Adicionado
+    })
+      .then(data => data.data)
+  }
 * Dicas de cursos
 ** Java  das Ruas
 https://www.youtube.com/watch?v=N4cwmvjPj8c
