@@ -882,6 +882,330 @@ const fetchUserAccountLogin = async (
     })
       .then(data => data.data)
   }
+* CORS
+** O que é, e o que não é
+**CORS** is a protocol that enables scripts running on a browser client to interact with resources from a different origin. For example, if a UI app wishes to make an API call running on a different domain, it would be blocked from doing so by default due to CORS. It is a specification from W3C implemented by most browsers.
+
+So **CORS** is not a security issue/attack but the default protection provided by browsers to stop sharing the data/communication between different origins.
+** Preflight request (tab "Network" do Dev Tools do browser)
+A "Preflight request" é enviada do browser para o backend antes da chamada da API, se o servidor backend dizer que o CORs está ok, é feita a requisição da API apenas.
+** exemplo de configuração
+http.cors(cors -> cors.configurationSource(corsConfigurationSource()))
+...
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        var configuration = new CorsConfiguration();
+        configuration.setAllowCredentials(true);
+        configuration.addAllowedOriginPattern("*");
+        configuration.addAllowedHeader("*");
+        configuration.addAllowedMethod("*");
+        var source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }
+    
+* CSRF
+Geram erro HttpStatus 403.
+** Quando pode ocorrer
+By default Spring Security block all HTTP POST, PUT, DELETE, PATCH operations with an error of 403, if there is no CSRF solution implemented inside a web application. We can change this default behaviour by disabling the CSRF protection provided by Spring Security.
+
+.csrf(csrf -> csrf.disable())
+** Está correto afirmar que é aconselhável desabilitar a proteção de CSRF em APIs públicas?
+Sim, está **correto afirmar que é aconselhável desabilitar a proteção CSRF (Cross-Site Request Forgery) em APIs públicas**, mas há algumas nuances importantes a serem consideradas.
+
+### **1. Por que desabilitar CSRF em APIs públicas?**
+A proteção CSRF foi projetada para proteger **aplicações web tradicionais**, onde os usuários interagem diretamente com formulários e sessões autenticadas baseadas em cookies. No entanto, esse mecanismo **não é necessário para APIs RESTful ou públicas**, por vários motivos:
+
+- **APIs REST não usam cookies por padrão**: A autenticação em APIs é geralmente baseada em tokens (como JWT ou API keys) em vez de cookies, que são os principais alvos de ataques CSRF.
+- **CSRF depende de sessões baseadas em cookies**: Se sua API não depende de cookies para autenticação, o CSRF não se aplica.
+- **APIs são chamadas por clientes específicos**: Como aplicativos frontend (React, Angular) ou scripts, eles já devem enviar os tokens apropriados para autenticação.
+
+Por isso, desabilitar CSRF para APIs públicas simplifica a configuração e evita problemas desnecessários.
+
+### **3. Casos em que CSRF é necessário**
+Embora desabilitar CSRF para APIs públicas seja uma prática padrão, **não desabilite CSRF para aplicações que dependem de cookies de autenticação**. Isso inclui:
+
+1. **Aplicações web tradicionais (ex.: sistemas com login baseado em sessão)**.
+2. **APIs protegidas por cookies** em vez de tokens.
+
+Nestes casos, a proteção CSRF é essencial para evitar que um atacante use a sessão do usuário autenticado para realizar ações maliciosas.
+
+---
+
+### **4. Melhor alternativa para APIs públicas: segurança baseada em tokens**
+Para APIs públicas ou RESTful, em vez de depender de CSRF, implemente os seguintes mecanismos de segurança:
+
+#### a. **Autenticação baseada em tokens (JWT, OAuth2, API keys)**
+- Exija que os clientes enviem um cabeçalho `Authorization` com um token em cada requisição:
+    ```http
+    Authorization: Bearer <token>
+    ```
+- Os tokens devem ser gerados no backend e devem ter um tempo de expiração limitado.
+
+#### b. **Validação da origem e CORS**
+- Configure CORS adequadamente para permitir apenas origens confiáveis, especialmente se a API for acessada por navegadores.
+
+### **6. Conclusão**
+Sim, desabilitar CSRF para APIs públicas é uma prática recomendada e amplamente adotada, especialmente quando sua API usa autenticação baseada em tokens ou é completamente aberta. Apenas certifique-se de que outras camadas de segurança estão implementadas, como autenticação, CORS e validação adequada de entradas.
+* Authentication & Authorization
+** Diferenças
+*** Authentication
+- In authentication, the identity of users are checked for providing the access to the system.  
+- Authentication (AuthN) done before authorization.  
+- It needs usually user’s login details.  
+- If authentication fails usually we will get 401 error response.  
+- For example, as a Bank customer/employee, in order to perform actions in the app, we need to first prove our identity.
+
+*** Authorization
+- In authorization, person’s or user’s authorities are checked for accessing the resources.  
+- Authorization (AuthZ) always happens after authentication.  
+- It needs user’s privilege or roles.  
+- If authorization fails usually we will get 403 error response.  
+- Once logged into the application, my roles, authorities will decide what kind of actions I can do.
+** Como atribuir permissões com authorities
+**In Spring Security the authorities requirements can be configured using the following ways,**
+
+*** hasAuthority()
+— Accepts a single authority for which the endpoint will be configured and user will be validated against the single authority mentioned. Only users having the same authority configured can invoke the endpoint.
+
+*** hasAnyAuthority()
+— Accepts multiple authorities for which the endpoint will be configured and user will be validated against the authorities mentioned. Only users having any of the authority configured can invoke the endpoint.
+
+*** access()
+— Using Spring Expression Language (SpEL) it provides you unlimited possibilities for configuring authorities which are not possible with the above methods. We can use operators like OR, AND inside access() method.
+
+**You can extract path values from the request, as seen below by using access():**
+
+```java
+http.authorizeHttpRequests((authorize) -> authorize
+    .requestMatchers("/cards/{name}").access(new WebExpressionAuthorizationManager("#name == authentication.name"))
+)
+```
+
+**You can check if the user has multiple roles, as seen below by using access():**
+
+```java
+.requestMatchers("/admin/**").access(allOf(hasAuthority("admin"), hasAuthority("manager")))
+```
+
+**You can check if the user has multiple roles, as seen below by using access():**
+
+```java
+.requestMatchers("/admin/**").access(new WebExpressionAuthorizationManager("hasAuthority('admin') && hasAuthority('manager')"))
+```
+
+
+
+** Como atribuir permissões com roles
+
+In Spring Security the ROLES requirements can be configured using the following ways,
+
+- **hasRole()** — Accepts a single role name for which the endpoint will be configured and user will be validated against the single role mentioned. Only users having the same role configured can invoke the endpoint.
+
+- **hasAnyRole()** — Accepts multiple roles for which the endpoint will be configured and user will be validated against the roles mentioned. Only users having any of the role configured can call the endpoint.
+
+- **access()** — Using Spring Expression Language (SpEL) it provides you unlimited possibilities for configuring roles which are not possible with the above methods. We can use operators like OR, AND inside access() method.
+
+**Note:**
+- ROLE_ prefix only to be used while configuring the role in DB. But when we configure the roles, we do it only by its name.
+  
+*** mudando o prefixo que não "ROLE_"
+You can configure the authorization rules to use a different prefix by providing a GrantedAuthorityDefaults bean, as shown below:
+
+@Bean
+static GrantedAuthorityDefaults grantedAuthorityDefaults() {
+    return new GrantedAuthorityDefaults("MYPREFIX_");
+}
+
+You need to expose GrantedAuthorityDefaults using a static method to ensure that Spring publishes it before initializing Spring Security's method security @Configuration classes.
+** Authorization Events
+For each denied authorization, an `AuthorizationDeniedEvent` is triggered. You can listen these events, using the below kind of logic:
+
+@EventListener
+public void onFailure(AuthorizationDeniedEvent deniedEvent) {
+    log.error("Authorization failed for the user : {} due to : {}",
+        deniedEvent.getAuthentication().get().getName(),
+        deniedEvent.getAuthorizationDecision().toString());
+}
+
+Due to the potential for `AuthorizationGrantedEvents` to generate excessive noise, they are not published by default.
+** Http Status Errors
+Authentication : 401
+Authorization : 403
+* Filtros
+** FILTERS IN SPRING SECURITY 1
+✔ Lot of times we will have situations where we need to perform some house keeping activities during the authentication and authorization flow. Few such examples are:
+- Input validation
+- Tracing, Auditing and reporting
+- Logging of input like IP Address etc.
+- Encryption and Decryption
+
+✔ All such requirements can be handled using HTTP Filters inside Spring Security. Filters are servlet concepts which are leveraged in Spring Security as well.
+
+---
+
+✔ We already saw some in built filters of Spring security framework like UsernamePasswordAuthenticationFilter, BasicAuthenticationFilter, DefaultLoginPageGeneratingFilter etc. in the previous sections.
+
+✔ A filter is a component which receives requests, processes its logic and handovers to the next filter in the chain.
+
+✔ Spring Security is based on a chain of servlet filters. Each filter has a specific responsibility and depending on the configuration, filters are added or removed. We can add our custom filters as well based on the need.
+** FILTERS IN SPRING SECURITY (como configurar para ver a relação dos filtros executados e sua ordem de execução)
+✔ **We can always check the registered filters inside Spring Security with the below configurations,**
+
+1. Adicionar na MainCalss: "@EnableWebSecurity(debug = true)"
+    – We need to enable the debugging of the security details.
+
+2. Adicionar no `application.properties`:
+   logging.level.org.springframework.security.web.FilterChainProxy=DEBUG
+
+
+**Security filter chain:**
+- DisableEncodeUrlFilter  
+- ForceEagerSessionCreationFilter  
+- ChannelProcessingFilter  
+- WebAsyncManagerIntegrationFilter  
+- SecurityContextPersistenceFilter  
+- HeaderWriterFilter  
+- CorsFilter  
+- CsrfFilter  
+- LogoutFilter  
+- UsernamePasswordAuthenticationFilter  
+- DefaultLoginPageGeneratingFilter  
+- DefaultLogoutPageGeneratingFilter  
+- BasicAuthenticationFilter  
+- CsrfCookieFilter  
+- RequestCacheAwareFilter  
+- SecurityContextHolderAwareRequestFilter  
+- AnonymousAuthenticationFilter  
+- SessionManagementFilter  
+- ExceptionTranslationFilter  
+- AuthorizationFilter  
+
+Attached are some of the internal filters of Spring Security that get executed in the authentication flow.
+** IMPLEMENTING CUSTOM FILTERS
+✔ We can create our own filters by implementing the `Filter` interface from the **jakarta.servlet** package. After that, we need to override the `doFilter()` method to implement our custom logic. This method accepts 3 parameters: ServletReques*, ServletResponse, and FilterChain.
+
+- ServletRequest: Represents the HTTP request. We use the `ServletRequest` object to retrieve details about the client's request.
+- ServletResponse: Represents the HTTP response. We use the `ServletResponse` object to modify the response before sending it back to the client or passing it along the filter chain.
+- FilterChain: The filter chain represents a collection of filters with a defined order in which they act. We use the `FilterChain` object to forward the request to the next filter in the chain.
+
+---
+
+✔ You can add a new filter to the Spring Security chain before, after, or at the position of a known filter. Each filter's position is an index (a number) and can be referred to as "the order."
+
+✔ Below are the methods available to configure a custom filter in the Spring Security flow:
+- `addFilterBefore(filter, class)` – Adds a filter before the position of the specified filter.
+- `addFilterAfter(filter, class)` – Adds a filter after the position of the specified filter.
+- `addFilterAt(filter, class)` – Adds a filter at the exact position of the specified filter.
+** Other importants filters
+Para saber qual interface implementar na criação de um filtro:
+*** GenericFilterBean
+"This is an abstract class filter bean which allows you to use the initialization parameters and configurations defined inside the deployment descriptors."
+	
+*** OncePerRequestFilter
+"Spring doesn’t guarantee that your filter will be called only once. But if we have a scenario where we need to make sure to execute our filter only once then we can use this."
+** Exemplos de implementações de filtros
+*** adição de filtro que verifica se há a string "test" no meio do username
+**** src/main/java/com/timeflowsystem/security/config/ProjectSecurityProdConfig.java
+               http (...) .addFilterBefore(new RequestValidationBeforeFilter(), BasicAuthenticationFilter.class) // The filter
+                                // RequestValidationBeforeFilter is going to be executed before the BasicAuthenticationFilter
+**** src/main/.../security/filter/RequestValidationBeforeFilter.java
+public class RequestValidationBeforeFilter implements Filter {
+
+    @Override
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+            throws IOException, ServletException {
+        HttpServletRequest req = (HttpServletRequest) request;
+        HttpServletResponse res = (HttpServletResponse) response;
+        String header = req.getHeader(HttpHeaders.AUTHORIZATION);
+        if(null != header) {
+            header = header.trim();
+            if(StringUtils.startsWithIgnoreCase(header, "Basic ")) { // Verify if the header is a Basic Auth (Need to
+                                                                           // choose this manually in case of using Postman)
+                byte[] base64Token = header.substring(6).getBytes(StandardCharsets.UTF_8);
+                byte[] decoded;
+                try {
+                    decoded = Base64.getDecoder().decode(base64Token);
+                    String token = new String(decoded, StandardCharsets.UTF_8); // format resulted: 'username:pwd'
+                    int delim = token.indexOf(":");
+                    if(delim== -1) {
+                        throw new BadCredentialsException("Invalid basic authentication token");
+                    }
+                    String email = token.substring(0,delim);
+                    if(email.toLowerCase().contains("test")) {     // Verify if in username creditial has 'test' string
+                        res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                        return;
+                    }
+                } catch (IllegalArgumentException exception) {
+                    throw new BadCredentialsException("Failed to decode basic authentication token");
+                }
+            }
+        }
+        chain.doFilter(request, response); // VERY IMPORTANT to call next filter in the chain
+    }
+*** adição de filtro que gera LOG após êxito de login
+**** src/main/java/com/timeflowsystem/security/filter/AuthoritiesLoggingAtFilter.java
+@Slf4j
+public class AuthoritiesLoggingAtFilter implements Filter {
+    /**
+     * @param request  The request to process
+     * @param response The response associated with the request
+     * @param chain    Provides access to the next filter in the chain for this filter to pass the request and response
+     *                 to for further processing
+     * @throws IOException
+     * @throws ServletException
+     */
+    @Override
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+            throws IOException, ServletException {
+        log.info("Authentication Validation is in progress");
+        chain.doFilter(request,response); // VERY IMPORTANT to call next filter in the chain
+    }
+}
+**** src/main/java/com/timeflowsystem/security/config/ProjectSecurityProdConfig.java
+           http. (...).addFilterAfter(new AuthoritiesLoggingAtFilter(), BasicAuthenticationFilter.class) // The filter
+                                // AuthoritiesLoggingAtFilter is going to be executed after the BasicAuthenticationFilter
+**** saída no console
+Security filter chain: [
+  DisableEncodeUrlFilter
+  WebAsyncManagerIntegrationFilter
+  SecurityContextHolderFilter
+  HeaderWriterFilter
+  CorsFilter
+  LogoutFilter
+  UsernamePasswordAuthenticationFilter
+  RequestValidationBeforeFilter		// aqui está o do exemplo anterior
+  BasicAuthenticationFilter 		// filtro de referência
+  AuthoritiesLoggingAtFilter			//Aqui está nosso filtro
+  RequestCacheAwareFilter
+  SecurityContextHolderAwareRequestFilter
+  AnonymousAuthenticationFilter
+  ExceptionTranslationFilter
+  AuthorizationFilter
+]
+
+*** adição de filtro que gera LOG "paralelo" a outro filtro
+Ambos filtros são executados, porém não é determinístico qual será executado primeiro.
+**** adição na classe de configurações
+.addFilterAt(new AuthoritiesLoggingAtFilter(), BasicAuthenticationFilter.class)
+**** Código fonte do pacote "filter"
+@Slf4j
+public class AuthoritiesLoggingAtFilter implements Filter {
+    /**
+     * @param request  The request to process
+     * @param response The response associated with the request
+     * @param chain    Provides access to the next filter in the chain for this filter to pass the request and response
+     *                 to for further processing
+     * @throws IOException
+     * @throws ServletException
+     */
+    @Override
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+            throws IOException, ServletException {
+        log.info("Authentication Validation is in progress");
+        chain.doFilter(request,response);
+    }
 * Dicas de cursos
 ** Java  das Ruas
 https://www.youtube.com/watch?v=N4cwmvjPj8c
