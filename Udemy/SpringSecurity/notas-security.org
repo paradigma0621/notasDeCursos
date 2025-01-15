@@ -1209,19 +1209,61 @@ public class AuthoritiesLoggingAtFilter implements Filter {
 * Dicas de cursos
 ** Java  das Ruas
 https://www.youtube.com/watch?v=N4cwmvjPj8c
-* JWT
-JSON Web Tokens
-Prode-se dizer: "jot tokens" (pronúncioa: "jót")
+* Token formats
+** Opaque Tokens x JWT Tokens
+In general, there are two token formats.  
+1) Opaque Tokens  
+2) JSON Web Tokens (JWT)
+
+*** Opaque Tokens
+Opaque tokens are typically random strings with no inherent meaning.  
+Used to reference authentication information stored on the server-side.  
+Requires a call to the authorization server or a dedicated introspection endpoint to validate and obtain user information.
+
+*** JWT Tokens
+JWTs are self-contained tokens that consist of three parts: a header, a payload, and a signature, encoded in Base64 URL.  
+Encodes user information and claims directly within the token.  
+Can be validated locally by verifying the token's signature using a public key, without needing a server call.
+
+*** Witch to use
+Opaque tokens are suitable for scenarios where token validation by a central server is feasible, such as within a secure internal network, whereas JWT tokens are ideal for stateless, distributed systems where quick token validation is needed without frequent server calls.
+
+** Características dos tokens
+*** Security
+- Limited exposure of the user credentials inside the network.
+- Tokens can be revoked during any suspicious activities without invalidating the user credentials.
+
+*** Reusability
+- Tokens can be used across different domains and services, making them suitable for single sign-on (SSO) systems.
+
+SSO (Single Sign-On) é um mecanismo de autenticação que permite que os usuários acessem vários sistemas ou aplicativos diferentes usando um único conjunto de credenciais (geralmente um nome de usuário e senha). Em vez de o usuário ter que autenticar separadamente em cada sistema, o SSO autentica o usuário uma única vez e compartilha essa autenticação entre os aplicativos ou sistemas confiáveis. (ex: serviços do Google (gmail, maps, youtube, ...).
+
+*** Cross-Platform Compatibility
+- Tokens can be used across various platforms and devices, including web applications, mobile apps, and IoT devices.
+
+*** Statelessness
+- The token contains all the information to identify the user, eliminating the need for the session state.
+- If we use a load balancer, we can pass the user to any server, instead of being bound to the same server we logged in on.
+
+*** Self-Contained (Apenas para JWT)
+- Tokens are self-contained and carry all the necessary information about the user, roles/authorities, etc.
+
+*** Expiration
+- Tokens can have specific expiration times set, ensuring tokens are valid only for a predefined duration.
+** JSON Web Tokens (JWT
+Para JWT tokens, pode-se dizer: "jot tokens" (pronúncioa: "jót")
 
 é feito sempre o repasse do token do backend pro front, e do front pro back, e do back pro front, e ...
-** composto por 3 partes
+*** composto por 3 partes
 pode ser gerado pelo site:
 
 	http://jwt.io
 
-3 partes sepadas por "."
-*** Primeira é o Header
-we store metadata/info related to the token. If we chose to sign the token, the header contains the name of the algorithm that generates the signature.
+Suas 3 partes são sepadas por "." - exemplo:
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+
+**** Primeira é o Header
+we store metadata/info (ex: type, algorithm) related to the token. If we chose to sign the token, the header contains the name of the algorithm that generates the signature.
 
 **Exemplo de cabeçalho:**
 ```json
@@ -1230,8 +1272,10 @@ we store metadata/info related to the token. If we chose to sign the token, the 
   "typ": "JWT"
 }
 ```
-que é codificada em base64
-*** Segunda é o Payload
+que é codificada em base64. Ex:
+	eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9
+Pode ser decodado facilmente.
+**** Segunda é o Payload
 - **In the body**, we can store details related to user, roles, etc., which can be used later for AuthN and AuthZ. Though there is no such limitation on what we can send and how much we can send in the body, but we should put our best efforts to keep it as light as possible.
 
 **Exemplo de corpo:**
@@ -1242,63 +1286,30 @@ que é codificada em base64
   "iat": 1516239022
 }
 ```
-que é codificada em base64
-*** Terceira é o Signature (opcional)
+que é codificada em base64. Ex:
+	eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ
+Pode ser decodado facilmente.
+**** Terceira é o Signature
+É uma parte opcional. Exemplo:
+	SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
 
-
-```json
-{
-  "alg": "HS256",
-  "typ": "JWT"
-}
-```
-**Codificado em Base64:**
-`eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9`
-
----
-
-**Parte inferior:**
-
-- **In the body**, we can store details related to user, roles, etc., which can be used later for AuthN and AuthZ. Though there is no such limitation on what we can send and how much we can send in the body, but we should p
-**Exemplo de corpo:**
-```json
-{
-  "sub": "1234567890",
-  "name": "John Doe",
-  "iat": 1516239022
-}
-```
-**Codificado em Base64:**
-`eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ`
-
----
-
-Se precisar de mais informações sobre JWT ou como funciona, posso ajudar a esclarecer mais!
-
-
-- This part can be optional if the party that you share the JWT token with is internal and someone who you can trust but not open in the web.
+This part can be optional if the party that you share the JWT token with is internal and someone who you can trust but not open in the web.
   
-- But if you are sharing this token to the client applications which will be used by all the users in the open web then we need to make sure that no one changed the header and body values like Authorities, username, etc.
+But if you are sharing this token to the client applications which will be used by all the users in the open web then we need to make sure that no one changed the header and body values like Authorities, username, etc.
 
-- To make sure that no one tampered the data on the network, we can send the signature of the content when initially the token is generated. To create the signature part you have to take the encoded header, the encoded payload, a secret, the algorithm specified in the header, and sign that.
+Para garantir que ninguém adulterou os dados na rede, podemos enviar a assinatura do conteúdo no momento em que o token é inicialmente gerado. Para criar a parte da assinatura, você deve pegar o cabeçalho codificado, o payload codificado, um segredo (chave privada), o algoritmo especificado no cabeçalho e assiná-los.
 
-- For example if you want to use the HMAC SHA256 algorithm (**Obs: esse algorítmo é de hasheamento**), the signature will be created in the following way:
+For example if you want to use the HMAC SHA256 algorithm (**Obs: esse algorítmo é de hasheamento**), the signature will be created in the following way:
 
 		HMACSHA256(base64UrlEncode(header) + "." + base64UrlEncode(payload), secret)
 
-- The signature is used to verify the message wasn’t changed along the way, and, in the case of tokens signed with a private key, it can also verify that the sender of the JWT is who it says it is.
+The signature is used to verify the message wasn’t changed along the way, and, in the case of tokens signed with a private key, it can also verify that the sender of the JWT is who it says it is.
 
 Obs: A chave privada (secret) fica salva no backend.
 
 Se por exemplo um hacker obter o header e o payload, e modificar o profile/role do payload para um com todas permissões, o servidor que faz a autorização, ao verificar a parte signature do jwt enviado pelo cliente (que é composto pelo header+payload+secret) verá que o resultado não confere com o hash da signature gerado nele para esses mesmos valores de header e payload, uma vez que usando a key secret obteve um hash da signature diferente.
 
 No site http://jwt.io pode-se alterar no campo da esquerda os valores da encodação da base64 do header e do payload, o que aparecerá o valor correspondente do header/payload/sigature na direita - e se os valores HMACSHA256(base64UrlEncode(header) + "." + base64UrlEncode(payload), secret) não conferirem com o valor da signature obtem-se a label da página "Invalid Signature".
-
-
-
-
-
-
 
 * commit messages 
 //copilot:
