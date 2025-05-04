@@ -947,7 +947,7 @@ Para APIs públicas ou RESTful, em vez de depender de CSRF, implemente os seguin
 - Configure CORS adequadamente para permitir apenas origens confiáveis, especialmente se a API for acessada por navegadores.
 
 ### **6. Conclusão**
-Sim, desabilitar CSRF para APIs públicas é uma prática recomendada e amplamente adotada, especialmente quando sua API usa autenticação baseada em tokens ou é completamente aberta. Apenas certifique-se de que outras camadas de segurança estão implementadas, como autenticação, CORS e validação adequada de entradas.
+Sim, desabilitar CSRF para APIs públicas é uma prática recomendada e amplamente adotada, especialmente quando sua API usa autenticação baseada em tokens ou é completamente aberta. Apenas certifique-se de que outras camadas de segurança estão implementadas, como autenticação, CORS e validação adequada de entradas
 * Authentication & Authorization
 ** Diferenças
 *** Authentication
@@ -1250,7 +1250,7 @@ SSO (Single Sign-On) é um mecanismo de autenticação que permite que os usuár
 
 *** Expiration
 - Tokens can have specific expiration times set, ensuring tokens are valid only for a predefined duration.
-** JSON Web Tokens (JWT
+** JSON Web Tokens (JWT)
 Para JWT tokens, pode-se dizer: "jot tokens" (pronúncioa: "jót")
 
 é feito sempre o repasse do token do backend pro front, e do front pro back, e do back pro front, e ...
@@ -1310,7 +1310,361 @@ Obs: A chave privada (secret) fica salva no backend.
 Se por exemplo um hacker obter o header e o payload, e modificar o profile/role do payload para um com todas permissões, o servidor que faz a autorização, ao verificar a parte signature do jwt enviado pelo cliente (que é composto pelo header+payload+secret) verá que o resultado não confere com o hash da signature gerado nele para esses mesmos valores de header e payload, uma vez que usando a key secret obteve um hash da signature diferente.
 
 No site http://jwt.io pode-se alterar no campo da esquerda os valores da encodação da base64 do header e do payload, o que aparecerá o valor correspondente do header/payload/sigature na direita - e se os valores HMACSHA256(base64UrlEncode(header) + "." + base64UrlEncode(payload), secret) não conferirem com o valor da signature obtem-se a label da página "Invalid Signature".
+* Configurações necessárias para usar Tokens JWT
+** MUITO IMPORTANTE
+Com as configurações abaixo, após acessar o endpoint:
+	GET /user
+e passar na requisição do Postman usando "Basic Auth", com usuário e senha - será retornado no Header da response, na chave "Authorization" o token JWT. É preciso pegar esse token para usá-lo nas requisições gerais do microserviço - porém nessas novas requisições de acesso geral é preciso definir a autenticação como "No Auth", e passar numa chave "Authorization" do header o token gerado pelo endpoint GET /user.
 
-* commit messages 
+É preciso fazer a geração do token uma única vez. Então pode-se usar o token gerado até que o mesmo expire.
+No frontend, pode-se gerar o token no momento do login, e popular o header com o mesmo a cada nova requisição.
+** Dependências requeridas
+		<dependency>
+			<groupId>io.jsonwebtoken</groupId>
+			<artifactId>jjwt-api</artifactId>
+			<version>0.12.5</version>
+		</dependency>
+		<dependency>
+			<groupId>io.jsonwebtoken</groupId>
+			<artifactId>jjwt-impl</artifactId>
+			<version>0.12.5</version>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>io.jsonwebtoken</groupId>
+			<artifactId>jjwt-jackson</artifactId>
+			<version>0.12.5</version>
+			<scope>runtime</scope>
+		</dependency>
+** Adicionar nas configurações do CORS:
+  configuration.setExposedHeaders(Arrays.asList("Authorization"));
+
+** Definir a sessionCreationPolicy com STATELESS
+  @Bean
+  public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+      http
+              .sessionManagement(sessionConfig -> sessionConfig.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+
+Com isso passará a não mais salvar o cookie nos clientes acessantes dos endpoints.              
+** Adicionar filtro de geração de token
+public class JWTTokenGeneratorFilter extends OncePerRequestFilter {
+
+    /**
+     * @param request
+     * @param response
+     * @param filterChain
+     * @throws ServletException
+     * @throws IOException
+     */
+    @Override
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
+            FilterChain filterChain) throws ServletException, IOException {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (null != authentication) {
+            Environment env = getEnvironment();
+            if (null != env) {
+                String secret = env.getProperty(ApplicationConstants.JWT_SECRET_KEY,
+                        ApplicationConstants.JWT_SECRET_DEFAULT_VALUE);
+                SecretKey secretKey = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
+                String jwt = Jwts.builder().issuer("Timeflow").subject("JWT Token")
+                        .claim("username", authentication.getName())
+                        .claim("authorities", authentication.getAuthorities().stream().map(
+                                GrantedAuthority::getAuthority).collect(Collectors.joining(",")))
+                        .issuedAt(new Date())
+                        .expiration(new Date((new Date()).getTime() + 30000000))
+                        .signWith(secretKey).compact();
+                response.setHeader(ApplicationConstants.JWT_HEADER, jwt);
+            }
+        }
+        filterChain.doFilter(request, response);
+    }
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+        return !request.getServletPath().equals("/user"); // Only execute the filter for this endpoint
+    }
+              
+** Adicionar filtro de verificação de token
+public class JWTTokenValidatorFilter extends OncePerRequestFilter {
+    /**
+     * @param request
+     * @param response
+     * @param filterChain
+     * @throws ServletException
+     * @throws IOException
+     */
+    @Override
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+            throws ServletException, IOException {
+       String jwt = request.getHeader(ApplicationConstants.JWT_HEADER);
+       if(null != jwt) {
+           try {
+               Environment env = getEnvironment();
+               if (null != env) {
+                   String secret = env.getProperty(ApplicationConstants.JWT_SECRET_KEY,
+                           ApplicationConstants.JWT_SECRET_DEFAULT_VALUE);
+                   SecretKey secretKey = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
+                   if(null !=secretKey) {
+                       Claims claims = Jwts.parser().verifyWith(secretKey)
+                                .build().parseSignedClaims(jwt).getPayload();
+                       String username = String.valueOf(claims.get("username"));
+                       String authorities = String.valueOf(claims.get("authorities"));
+                       Authentication authentication = new UsernamePasswordAuthenticationToken(username, null,
+                               AuthorityUtils.commaSeparatedStringToAuthorityList(authorities));
+                       SecurityContextHolder.getContext().setAuthentication(authentication);
+                   }
+               }
+
+           } catch (Exception exception) {
+               throw new BadCredentialsException("Invalid Token received!");
+           }
+       }
+        filterChain.doFilter(request,response);
+    }
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+        return request.getServletPath().equals("/user"); // If it is the endpoint /user, do not execute the filter
+                                                        // Because the JWTTokenGeneratorFilter will be executed to 
+                                                        // generate the token
+    }
+
+}
+** Adicionar agendamento da execução dos filtros acima
+http. ...
+                .addFilterAfter(new JWTTokenGeneratorFilter(), BasicAuthenticationFilter.class)
+                .addFilterBefore(new JWTTokenValidatorFilter(), BasicAuthenticationFilter.class)
+** Liberar endpoint de criação do token
+http (...)
+	.authorizeHttpRequests((requests) -> requests
+		.requestMatchers("/user").authenticated()  // Adicionar esse
+               
+* Utilizando JWT - Autenticação customizada
+Pode-se almejar implementar especificações customizadas para a obtenção do token JWT, por exemplo definindo um endpoint de recebimento do mesmo que não o padrão, bem como desejar uma forma de autenticação customizada - ou ainda escolher valores para os campos que estarão hasheados no token final. Essa seção ensina como conseguir isso.
+
+Publish an AuthenticationManager bean for custom authentication
+
+A common requirement is to publish an `AuthenticationManager` bean to enable custom authentication, such as within a `@Service` or a Spring MVC `@Controller`. For instance, you might want to authenticate users via a REST API instead of using form login. You can publish an `AuthenticationManager` for custom authentication scenarios using the following configuration:
+
+** Bean dentro da classe de configurações
+Inside `ProjectSecurityProdConfig.java` class create a bean of `AuthenticationManager` like shown below:
+
+@Bean
+public AuthenticationManager authenticationManager(
+        UserDetailsService userDetailsService,
+        PasswordEncoder passwordEncoder) {
+    EazyBankUsernamePwdAuthenticationProvider authenticationProvider =
+        new EazyBankUsernamePwdAuthenticationProvider(userDetailsService, passwordEncoder);
+    ProviderManager providerManager = new ProviderManager(authenticationProvider);
+    providerManager.setEraseCredentialsAfterAuthentication(false);
+    return providerManager;
+}
+
+** Atribuir .permitAll() pro endpoint
+.requestMatchers("/login/**").permitAll()  // poismeu endpoint é /login/apiLogin
+** Dtos
+Request and Response related record files:
+
+public record LoginRequestDto(String username, String password) {
+}
+
+public record LoginResponseDto(String status, String jwtToken) {
+}
+
+** Classe Controller
+Inside the controller class add the logic to manually authenticate and generate a token if the authentication is successful. Also make sure to `permitAll` and add CSRF ignoringRequestMatchers for the `/apiLogin` API inside the `ProjectSecurityConfig` class.
+
+@RequiredArgsConstructor
+public class LoginController {
+
+    private final AuthenticationManager authenticationManager;
+    private final Environment env;
+
+
+    @PostMapping("/apiLogin") // endpoint escolhido que retornará o token
+    public ResponseEntity<LoginResponseDto> apiLogin (@RequestBody LoginRequestDto loginRequest) {
+        String jwt = "";
+        Authentication authentication = UsernamePasswordAuthenticationToken.unauthenticated(loginRequest.username(),
+                loginRequest.password());
+        Authentication authenticationResponse = authenticationManager.authenticate(authentication);
+        if(null != authenticationResponse && authenticationResponse.isAuthenticated()) {
+            if (null != env) {
+                String secret = env.getProperty(ApplicationConstants.JWT_SECRET_KEY,
+                        ApplicationConstants.JWT_SECRET_DEFAULT_VALUE);
+                SecretKey secretKey = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
+                jwt = Jwts.builder().issuer("Timeflow").subject("JWT Token")
+                        .claim("username", authenticationResponse.getName())
+                        .claim("authorities", authenticationResponse.getAuthorities().stream().map(
+                                GrantedAuthority::getAuthority).collect(Collectors.joining(",")))
+                        .issuedAt(new java.util.Date())
+                        .expiration(new java.util.Date((new java.util.Date()).getTime() + 30000000))
+                        .signWith(secretKey).compact();
+            }
+        }
+        return ResponseEntity.status(HttpStatus.OK).header(ApplicationConstants.JWT_HEADER,jwt)  // Estamos enviando o token aqui no HEADER
+                .body(new LoginResponseDto(HttpStatus.OK.getReasonPhrase(), jwt));               // Estamos enviando o mesmo token no cody aqui tb
+                										     // Em um projeto em produção podemos enviar em 1
+	                                                                                             // só lugar apenas
+    }
+
+** Testando
+fazer requisição POST no endpoint
+passando um body, com configuração de autenticação: "No Auth"
+
+{
+    "username": "oswaldo",
+    "password": "123"
+}
+
+exemplo de response:
+{
+    "status": "OK",
+    "jwtToken": "eyJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJUaW1lZmxvdyIsInN1YiI6IkpXVCBUb2tlbiIsInVzZXJuYW1lIjoib3N3YWxkbyIsImF1dGhvcml0aWVzIjoiUk9MRV9BRE1JTixST0xFX1VTRVIiLCJpYXQiOjE3MzcyMzE0MDUsImV4cCI6MTczNzI2MTQwNX0.AoS6PQMW9YXu90i_nK-4Z8BXN1J45UfrFIgQUubITjk"
+}
+
+Copiar esse token e usá-lo no campo "Authorization" para requisições que exigem atutenticação.
+	
+* Aplicando Segurança no nível dos Métodos
+** Configuração da MainClass
+colocar na MainClass
+@EnableMethodSecurity(jsr250Enabled = true,securedEnabled = true) // By deault, the prePostEnabled is set to true, 
+	// that's why we don't need to set it here
+        -------
+
+As of now we have applied authorization rules on the API paths/URLs using spring security but method level security allows to apply the authorization rules at any layer of an application like in service layer or repository layer etc. Method level security can be enabled using the annotation `@EnableMethodSecurity` on the configuration class (or in the MainClass of the project).
+
+Method level security will also help authorization rules even in the non-web applications where we will not have any endpoints.
+
+Method level security provides the below approaches to apply the authorization rules and executing your business logic,
+
+- **Invocation authorization** – Validates if someone can invoke a method or not based on their roles/authorities.
+- **Filtering authorization** – Validates what a method can receive through its parameters and what the invoker can receive back from the method post business logic execution.
+
+Spring security will use the aspects from the AOP module and have the interceptors in between the method invocation to apply the authorization rules configured.
+
+Method level security offers below 3 different styles for configuring the authorization rules on top of the methods:
+
+- The `prePostEnabled` property which enabled by default enables Spring Security `@PreAuthorize` & `@PostAuthorize` annotations.
+- The `securedEnabled` property enables `@Secured` annotation.
+- The `jsr250Enabled` property enables `@RoleAllowed` annotation.
+
+```java
+@Configuration
+@EnableMethodSecurity(prePostEnabled = true, securedEnabled = true, jsr250Enabled = true)
+public class ProjectSecurityConfig {
+    ...
+}
+```
+
+`@Secured` and `@RoleAllowed` are less powerful compared to `@PreAuthorize` and `@PostAuthorize`.
+
+** preauthorization / postauthorization
+- Using invocation authorization we can decide if a user is authorized to invoke a method before the method executes (preauthorization) or after the method execution is completed (postauthorization). For filtering the parameters before calling the method we can use Prefiltering.
+
+*** @PreAuthorize
+```java
+@Service
+public class LoansService {
+
+    @PreAuthorize("hasAuthority('VIEWLOANS')")
+    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
+    @PreAuthorize("#username == authentication.principal.username")
+    public Loan getLoanDetails(String username) {
+        return loansRepository.loadLoanDetailsByUserName(username);
+    }
+}
+```
+Obs1: foram apresentadas várias vezes a anotação @PreAuthorize como ilustração, mas na prática só é possível declará-la uma vez.
+Se o usuário não se enquadrar nas limitações da anotação declarada acima, é lançado HttpStatus 403 (Forbidden) (Diferente do 401 Unauthorized, onde o problema pode ser a falta de autenticação, o 403 Forbidden indica que a autenticação foi feita corretamente, mas o usuário ou sistema não tem as permissões necessárias).
+Obs2: Repare que foi declarado role "ADMIN" e não "ROLE_ADMIN" (esse último é como está o registro no banco de dados na coluna 'name').
+
+*** @PostAuthorize
+- For applying postauthorization rules below is the sample configuration:
+
+```java
+@Service
+public class LoanService {
+
+    @PostAuthorize("hasAuthority('VIEWLOANS')")
+    @PostAuthorize("hasRole('ADMIN')")
+    @PostAuthorize("hasAnyRole('ADMIN', 'USER')")
+    @PostAuthorize("returnObject.username == authentication.principal.username")
+    public Loan getLoanDetails(String username) {
+        return loanRepository.loadLoanByUserName(username);
+    }
+}
+```
+
+Obs1: foram apresentadas várias vezes a anotação @PostAuthorize como ilustração, mas na prática só é possível declará-la uma vez.
+Se o usuário não se enquadrar nas limitações da anotação declarada acima, é lançado HttpStatus 403  (Forbidden) (Diferente do 401 Unauthorized, onde o problema pode ser a falta de autenticação, o 403 Forbidden indica que a autenticação foi feita corretamente, mas o usuário ou sistema não tem as permissões necessárias).
+Obs2: Repare que foi declarado role "ADMIN" e não "ROLE_ADMIN" (esse último é como está o registro no banco de dados na coluna 'name').
+** Filtering
+- If we have a scenario where we don’t want to control the invocation of the method but we want to make sure that the parameters sent and received to/from the method need to follow authorization rules or filtering criteria, then we can consider filtering.
+  
+*** @PreFilter
+- For filtering the parameters before calling the method we can use PreFilter annotation. But please note that the filterObject should be of type Collection interface.
+
+```java
+@RestController
+public class ContactController {
+
+    @PreFilter("filterObject.contactName != 'Test'")
+    public List<Contact> saveContactInquiryDetails(@RequestBody List<Contact> contacts) {
+        // business logic
+        return contacts;
+    }
+}
+```
+exemplo:
+@PostMapping("/contact")
+@PreFilter("filterObject.contactName != 'Test'") //Se fornecido o campo com atributo "Test", e se for o único elemento fornecido, a collection contacts vai ser empty. Obs: a HttpStatus de retorno é 200 mesmo assim
+public Contact saveContactInquiryDetails(@RequestBody List<Contact> contacts) {
+    if (!contacts.isEmpty()) {
+        Contact contact = contacts.getFirst();
+        contact.setContactId(getServiceReqNumber());
+        contact.setCreateDt(new Date(System.currentTimeMillis()));
+        return contactRepository.save(contact);
+    } else {
+        return null;
+    }
+}
+
+"filterObject" vai ser do tipo "Contact" (tipo da collection)
+
+*** @PostFilter
+- For filtering the parameters after executing the method we can use PostFilter annotation. But please note that the filterObject should be of type Collection interface.
+
+```java
+@RestController
+public class ContactController {
+
+    @PostFilter("filterObject.contactName != 'Test'")
+    public List<Contact> saveContactInquiryDetails(@RequestBody List<Contact> contacts) {
+        // business logic
+        return contacts;
+    }
+}
+```
+
+- We can use the `@PostFilter` on the Spring Data repository methods as well to filter any unwanted data coming from the database.
+
+  Exemplo:
+    @PostMapping("/contact")
+    @PostFilter("filterObject.contactName != 'Test'") /Se fornecido o campo com atributo "Test", e se for o único elemento fornecido, a collection contacts vai te-lo como 1 elemento.
+    public List<Contact> saveContactInquiryDetails(@RequestBody List<Contact> contacts) {
+        List<Contact> returnContacts = new ArrayList<>();
+        if(!contacts.isEmpty()) {
+            Contact contact = contacts.getFirst();
+            contact.setContactId(getServiceReqNumber());
+            contact.setCreateDt(new Date(System.currentTimeMillis()));
+            Contact savedContact = contactRepository.save(contact);
+            returnContacts.add(savedContact);
+        }
+        return returnContacts; // Porém, apesar de ter recebido 1 elemento, a collection retornada é vazia, e HttpStatus de retorno é 200
+    }
+    
+
+* commit messages
 //copilot:
 A commit message is a message that is associated with a specific change made to a file in a repository. It is a way to communicate to other developers why a change was made, what the change was, and how it was made. A good commit message is clear, concise, and informative. It should explain the purpose of the change, the motivation behind it, and any relevant details about how the change was implemented. A commit message should also be written in the imperative mood, meaning it should describe what the change does, not what it did. For example, "Add feature X" is a good commit message, while "Added feature X" is not as clear. A commit message is an important part of the development process because it helps other developers understand the history of a project and the reasoning behind specific changes. It also helps with code reviews, debugging, and tracking down issues in the future.
