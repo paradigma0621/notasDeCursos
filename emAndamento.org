@@ -1,0 +1,107 @@
+[00:00] Nós estamos enfrentando um problema de persistência de dados, porque, o que acabou de acontecer? Nós pegamos alguns arquivos das nossas notícias, colocamos dentro do nosso Pod, dentro do container desse Pod e quando este Pod é encerrado, todos os arquivos dele são perdidos.
+
+[00:18] Isso porque eles, ao serem executados nativamente, não tem nenhuma maneira, até então, de nós utilizarmos e persistir os dados de algum modo.
+
+[00:28] Porque nós sabemos que eles são efêmeros, eles devem estar prontos para serem trocados a qualquer momento e isso implica numa situação um pouco mais delicada.
+
+[00:39] Então, nós precisamos ver o que? Nós precisamos começar a estudar as questões da persistência de dados, primeiro no âmbito dos containers dentro de um Pod para que nós consigamos partir para conhecimentos mais aprofundados, que seria a persistência de dados no próprio Pod.
+
+[00:57] Então, o que acontece aqui? Nós já vimos lá do Docker que nós conseguimos compartilhar dados, arquivos de maneira geral entre containers.
+
+[01:08] O que acaba acontecendo? Nós precisamos de início, como eu acabei de falar para vocês, ter alguma maneira também do Kubernetes de compartilhar dados entre containers.
+
+[01:19] Mas, entre containers de um mesmo Pod. Nós precisamos estudar isso para entender a base e depois partir para o avançado.
+
+[01:27] E para isso nós temos os nossos recursos que são os Volumes, os Persistents Volumes, os Persistent Volume Claim e os Storage Classes.
+
+[01:37] Nós vamos começar falando sobre os Volumes. E qual é a peculiaridade deles? Bom, voltando ao nosso problema inicial, mais básico, nós temos um container ou alguns containers dentro de um Pod e queremos compartilhar um arquivo entre eles.
+
+[01:55] Se nós queremos compartilhar arquivos entre containers no Docker, nós fazemos o que? Nós criamos Volumes. No Kubernetes nós fazemos a mesma coisa, só que a peculiaridade dele é que o ciclo de vida é independente dos containers do Pod, mas é dependente do Pod.
+
+[02:14] Então, isso quer dizer que se nós vincularmos, colocar algum arquivo dentro desse Volume, dentro dos containers compartilhando esse Volume e algum desses containers dentro do Pod falhe, mas, o Pod ainda esteja em execução, esse Pod ainda existe.
+
+[02:33] E caso nós consigamos fazer o reinício manual desse container ou mantenha ele ainda em estado parado, mas tenha outros containers em execução, os arquivos ainda estão persistidos, por mais que este container tenha falhado.
+
+[02:46] Porque frisando, o ciclo de vida desse Volume é independente do container e sim dependente do Pod. Isso quer dizer que se esse segundo container aqui falhar, ou seja, todos os containers desse Pod estão falhando, o Pod vai falhar, logo, o volume vai ser removido, porque o ciclo de vida dele é dependente do Pod.
+
+[03:07] Mas, o que vai acontecer com o arquivo? Bom, depende, se nós olharmos aqui na documentação oficial do Kubernetes, o que acontece? Nós conseguimos ver toda a questão dos Volumes e que os containers são efêmeros assim como os Pods e tudo mais.
+
+[03:24] E ele conta uma breve história sobre estes tipos de recursos, bem básico que é o básico que eu contei para vocês.
+
+[03:31] E mais aqui embaixo ele tem os tipos de Volumes, então, ele fala que o Kubernetes suporte diversos tipos, por exemplo, o awsElasticBlockStore, azureDisc, azureFile, vários.
+
+[03:44] O que nós vamos usar para exemplificar a nossa utilização de Volumes é o hostPath, que é que nem o que vocês fizeram lá no curso de Docker.
+
+[03:53] Então, nós fazemos o bind de um diretório do nosso host para um diretório de dentro do nosso container do nosso Pod, nesse caso do Kubernetes.
+
+[04:06] E como que ele funciona? Se nós clicarmos no link do “hostPath” e ver, é exatamente dessa mesma maneira, o hostPath monta um caminho ou arquivo do nosso host e monta ele dentro do nosso Pod, dentro dos containers desse Pod.
+
+[04:20] E enquanto o Pod ficar vivo, esse Volume vai existir, e como é que nós fazemos a criação desse hostPath? É bem simples, como que nós criamos um volume básico no Kubernetes?
+
+[04:32] Então, nós precisamos criar um arquivo de definição para ele. Vou criar um arquivo chamado pod-volume.yaml e dentro dele nós vamos definir um Pod mesmo para ser mais prática, mais simples a definição, funcionaria da mesma maneira para um ReplicaSet ou para um Deployment.
+
+[04:49] Vamos colocar aqui o kind que é um Pod e no metadata vamos definir um name para ele que vai ser o nosso pod-volume.
+
+[04:56] Nas especificações vamos colocar aqui as informações do container que nesse caso nós vamos fazer o que? Nós vamos ter o mesmo cenário da nossa apresentação. Vou encerrar a tela e colocar a animação da apresentação novamente para nós termos a ideia inicial.
+
+[05:10] Nós almejamos criar dois containers dentro de um Pod e um Volume para fazer o compartilhamento entre esses dois containers, é esse o nosso objetivo para entender a utilização de Volumes.
+
+[05:24] Então, vamos lá, como nós declaramos dois containers dentro de um Pod? É bem simples, basta seguir o que nós já viemos fazendo, nós definimos um nome para ele, vamos chamar ele de nginx-container, uma imagem, vou utilizar a versão nginx-latest.
+
+[05:41] E agora, repara que o nome containers já está até no plural, basta nós fazermos outra definição de nome e imagem. Esse traço no início da especificação name indica uma nova posição, como se fosse um array, uma nova posição nesse array para nós adicionarmos um novo campo.
+
+[05:59] Então, nós estamos adicionando aqui um novo campo, um novo container, por exemplo, vamos utilizar uma outra especificação bem famosa, por exemplo, o Jenkins. Vamos colocar o jenkins-container e utilizar a versão não latest, vamos utilizar uma versão mais leve, por exemplo, a alpine, irrelevante isso, mas só para nós definirmos aqui.
+
+[06:20] E agora, falta nós definirmos o nosso Volume, mas, como eu falei para vocês os Volumes tem ciclo de vida atrelado ao Pod, a especificação do Pod e não aos containers, então, faz todo sentido nós alinharmos com os containers a definição dos Volumes desse Pod.
+
+[06:40] Que é bem simples, basta nós definirmos um nome para ele, como por exemplo, primeiro-volume e definir qual é o tipo, o que nós queremos fazer? Nós queremos criar um hostPath e agora nós precisamos definir qual é o caminho dele no nosso host.
+
+[06:56] O caminho vai ser para /c/Users/Daniel/Desktop/primeiro-volume. Eu criei essa pasta na minha área de trabalho e ela vai ser o nosso Volume para nós.
+
+[07:12] E agora, a questão é bem simples, basta nós também falarmos que o tipo desse Volume é um diretório, sem nenhum mistério.
+
+[07:20] Só que falta algumas coisas ainda, como por exemplo, nós precisamos informar agora que cada um desses dois containers que nós definimos dentro do nosso Pod, vai montar esse Volume chamado primeiro-volume em algum lugar deles.
+
+[07:36] Então, dentro da definição de cada um desses containers, nós precisamos colocar aqui esse volumeMounts e dentro dele basta definir qual é o caminho dentro do nosso container. Pode ser, por exemplo, volume-dentro-do-container, sem nenhum mistério.
+
+[07:53] E qual é o Volume que nós queremos montar? É o primeiro volume, então, o nome do Volume que nós queremos montar é primeiro-volume, sem nenhum mistério.
+
+[08:06] E como nós queremos fazer isso para o nosso segundo container basta nós virmos no volumeMounts colar e tudo feito, sem nenhum mistério.
+
+[08:15] Por fim, basta vocês fazerem o seguinte, o pessoal que está no Windows comigo vai ter que fazer essa declaração como eu fiz para o caminho, não vai ser c:// vai ser no formato do Unix /C/Users/ o seu usuário/pasta que você quiser compartilhar.
+
+[08:33] Eu, no caso, coloquei essa aqui, /C/User/Daniel/Desktop/primeiro-volume. Eu vou mostrar para o pessoal do Linux, vai ter uma pequena diferença que já eu mostro, mas aqui no Windows ainda vocês vão precisar fazer o seguinte.
+
+[08:43] Aqui vocês, dentro do Docker, das configurações do Docker que você podem abrir com settings, basta vocês fazerem o que? Vocês precisam desativar, caso esteja ativa essa opção de utilizar o WSL 2, vai precisar reiniciar o Docker, sem nenhum problema.
+
+[09:01] E depois em resources, basta vocês virem em “File Sharing” e marcar aqui no botão mais “+”, escolher, por exemplo, que nem eu fiz. A pasta C/Users/Daniel/Desktop/primeiro-volume, selecionar pasta e agora essa pasta vai estar compartilhável com o Docker. Sem nenhum mistério, tudo feito.
+
+[09:23] Com isso feito, basta nós virmos no PowerShell e aplicar esse arquivo, então kubectl apply -f pod volume.yaml.
+
+[09:34] E agora, ele foi criado sem nenhum mistério, se nós dermos um kubectl get pod agora, repara que nós temos aqui o nosso Pod com 2/2 em execução, sem nenhum problema.
+
+[09:48] Nós temos dois containers em execução e dois estão prontos já e basta nós virmos aqui e fazer o seguinte teste, eu quero executar um comando em modo interativo no meu Pod Volume, mas agora como eu tenho dois containers dentro desse Pod eu preciso explicitar se eu quero fazer isso no meu primeiro ou no meu segundo.
+
+[10:10] E como é que eu faço isso? Só passando o nome. Então --container nginx-container, eu quero fazer o que? Eu quero executar o --bash, sem nenhum mistério.
+
+[10:24] Se eu usar um ls, olha que legal, eu tenho o meu volume-dentro-do-container assim como eu defini no mouthPath dentro de VolumeMounts. E ele está mapeado para a minha área de trabalho nessa pasta primeiro-volume.
+
+[10:37] Se eu acessar essa pasta, então cd/volume-dentro-do-container, eu posso, por exemplo, criar um arquivo, um arquivo.txt. Isso significa que agora se eu vier na minha área de trabalho eu tenho o primeiro-volume e aqui está o arquivo que eu acabei de criar as 17:31.
+
+[10:55] Isso também significa que se eu vier aqui agora, sair desse meu container e acessar o meu jenkins-container com a mesma maneira, basta eu colocar o nome dele. O que vai acontecer? Eu também vou ter aqui o meu volume-dentro-do-container e posso, se eu vier aqui comandar um cd volume-dentro-do-container e acessar esse meu Volume se eu der um ls, aqui está o meu arquivo.txt.
+
+[11:18] Inclusive, eu posso criar outro arquivo, por exemplo, outro arquivo.txt e se eu vier mais uma vez na minha área de trabalho, eu tenho agora esses dois arquivos criados. Isso significa que esse Volume vai existir, se nós sairmos daqui, enquanto este meu Pod existir.
+
+[11:38] Como assim? Vamos executar o comando kubectl describe pod pod – volume, se nós dermos uma olhada aqui em cima, olha só a definição dele aqui do Volume, esse cara ele só vai existir essa definição só vai existir enquanto este Pod existir. Ele está vinculado diretamente ao nosso Pod.
+
+[12:02] Mas, como os arquivos já estão persistidos no nosso host, no caso aqui do hostPath, por mais que o Volume deixe de existir em algum momento, os arquivos vão continuar nessa pasta, o que vai ser encerrado é o vínculo.
+
+[12:16] Então, se eu remover agora este meu pod-volume, volume atrelado a este Pod, se nós voltarmos na nossa apresentação, como os dois Pods que estavam em execução foram removidos, foram parados, tudo, os dois containers, perdão, vinculados a esse Pod foram parados, o Pod também parou.
+
+[12:37] Logo, o Volume também foi removido, mas nesse caso, o arquivo, como nós fizemos esse mapeamento para a nossa área de trabalho aqui para um lugar persistente no nosso disco, os arquivos vão continuar aqui.
+
+[12:51] O que não continua é o Volume em si, se nós fizermos essa mesma declaração de novo, ele vai criar outro Volume para nós, mas que vai seguir a mesma ideia. E como os arquivos já vão existir, vai estar tudo ali sem nenhum problema.
+
+[13:08] Então, nós precisamos ver agora como que isso vai funcionar no Linux, então, eu vou fazer um vídeo um pouco mais breve em relação ao que nós fizemos no Windows agora, para o pessoal do Linux entender como vai funcionar lá.
+
+[13:20] Então, por esse vídeo aqui é só, eu vejo vocês no próximo vídeo onde nós vamos falar sobre como isso que nós acabamos de fazer vai funcionar no Linux e eu vejo vocês lá. Até mais!
