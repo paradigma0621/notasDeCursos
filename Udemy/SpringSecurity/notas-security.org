@@ -1,0 +1,1670 @@
+curso da udemy que usa reactJS:	
+https://www.udemy.com/course/spring-security-6-with-reactjs-oauth2-jwt-multifactor-authentication/?utm_source=adwords&utm_medium=udemyads&utm_campaign=LongTail_la.EN_cc.BR&campaigntype=Search&portfolio=Brazil&language=EN&product=Course&test=&audience=DSA&topic=&priority=&utm_content=deal4584&utm_term=_._ag_112130202920_._ad_467215026650_._kw__._de_c_._dm__._pl__._ti_dsa-1007766171032_._li_9102161_._pd__._&matchtype=&gad_source=1&gclid=Cj0KCQjwsc24BhDPARIsAFXqAB39RnR4k1zL3McyPaS5U-PfGQ52YVJBNWayMr8e5ZjAbTCtWyT2OZUaAo0iEALw_wcB&couponCode=2021PM25
+* erro
+O simples fato de declarar qualquer uma das 2 dependencies e não no application.properties abaixo gera o erro de "** erro gerado"
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-jpa</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-jdbc</artifactId>
+		</dependency>
+
+
+Obs importante: ao  atualizar o pom.xml, não esquecer de fazer o reload dos módulos.
+
+** erro gerado
+
+***************************
+APPLICATION FAILED TO START
+***************************
+
+Description:
+
+Failed to configure a DataSource: 'url' attribute is not specified and no embedded datasource could be configured.
+
+Reason: Failed to determine a suitable driver class
+
+
+Action:
+
+Consider the following:
+	If you want an embedded database (H2, HSQL or Derby), please put it on the classpath.
+	If you have database settings to be loaded from a particular profile you may need to activate it (no profiles are currently active).
+
+* Porque proteção CSRF bloqueia
+Em métodos GET não ocorre bloqueio de CSRF, mas ao tentar fazer um POST e afins (ex: PUT, DELETE), sim (erro HttpStatus 403: Forbidden).
+
+Para desabilita-lo precisamos de adicionar:
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http.csrf(csrf -> csrf.disable())
+	(continua o código...)
+
+* versões/configurações usadas no curso
+- Spring Boot 3.3.0
+- Maven
+- Java 21
+- Dependences
+	- Spring Web
+	- Spring Boot DevTools (para reexecutar o projeto automaticamente)
+	- Spring Security
+Na seção 4 são adicionados:
+	- JDBC API
+	- MySQL Driver
+	- Spring Data JPA
+	- Lombok (adiciona na aula 32. Obs: é preciso adicionar o plugin do Lombok tb pra ele aparecer legal no IntelliJ)
+Obs: o projeto da Udemy printa as queries no formato Hibernate
+
+* Lombok  (para ver os métodos criados pelo lombok, usar o amostrar  métodos do IntelliJ)
+Alt + 7 
+  e
+Ctrl + F12
+
+* Senha default (quando não é definida nenhuma senha)
+Ao adicionar a dependência do Spring Security ao projeto, por padrão passa a pedir senha. Nesse caso:
+- usuário: user
+- senha: aparece printada no console na hora que sobe o microsserviço
+* definindo usuário/senha: MODO #01
+** preenchendo application.properties
+spring.security.user.name = eazybytes
+spring.security.user.password = 12345
+* Mostrando mensagens de TRACE no console do IntelliJ durante o processamento de uma biblioteca
+Adicione a seguinte linha ao seu arquivo application.properties:
+logging.level.org.springframework.security=TRACE
+
+Usando application.yml: Se você estiver usando um arquivo application.yml, adicione a seguinte configuração:
+logging:
+  level:
+    org.springframework.security: TRACE
+
+Aparentemente esse recurso pode ser aplicado a outras bibliotecas.
+* Processo
+uma vez feito o login, a cada nova requisição: não é mais feita requisição ao Authentication Manager, o Security Context diz que já está logado.
+* Cookies
+** No DevTools
+Ir na aba "Application", na seção "Storage" há o item "Cookies".
+É possível que haja um elemento  de nome "JSESSIONID" com um hash... esse hash é passado para o Security Context - ele avalia se é válido.
+* Configurando as permissões no Bean
+** permitAll()
+@Configuration
+public class ProjectSecurityConfig {
+
+    @Bean
+    SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
+
+        http.authorizeHttpRequests((requests) -> requests.anyRequest().permitAll())
+            .formLogin(Customizer.withDefaults())
+            .httpBasic(Customizer.withDefaults());
+        
+        return http.build();
+    }
+}
+** denyAll()
+@Configuration
+public class ProjectSecurityConfig {
+
+    @Bean
+    SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
+
+        http.authorizeHttpRequests((requests) -> requests.anyRequest().denyAll())
+            .formLogin(Customizer.withDefaults())
+            .httpBasic(Customizer.withDefaults());
+        
+        return http.build();
+    }
+}
+** configurado para permitir alguns e autenticar outros
+@Configuration
+public class ProjectSecurityConfig {
+
+    @Bean
+    SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
+
+        http.authorizeHttpRequests()
+                        .requestMatchers("/myAccount","/myBalance","/myLoans","/myCards").authenticated()
+                        .requestMatchers("/notices","/contact").permitAll()
+                .and().formLogin()
+                .and().httpBasic();
+        return http.build();
+    }
+}
+** configurando para desabilitar o formulariozinho de autenticação 
+Com isso é mostrado um formulário próprio do browser
+http.authorizeHttpRequests((requests) -> requests
+    .requestMatchers("/myAccount", "/myBalance", "/myLoans", "/myCards").authenticated()
+    .requestMatchers("/notices", "/contact", "/error").permitAll())
+    .formLogin(flc -> flc.disable())  //*************************
+    .httpBasic(Customizer.withDefaults());
+** configurando para desabilitar a página do formulariozinho (HTML) de autenticação 
+Com isso não aparece  forma nenhuma de autenticação via web. Pode-se usar a autenticação via Postman do tópico abaixo
+http.authorizeHttpRequests((requests) -> requests
+    .requestMatchers("/myAccount", "/myBalance", "/myLoans", "/myCards").authenticated()
+    .requestMatchers("/notices", "/contact", "/error").permitAll())
+    .formLogin(Customizer.withDefaults()) //No video do curso o professor deixou aqui  como no tópico acima:    .formLogin(flc -> flc.disable())
+    .httpBasic(hbc -> hbc.disable()); //**************
+
+* Autenticando via postman
+Na guia "Authorization" escolhe-se no "Auth Type": "Basic Auth" e digita-se o "Username" e "Password"
+* ver atualizações do Spring Security
+https://dev.to/wldomiciano/metodos-obsoletos-da-httpsecurity-no-spring-security-61-5033?fbclid=IwAR23WQOlLKOJS8XHGQu5wqkZhW1qjldYOnksk2WIkIWJUyp7ERLyDihm0YU
+* Formas de armazenar usuários/credenciais
+** Armazenando usuários na memória (Seção 3)
+*** usando senhas como plain text
+dentro de: public class ProjectSecurityConfig { 
+
+@Bean
+public UserDetailsService userDetailsService() {
+
+    UserDetails user = User.withUsername("user").password("{noop}12345").authorities("read").build();
+    UserDetails admin = User.withUsername("admin").password("{noop}54321").authorities("admin").build();
+
+    return new InMemoryUserDetailsManager(user, admin);
+}
+
+Obs: apesar de as senhas estarem como: {noop}12345  e  {noop}54321, as senhas são 12345 e 54321. O "{noop}" é usado para especificar que não haverá nenhuma encoder no password, mas entendê-lo como plain text.
+*** usando senhas com encodação padrão do spring (BCrypt)
+criar o hash da senha em: bcrypt-generator.com
+
+dentro de: public class ProjectSecurityConfig { 
+
+@Bean
+public UserDetailsService userDetailsService() {
+
+    UserDetails user = User.withUsername("user").password("{noop}12345").authorities("read").build(); //*** conforme tópico acima: a senha é 12345, mas tem que colocar o "{noop}" pra dizer que não está encodada
+    UserDetails admin = User.withUsername("admin")
+        .password("{bcrypt}$2a$12$8A3r8ysU5CFsR1IbyMI8O.PoaVXKcC0xExHQ/.B3at4XfkkYTI.yO")  //******* a senha era 54321, que após passar peo site bcrypt-generator.com ficou o que vem após o "{bcrypt}". É preciso colocar o {bcrypt} pra o Spring saber que é esse o tipo de encodação
+        .authorities("admin").build();
+
+    return new InMemoryUserDetailsManager(user, admin);
+}
+
+@Bean
+public PasswordEncoder passwordEncoder() {
+    return PasswordEncoderFactories.createDelegatingPasswordEncoder();
+/*
+Dentro desse método é declarado:
+		String encodingId = "bcrypt";
+Pro: Ou seja: A encodação BCryot é recomendada mesmo para projetos em produção. Outro ponto: se não for passado o prefixo "{noop}" antes da senha no User.withUsername("user").password("{noop}12345").authorities("read").build() ele considera que a senha é por padrão BCrypt 
+*/
+}
+
+*** exigindo que o usuário crie senhas fortes (Aula 24)
+dentro de: public class ProjectSecurityConfig { 	
+    /**
+     * From Spring Security 6.3 version
+     * @return
+     */
+    @Bean
+    public CompromisedPasswordChecker compromisedPasswordChecker() {
+        return new HaveIBeenPwnedRestApiPasswordChecker();
+    }
+* UserDetailsManager x UserDetailsService
+ Which of the following statements about the UserDetailsManager interface in Spring Security is correct?
+R: UserDetailsService provides methods for creating, updating, and deleting user accounts
+
+Which of the following statements about the UserDetailsService interface in Spring Security is correct?
+R: UserDetailsService loads user-specific data during authentication
+* Definindo Banco de Dados
+** JDBC
+Após adicionarmos as bibliotecas do banco de dados, e ao definirmos em application.properties:
+spring.datasource.url=jdbc:mysql://${DATABASE_HOST:localhost}:${DATABASE_PORT:3306}/${DATABASE_NAME:eazybank}
+spring.datasource.username=${DATABASE_USERNAME:root}
+spring.datasource.password=${DATABASE_PASSWORD:root}
+spring.jpa.show-sql=${JPA_SHOW_SQL:true}
+spring.jpa.properties.hibernate.format_sql=${HIBERNATE_FORMAT_SQL:true}
+
+*** Quando declaramos em ProjectSecurityConfig.java:
+    @Bean
+    public UserDetailsService userDetailsService(DataSource dataSource) {
+        return new JdbcUserDetailsManager(dataSource);
+    }
+
+O Spring entende que esse campo "DataSource dataSource" é o do JDBC declarado em application.properties.
+
+Obs: adicionalmente, nesse arquivo precisamos do 
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
+    }
+
+//Já esse abaixo, acredito ser opcional:
+    /**
+     * From Spring Security 6.3 version
+     * @return
+     */
+    @Bean
+    public CompromisedPasswordChecker compromisedPasswordChecker() {
+        return new HaveIBeenPwnedRestApiPasswordChecker();
+    }
+** JPA
+*** Para definir um sistema que autentica via JPA é preciso comentar as linhas dentro do config
+//    @Bean
+//    public UserDetailsService userDetailsService(DataSource dataSource) {
+//        return new JdbcUserDetailsManager(dataSource);
+//    }
+*** Para definir um sistema que autentica via JPA é preciso declarar as linhas
+
+@Service
+@RequiredArgsConstructor
+public class TimeFlowUserDetailsService implements UserDetailsService {
+
+    private final CustomerRepository customerRepository;
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        Customer customer = customerRepository.findByEmail(username).orElseThrow(() -> new
+                UsernameNotFoundException("User details not found for the user: " + username));
+        List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(customer.getRole()));
+        return new User(customer.getEmail(), customer.getPwd(), authorities);
+    }
+}
+
+* Encoding x Encryption x Hashing
+** **Encoding** (com notas de Pro do curso)
+- Encoding is defined as the process of converting data from one form to another and has nothing to do with cryptography.
+- It involves no secret and completely reversible.
+- Encoding can't be used for securing data. Below are the various publicly available algorithms used for encoding.
+
+    Ex: ASCII, BASE64, UNICODE
+
+Pro: para encodar um conteúdo em base64 (por exemplo) podemos usar o aplicativo de terminal openssl:
+ openssl base64 -in inputToEncode.txt -out outputEncoded.txt
+
+Para decodar:
+ openssl base64 -d -in outputEncoded.txt -out fraseDecoded.txt
+** **Encryption** (com notas de Pro do curso): Não é recomendado para senhas!
+- Encryption is defined as the process of transforming data in such a way that guarantees confidentiality.
+- To achieve confidentiality, encryption requires the use of a secret which, in cryptographic terms, we call a "key".
+- Encryption can be reversible by using decryption with the help of the "key". As long as the "key" is confidential, encryption can be considered as secured.
+
+O texto encriptado chama: "Cipher Text"
+Pro: Existem 2 tipos: simétrica e  assimétrica
+*** simétrica
+a mesma secret key é usada tanto para encriptar como  decriptar. Ou seja: é preciso cuidado redobrado para proteger a secret key.
+
+caso de uso: Buckets S3 da AWS (Com opção de o usuário fornecer a key)
+*** assimétrica
+Há 2 chaves (secret keys):
+**** public key
+usada para encriptar
+é usada tanto para encriptar 
+**** private key
+usada para decriptar
+**** descrição
+Here is the transcription of the text from the image you provided:
+
+**Asymmetric encryption** - Asymmetric encryption functions like a unique lock with two distinct keys: one for locking (encrypting) and one for unlocking (decrypting). You keep the private key, which unlocks the message, secure with you, while freely distributing the public key to anyone who wants to send you an encrypted message. They use this public key to encrypt their message, and only you can decrypt it using your private key. This system ensures secure communication, as it relies on a pair of keys: a **public key for encryption and a private key for decryption**.
+
+Como alguém pode hackear e obter as chaves, essa pessoa pode ter os dados decriptados - por isso  encriptação não é recomendada para senhas.
+**** exemplo de caso prático de encriptação/decriptação
+comando para encriptar:
+openssl enc -aes-256-cbc -pass pass:12345 -pbkdf2 -in plainInput.txt -out encryptOutput.txt -base64
+onde:
+	-aes-256-cbc = algoritmo escolhido para encriptação 
+	12345 = secret key
+	-pbkdf2 = recurso usado para trabalhar com a secret key para tornar mais difícil ainda a decriptação
+	-base64 = torna a saída gerada em formato legível para leitura para o usuário visualizar
+
+comando para decriptar:
+openssl enc -aes-256-cbc -base64 -pass pass:12345 -d -pbkdf2 -in encryptOutput.txt -out decriptedOutput.txt
+onde:
+	-d: pede para decriptar
+	(idem como acima para demais parâmetros)
+** **Hashing** (Usado para senhas)
+
+- In hashing, data is converted to the hash value using some hashing function.
+- Data once hashed is non-reversible. One cannot determine the original data from a hash value generated.
+- Given some arbitrary data along with the output of a hashing algorithm, one can verify whether this data matches the original input data without needing to see the original data.
+
+Pro: Não é reversível.
+A saída de hash é chamada de "digest" ou um "HASH".
+As saídas geradas possuem tamanho fixo, conforme o tipo. Exemplo: Para o uso via SHA-256, a saída sempre possuí 256 bits, idependentemente o tamanho da entrada.
+*** caso prático de gerar hash
+echo -n "meu texto a passar para hash" | openssl dgst -sha256
+saída: dde7534e8b2e30b18a3ab3c188eabeeb927dc7d0fad2cc87b08568a0ec577aee
+onde -sha256 é o algorítmo de hash
+Obs: comando para testar se o hash sha-256 de um download é igual ao do servidor:
+
+	openssl dgst -sha256 nomeArquivo.zip
+
+a saída pode ser copiada e rodar um CTRL+F no browser para comparar.
+*** recursos para dificultar a descoberta do valor da senha
+**** Usando "salt value" - geração randômica adicionada à senha (esse salt value fica salvo também no banco de dados). Só não tem valor se o hacker consegue adquirir esse salt value do banco - nesse caso precisamos do recurso abaixo.
+
+**1.** To prevent rainbow table attacks, **salts** are commonly used. Salts are random values that are unique for each user and are made public. The salt value is stored as part of the resulting hash itself. Specifically, the salt is included in the hash string along with the actual hashed password. The salt is typically stored at the beginning of the hash string and is used during the password verification process to generate the same hash again for comparison. Since each user has a unique hash function, attackers can't precompute large tables of passwords (rainbow tables) to test against the entire database of stolen password hashes.
+
+**** Fazendo o hashing process ser devagar (ex: usando BCrypt que usa CPU e memória, demorando +- 1 segundo para "hashear" uma String de 8 caracteres (com números, letras, símbolos especiais), o que o  hacker usando dicionário ou geração sequência de possíveis valores levaria 10 anos para descobrir uma senha).
+**Plain text password + Random salt value + Hashing Algo = Protection from Rainbow attacks**
+
+**2.** Brute force attacks issue can be solved with password hashes, which are designed to be slow. The normal hashing process is quite fast, due to which attackers can do the trial and error by trying any number of plain passwords to check against hashed passwords. We can make attacker life tough by using password hashing algorithms like **PBKDF2**, **bcrypt**, **scrypt** and **Argon2**. These algorithms slow the hashing process and demand lots of CPU cost, memory cost.
+
+These algorithms are specifically designed to slow down the hashing process, thereby increasing the time and resources required for an attacker to guess passwords. They achieve this by introducing additional computational costs, such as CPU and memory, into the hashing process. By making it more computationally expensive to hash passwords, these algorithms make brute force attacks less practical and deter attackers from attempting them.
+
+**Spring Security provides industry recommended Password Encoders that are capable of generating random salt and leverage password hashing algorithms like bcrypt**.
+
+
+
+
+
+
+
+
+
+
+** Observação a respeito de dizer que transformar uma senha em BCrypt é uma "encodação"
+A imagem que você compartilhou menciona o **SCrypt** no contexto de um **PasswordEncoder**. Embora o nome da interface seja `PasswordEncoder`, a utilização do termo "encode" aqui pode ser confusa, porque em casos como **bcrypt** ou **SCrypt**, o processo é de **hasheamento**.
+
+O Spring usa o termo **PasswordEncoder** por convenção, mas é importante entender que **o que está acontecendo não é uma encodação no sentido técnico usual (como em Base64 ou UTF-8), mas sim um processo de hasheamento**. Tanto o **bcrypt** quanto o **SCrypt** são algoritmos de hasheamento que fazem a transformação da senha em um hash seguro.
+
+Esses algoritmos aplicam técnicas como "salt" e "cost factor" para garantir que os hashes gerados sejam únicos e difíceis de serem revertidos ou quebrados, mesmo em caso de ataque de força bruta.
+
+Então, mesmo que o Spring use o termo "PasswordEncoder" na interface, o processo é, de fato, de **hasheamento** e não encodação. Essa convenção é apenas uma escolha de nome para a interface e não reflete o tipo de transformação dos dados.
+* Authentication Provider
+Podemos definir uma implementação para a autenticação via nome de usuário e senha, e outro por OAuth2, outro por xyz.
+** DaoAuthenticationProvider
+Quando um usuário tenta fazer login, o DaoAuthenticationProvider consulta o UserDetailsService para obter um objeto UserDetails correspondente ao nome de usuário fornecido.
+
+Usamos o DaoAuthenticationProvider padrão apenas para o caso geral de autenticação. Se quisermos aplicar alguma regra de autenticação, por exemplo: se o usuário é do país X, ou se é maior de 18 anos, precisamos escrever o nosso provider personalizado.
+** AuthenticationProvider
+Methods inside AuthenticationProvider inteface:
+
+1) The authenticate() method receives and returns authentication object. We can implement all our custom authentication logic inside authenticate() method.
+
+2) The second method in the AuthenticationProvider interface is supports(Class<?> authentication). You'll implement this method to return true if the current AuthenticationProvider supports the type of the Authentication object provided.
+** Escrevendo uma implementação do authenticate()
+
+@Override
+public Authentication authenticate(Authentication authentication) throws AuthenticationException {
+    String username = authentication.getName();
+    String pwd = authentication.getCredentials().toString();
+    
+    UserDetails userDetails = userDetailsService.loadUserByUsername(username);  // Aqui, como foi declarado 
+									// que "class TimeflowUserDetailsService implements UserDetailsService"
+									// vai ser executado o método loadUserByUsername dessa classe
+    
+    if (passwordEncoder.matches(pwd, userDetails.getPassword())) {
+
+        // Fetch Age details and perform validation to check if age > 18
+
+        return new UsernamePasswordAuthenticationToken(username, pwd, userDetails.getAuthorities());
+    } else {
+        throw new BadCredentialsException("Invalid password!");
+    }
+}
+
+* Profiles
+** application.properties 
+São possíveis de serem declarados em application.properties como:
+
+	spring.config.import = application-prod.properties, application-dev.properties, application-qa.properties 
+	spring.profiles.active = default  //Aqui é possível escolher múltiplos profiles. Com "default" é escolhido o application.properties
+						// mas poderia ser: spring.profiles.active = dev 
+** application-prod.properties
+precisamos dar o nome desses profiles específicos, como por exemplo com a linha:
+
+	spring.config.activate.on-profile=prod
+
+** verificar visualmente qual o profile em execução
+na saída do console do carregamento do aplicativo, na segunda linha temos:
+	18:59:30.374 INFO  [main] c.t.s.SecurityApplication - The following 1 profile is active: "default"
+
+poderia ser
+	19:00:37.280 INFO  [main] c.t.s.SecurityApplication - The following 1 profile is active: "dev"
+ou qualquer outro escolhido em spring.profiles.active (exemplo: via configuração do VM Options:
+
+	 -Dspring.profiles.active=prod
+
+ ou via "Enviroment Variables" com:
+
+	 SPRING_PROFILES_ACTIVE=prod  
+
+sendo que podemos setar as "Enviroment Variables" via Jenkins, por linha de comando, através de Argumento de Ambiente do Docker, pela AWS, etc.
+** Observação importante de quando desabilitamos as senhas
+Quando desabilitamos as senhas, com qualquer senha o usuário loga, porém, é preciso que forneçamos um nome de usuário válido (para que sejam pegos os roles e referências de configurações específicas desse usuário).
+** Especificando arquivos de configurações através de profiles 
+*** Exemplo 1
+@Component
+@Profile("prod")
+public class TimeflowProdUsernamePwdAuthenticationProvider implements AuthenticationProvider {
+
+@Component
+@RequiredArgsConstructor
+@Profile("!prod")
+public class TimeflowUsernamePwdAuthenticationProvider implements AuthenticationProvider {
+*** Exemplo 2
+@Configuration
+@Profile("prod")
+public class ProjectSecurityProdConfig {
+
+@Configuration
+@Profile("!prod")
+public class ProjectSecurityConfig {
+
+* HTTP e HTTPS
+Por padrão o Spring permite tanto requisições HTTP como HTTPS.
+Para impôr limitação é preciso adicionar no Bean uma chamada:
+** Apenas HTTPS
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http.requiresChannel(rcc -> rcc.anyRequest().requiresSecure()) // Only HTTPS
+		...
+** Apenas HTTP
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http.requiresChannel(rcc -> rcc.anyRequest().requiresInsecure()) // Only HTTP
+		...
+* Lidando com exceções
+If a client attempts to access a resource without authentication or proper authorization, they should be prompted to provide credentials to access the resource. This can be achieved by either redirecting the client to a login page in the user interface or by informing them about the situation through an API response.
+
+Inside Spring Security authentication & authorization related exceptions are handled by `ExceptionTranslationFilter`.
+
+Há 2 tipos de retornos de exceções no Spring Security:
+** AuthenticationException (HttpStatus code 401 (HttpStatus = "Unauthorized"))
+leads to **AuthenticationEntryPoint** via `ExceptionTranslationFilter`.
+Diz: a pessoa que está fazendo a requisição não está autenticada.
+*** AuthenticationEntryPoint
+An AuthenticationEntryPoint in your Spring application serves as a handler for unauthenticated access attempts, determining how to respond when someone tries to access a part of your site or API without the authentication. Think of it as a gatekeeper in a party who decided what needs to be done if there is no invite. Similarly AuthenticationEntryPoint might redirect users to a login page or return an error message indicating that authentication is necessary.
+
+Below is the definition of AuthenticationEntryPoint interface,
+
+public interface AuthenticationEntryPoint {
+    void commence(HttpServletRequest request, HttpServletResponse response,
+                  AuthenticationException authException) throws IOException, ServletException;
+}
+
+LoginUrlAuthenticationEntryPoint, BasicAuthenticationEntryPoint are a few of the Spring Security provider implementations of AuthenticationEntryPoint interface that gets executed by default in case of AuthenticationException.
+*** Defining Custom AuthenticationEntryPoint
+Below are the snippets on how to define a Custom AuthenticationEntryPoint for the HTTP Basic login flow,
+
+1) We need to create an implementation class using the `AuthenticationEntryPoint` interface & by overriding the `commence()` method. Inside the `commence()` method, we can build logic on what response to send back to clients based on our requirements.
+
+#+BEGIN_SRC java
+public class CustomBasicAuthenticationEntryPoint implements AuthenticationEntryPoint {
+
+    @Override
+    public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException)
+            throws IOException, ServletException {
+        // Populate dynamic values
+        LocalDateTime currentTimeStamp = LocalDateTime.now();
+        String message = (authException != null && authException.getMessage() != null) ? authException.getMessage()
+                : "Unauthorized";
+        String path = request.getRequestURI();
+        response.setHeader("timeflow-error-reason", "Authentication failed");
+        response.setStatus(HttpStatus.UNAUTHORIZED.value());
+        response.setContentType("application/json;charset=UTF-8");
+        // Construct the JSON response
+        String jsonResponse =
+                String.format("{\"timestamp\": \"%s\", \"status\": %d, \"error\": \"%s\", \"message\": \"%s\", \"path\": \"%s\"}",
+                        currentTimeStamp, HttpStatus.UNAUTHORIZED.value(), HttpStatus.UNAUTHORIZED.getReasonPhrase(),
+                        message, path);
+        response.getWriter().write(jsonResponse);
+    }
+
+#+END_SRC java
+
+Obs: para implementar o passo abaixo é preciso remover: .httpBasic(Customizer.withDefaults());
+
+2) The `CustomBasicAuthenticationEntryPoint` created in the above step can be configured for the `httpBasic` flow like shown below:
+
+        http.httpBasic(hbc -> hbc.authenticationEntryPoint(new CustomBasicAuthenticationEntryPoint()));
+
+**** TODO declarando http.exceptionHandling()
+(AP: Não consegui habilitar o login declarando apenas a exceptionHandling(). Ver pergunta do tópico abaixo.)
+
+We can also configure custom AuthenticationEntryPoint globally that is common for all the login types using exceptionHandling configurations. Below is the snippet of the same,
+
+        http.exceptionHandling(ehc -> ehc.authenticationEntryPoint(new CustomBasicAuthenticationEntryPoint())); //  It is a 
+													// Global Config
+
+A implementação via exceptionHandling é mais completa, pois trata outras formas em que podem ocorrer o erro 401. Essa deve ser usada em grandes projetos que vão para produção.
+Obs: essa exceptionHandling() desabilita a configuração: http.formLogin(Customizer.withDefaults()); 
+em vista que a mesma passaria a ser feita por um provedor do frontend através de configurações, como por exemplo;
+  	http.formLogin(flc -> flc.loginPage(...));
+
+***** ChatGPT: essas 2 configurações (http.httpBasic(hbc.authenticationEntryPoint()) e http.exceptionHandling(ehc -> ehc.authenticationEntryPoint()) são excludentes, ou é esperado que se declare a primeira sempre que declaro a segunda? 
+Essas duas configurações no Spring Security não são excludentes, mas elas têm finalidades ligeiramente diferentes e podem ser usadas juntas, dependendo do que você deseja configurar.
+
+### Diferença entre as duas configurações:
+
+1. **`http.httpBasic()`**:
+   - Configura especificamente a autenticação básica HTTP. Essa configuração define como lidar com exceções **somente para requisições que utilizam o fluxo de autenticação básica**.
+   - A chamada `http.httpBasic(hbc -> hbc.authenticationEntryPoint(new CustomBasicAuthenticationEntryPoint()));` define um ponto de entrada personalizado **apenas** para requisições que tentam se autenticar com HTTP Basic. Se uma requisição falhar nesse contexto, o `CustomBasicAuthenticationEntryPoint` será usado para lidar com a exceção.
+
+2. **`http.exceptionHandling()`**:
+   - Configura o tratamento de exceções para **todas as formas de autenticação**, não se limitando apenas ao HTTP Basic. Isso inclui outros tipos de autenticação, como **JWT, OAuth, Form Login, etc.**
+   - A chamada `http.exceptionHandling(ehc -> ehc.authenticationEntryPoint(new CustomBasicAuthenticationEntryPoint()));` define um `AuthenticationEntryPoint` global que será usado para lidar com exceções relacionadas à autenticação (como falhas de login ou permissões) **em qualquer fluxo de autenticação**.
+
+### Uso combinado:
+
+- Se você está configurando **apenas o HTTP Basic**, geralmente basta usar a primeira configuração (`http.httpBasic()`).
+- Se você quer definir um tratamento de exceções para **outros tipos de autenticação** ou quer ter uma configuração **global** para o tratamento de exceções, a segunda (`http.exceptionHandling()`) é mais apropriada.
+
+### Quando usar ambas?
+
+- Se a sua aplicação utiliza **diferentes métodos de autenticação** (por exemplo, HTTP Basic e JWT), você pode precisar usar ambas as configurações. Nesse caso, você estaria configurando um tratamento específico para o fluxo de autenticação HTTP Basic e outro tratamento **global** para os demais métodos de autenticação.
+
+### Exemplo de uso:
+
+
+http
+    .httpBasic(hbc -> hbc.authenticationEntryPoint(new CustomBasicAuthenticationEntryPoint())) // Apenas para HTTP Basic
+    .exceptionHandling(ehc -> ehc.authenticationEntryPoint(new GlobalAuthenticationEntryPoint())); // Para qualquer outro fluxo de autenticação
+
+
+Aqui, você define um ponto de entrada personalizado para falhas de autenticação HTTP Basic e outro ponto de entrada para lidar com falhas em **todos os outros** métodos de autenticação.
+
+### Conclusão:
+
+- **Não são excludentes**. Você pode declarar ambas as configurações se precisar de um ponto de entrada diferente para fluxos de autenticação específicos (como HTTP Basic) e outro para tratamento global de exceções de autenticação.
+- Se a sua aplicação usa **apenas HTTP Basic**, você pode simplesmente usar a configuração `http.httpBasic()`.
+- Se a sua aplicação usa vários métodos de autenticação, você pode usar ambos, ou somente `http.exceptionHandling()` se quiser uma configuração global.
+
+** AccessDeniedException (HttpStatus code 403)
+leads to **AccessDeniedHandler** via `ExceptionTranslationFilter`.
+Diz: Forbidden Error (o usuário está autenticado, mas não tem privilégio (ou `role`) para fazer a requisição).
+
+Pode ser obtido ao tentar, autenticado, acessar um endpoint que não existe.
+*** Código a ser adicionado no ProjectSecurityConfig.java
+        http.exceptionHandling(ehc -> ehc.accessDeniedHandler(new CustomAccessDeniedHandler()));
+        // In the example above, when a 403 error occurs during browser access, a JSON response is shown.
+        // Using the example below, we can specify a URL to redirect the user to when they attempt to access a page without
+        // the necessary permissions.
+        //http.exceptionHandling(ehc -> ehc.accessDeniedHandler(new CustomAccessDeniedHandler()).accessDeniedPage("/denied"));
+*** Exemplo de classe handler
+package com.timeflowsystem.security.exceptionhandling;
+...
+public class CustomAccessDeniedHandler implements AccessDeniedHandler {
+    @Override
+    public void handle(HttpServletRequest request, HttpServletResponse response,
+            AccessDeniedException accessDeniedException) throws IOException, ServletException {
+        // Populate dynamic values
+        LocalDateTime currentTimeStamp = LocalDateTime.now();
+        String message = (accessDeniedException != null && accessDeniedException.getMessage() != null) ?
+                accessDeniedException.getMessage() : "Authorization failed";
+        String path = request.getRequestURI();
+        response.setHeader("timeflow-denied-reason", "Authorization failed");
+        response.setStatus(HttpStatus.FORBIDDEN.value());
+        response.setContentType("application/json;charset=UTF-8");
+        // Construct the JSON response
+        String jsonResponse =
+                String.format("{\"timestamp\": \"%s\", \"status\": %d, \"error\": \"%s\", \"message\": \"%s\", \"path\": \"%s\"}",
+                        currentTimeStamp, HttpStatus.FORBIDDEN.value(), HttpStatus.FORBIDDEN.getReasonPhrase(),
+                        message, path);
+        response.getWriter().write(jsonResponse);
+    }
+}
+
+* Sessions Management in Spring Security
+** Handling Invalid Session
+Using the below config, the user can be redirected to the given URL when an invalid session is detected,
+
+http.sessionManagement(sessionConfig -> sessionConfig.invalidSessionUrl("/invalidSession"))
+
+Obs: lembrar de adicionar, nesse caso, dentro da lista de endpoints de acesso permitidos o endpoint da página que será exibida quando a seção expirar:
+	.requestMatchers("/invalidSession").permitAll()
+** Session Timeout
+With the help of the below property, we can configure what is the idle time after which the Spring Security created session should be expired. 20m indicates 20 minutes
+
+Adicionar no application.properties:
+	server.servlet.session.timeout=20m
+
+Por padrão, o tempo de timeout do spring é de 30 minutos.
+Obs1: se não fornecida a unidade (no exemplo acima foi de minutos ("m"), o Spring subtende em segundos)
+Obs2: O Spring não deixa atribuir timeout menor que 2 minutos.
+Obs3: é requerida inativadade para invalidar a seção, ou seja, enquanto houver acessos, o tempo de timeout é resetado a cada nova requisição.
+
+** Concurrent Session Control
+We can control the maximum sessions allowed for a user and what should happen in the case of invalid session due to too many sessions for the current user,
+ 
+Se fornecido o código abaixo: ele permiti manter x seções (no exemplo abaixo: "1"), sendo que ao atingir o limite, e, ao fazer novo login, uma outra seção que estava aberta é finalizada:
+http.sessionManagement(sessionConfig -> sessionConfig.maximumSessions(1))
+ 
+Se fornecido o código abaixo: ele permiti manter x seções (no exemplo abaixo: "1"), sendo que bloqueia a abertura de novas seções quando esse limite for atingido:
+http.sessionManagement(sessionConfig -> sessionConfig.maximumSessions(1).maxSessionsPreventsLogin(true))
+
+Se fornecido o código abaixo, idem explicação do caso acima, com a adição que quando atingir o limite de seções abertas: carregará a página "/expiredSession":
+http.sessionManagement(sessionConfig -> sessionConfig.maximumSessions(1).maxSessionsPreventsLogin(true)
+        .expiredUrl("/expiredSession"))
+Obs1: lembrar de adicionar a página "/expiredSession" no .permitAll().
+
+Obs2: caso haja definido a configuração da seção "Handling Invalid Session" acima, pode-se passar na mesma lambda as configurações citadas - ficando, por exemplo como:
+http.sessionManagement(sessionConfig -> sessionConfig.invalidSessionUrl("/invalidSession")
+                       				  .maximumSessions(1).maxSessionsPreventsLogin(true))
+** Session Fixation Attacks protection with Spring Security
+
+By default, Spring Security framework takes care of handling the Session Fixation Attacks. We have three options to control the strategy for Session Fixation Protection by following the configurations mentioned in the code snippet.
+
+**changeSessionId:** This option utilizes the session fixation protection provided by the Servlet container. It does not create a new session but instead changes the session ID. Note that this option is only available **in Servlet 3.1 (Java EE 7) and newer containers**. Para essas versões essa é a configuração padrão.
+
+**newSession:** With this option, a new "clean" session is created, without copying the existing session data. However, Spring Security-related attributes will still be copied.
+
+**migrateSession:** This option creates a new session and copies all existing session attributes to the new session. **It is the default in Servlet 3.0 or older containers.**
+
+@Bean
+public SecurityFilterChain filterChain(HttpSecurity http) {
+    http
+        .sessionManagement((session) -> session
+            .sessionFixation((sessionFixation) -> sessionFixation
+                .newSession()
+            )
+        );
+    return http.build();
+}
+
+**none**: We can also set the session fixation protection to **none** to disable it, but this is not recommended as it leaves your application vulnerable.
+
+No código de seu projeto a adição desse parâmetro seria encadeado dentro de uma possível campo existente `sessionConfig`, por exemplo::
+	http.sessionManagement(sessionConfig -> sessionConfig.invalidSessionUrl("/invalidSession").sessionFixation(sessionFixation -> sessionFixation.migrateSession())
+
+* Authentication Events
+For each authentication that succeeds or fails, a **AuthenticationSuccessEvent** or **AbstractAuthenticationFailureEvent**, respectively, is fired by Spring Security framework. Spring Security provided **DefaultAuthenticationEventPublisher** takes care of publishing these events to the listeners. We as developers just need to build listeners to listen to these events and execute business logic based on our requirements.
+
+By using Spring’s **@EventListener** support, we can listen to the Authentication success event and failure event. Below is the sample code to log these events.
+
+package com.timeflowsystem.security.events;
+
+@Component
+@Slf4j
+public class AuthenticationEvents {
+
+    @EventListener
+    public void onSuccess(AuthenticationSuccessEvent success) {
+        log.info("Login successful for the user : {}",
+            success.getAuthentication().getName());   // Debugando essa linha vemos que há informações interessantes no campo 
+							// sucess, como por exemplo: authorities
+    }							
+
+    @EventListener
+    public void onFailure(AbstractAuthenticationFailureEvent failures) {
+        log.error("Login failed for the user : {} due to : {}",
+            failures.getAuthentication().getName(),
+            failures.getException().getMessage());
+    }
+}
+
+* Form Login Configurations for MVC or monolithic apps
+
+For form-based logins, Spring Security already provides a simple login page. But this behaviour can be changed with the following configurations:
+
+.formLogin(formLoginConfig -> formLoginConfig
+    .loginPage("/login")
+    .usernameParameter("userid")
+    .passwordParameter("secretPwd")
+    .defaultSuccessUrl("/dashboard")
+    .failureUrl("/login?error=true").permitAll())
+
+** TODO loginPage
+Specifies the URL to send users to if login is required. The default is `/login`.
+Poderia ser fornecida URL do frontend.
+** usernameParameter
+The HTTP parameter to look for the username when performing authentication. Default is `"username"`.
+** passwordParameter
+The HTTP parameter to look for the password when performing authentication. Default is `"password"`.
+** TODO defaultSuccessUrl
+Specifies where users will be redirected after authenticating successfully if they have not visited a secured page prior to authenticating. This is a shortcut for calling `successHandler(AuthenticationSuccessHandler)`.
+** TODO failureUrl
+The URL to send users if authentication fails. This is a shortcut for
+invoking `failureHandler(AuthenticationFailureHandler)`. The default is `/login?error`.
+Poderia ser fornecida URL do frontend.
+* Alternative approach for handling logins events
+@RequiredArgsConstructor
+public class ProjectSecurityProdConfig {
+
+    private final CustomAuthenticationSuccessHandler authenticationSuccessHandler;
+    private final CustomAuthenticationFailureHandler authenticationFailureHandler;
+
+...
+http.formLogin(flc -> flc. ...
+      .successHandler(authenticationSuccessHandler)   // Alternative approach for handling successful logins
+      .failureHandler(authenticationFailureHandler)); // Alternative approach for handling failure logins
+** CustomAuthenticationFailureHandler
+package com.timeflowsystem.security.handler;
+
+@Component
+@Slf4j
+public class CustomAuthenticationFailureHandler implements AuthenticationFailureHandler {
+
+    @Override
+    public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
+            AuthenticationException exception) throws IOException, ServletException {
+        log.error("Login failed due to : {}", exception.getMessage());
+        response.sendRedirect("/login/denied");
+    }
+}
+
+** CustomAuthenticationSuccessHandler
+package com.timeflowsystem.security.handler;
+
+@Component
+@Slf4j
+public class CustomAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
+
+    @Override
+    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
+            Authentication authentication) throws IOException, ServletException {
+        log.info("Login successful for the user : {}", authentication.getName());
+        response.sendRedirect("/login/success");
+    }
+}
+* Logout (usando cookies)
+** backend
+Por default, a uri para realizar o logout de uma conta é chamar o endpoint: "/logout" do microsserviço Security.
+
+With the below configurations, we can configure what should happen during the logout operation of the user,
+
+.logout(logoutConfigurer -> logoutConfigurer
+    .logoutSuccessUrl("/login?logout=true").permitAll()
+    .invalidateHttpSession(true)
+    .clearAuthentication(true)
+    .deleteCookies("JSESSIONID"))
+
+
+- **logoutSuccessUrl** -> The URL to redirect to after logout has occurred. The default is "/login?logout". This is a shortcut for invoking logoutSuccessHandler(LogoutSuccessHandler) with a SimpleUrlLogoutSuccessHandler.
+- **invalidateHttpSession** – Configures SecurityContextLogoutHandler to invalidate the HttpSession at the time of logout.
+- **clearAuthentication** – Specifies if SecurityContextLogoutHandler should clear the Authentication at the time of logout.
+- **deleteCookies** – Allows specifying the names of cookies to be removed on logout success. This is a shortcut to easily invoke addLogoutHandler(LogoutHandler) with a CookieClearingLogoutHandler.
+
+** frontend
+Um recurso para a limpeza do cache de cookies do navagador é acessando diretamente o endpoint do backend Security através de:
+
+const Logout = () => {
+  window.location.href = USER_ACCOUNT_LOGOUT;  / /Onde poderíamos ter, por exemplo: 'http://localhost:8091/logout'
+  window.location.href = FRONTEND_URL_BASE;  // Onde poderíamos ter, por exemplo: 'http://localhost:3000/' 
+  return (
+	 ...
+
+Obs: a simples ação de fazer um GET usando o react query através da api não limpa o cookie do browser, foi preciso um carregamento completo através da chamada do endpoint de logout.
+
+* Role of SecurityContext & SecurityContextHolder
+** At the heart of Spring Security’s authentication model is the SecurityContextHolder. It contains the SecurityContext.
+
+The SecurityContextHolder is where Spring Security stores the details of who is authenticated. Spring Security does not care how the SecurityContextHolder is populated. If it contains a value, it is used as the currently authenticated user.
+** Role of SecurityContext & SecurityContextHolder
+
+After the authentication process, you may need details about the authenticated entity, such as the username or authorities of the current user. This information remains accessible even after authentication is complete. Once the AuthenticationManager successfully completes the authentication process, it stores the Authentication instance for the rest of the request. The component responsible for storing this object is called the **SecurityContext**.
+
+**SecurityContext** is an interface defining the minimum security information associated with the current thread of execution.
+
+public interface SecurityContext {
+    Authentication getAuthentication();
+    void setAuthentication(Authentication authentication);
+}
+
+The security context is stored in a **SecurityContextHolder**.
+
+**SecurityContextHolder** is a helper class that provides access to the security context. By default, it uses a **ThreadLocal** object to store the security context, ensuring it is always available to methods in the same thread, even if you don't explicitly pass it around. You don't need to worry about ThreadLocal memory leaks in web applications, as Spring Security handles the cleanup.
+
+Additionally, SecurityContextHolder can be configured with different strategies for storing the security context.
+
+** Holding strategies for the security context
+
+To specify which strategy should be used, you must provide a mode setting. Below are the three valid mode settings, common approaches in different scenarios:
+
+- **MODE_THREADLOCAL** — Allows each thread to store its own details in the security context. In a thread-per-request web application, this is a common approach, as each request has an individual thread. This is the *default mode*.
+
+- **MODE_INHERITABLETHREADLOCAL** — Similar to MODE_THREADLOCAL, this strategy also instructs Spring Security to copy the security context to the next thread in the case of an asynchronous method. This ensures that the new thread running the `@Async` method inherits the security context. The `@Async` annotation is used on methods to instruct Spring to execute the annotated method on a separate thread.
+
+- **MODE_GLOBAL** — Makes all the threads of the application see the same security context instance.
+
+As shown in the following code snippet, you can change the strategy to MODE_GLOBAL. You can use the method `SecurityContextHolder.setStrategyName()` or the system property `spring.security.strategy`:
+
+@Bean
+public InitializingBean initializingBean() {
+    return () -> SecurityContextHolder.setStrategyName(
+        SecurityContextHolder.MODE_GLOBAL);
+}
+
+** Load login user details in Spring Security
+
+**Approach 1** — The simplest way to load the currently authenticated user details is via a static call to the SecurityContextHolder:
+
+@RestController
+public class SomeController {
+
+    @GetMapping(value = "/username")
+    public String currentUserName() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentPrincipalName = authentication.getName();
+        return currentPrincipalName;
+    }
+}
+
+**Approach 2** — We can mention the Authentication directly as a method argument, and the framework will correctly resolve it by extracting from the SecurityContextHolder. Instead of Authentication, we can also mention Principal.
+
+@RestController
+public class SomeController {
+
+    @GetMapping(value = "/username")
+    public String currentUserName(Authentication authentication) {
+        return authentication.getName();
+    }
+}
+** Como cosegui setar e ler cofigurações de strategy
+Setando manualmente dentro de um método genérico qualquer:
+	SecurityContextHolder.setStrategyName(SecurityContextHolder.MODE_INHERITABLETHREADLOCAL);
+
+ eu obtia valor nulo para:
+	Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+Foi preciso centralizar a configuração do modo de estratégia de funcionamento do SecurityContextHolder numa classe @Configuration para correto funcionamento:
+
+@Configuration
+public class SecurityContextConfig {
+
+    @PostConstruct  //  This class was needed because setting the strategy in SecurityContextHolder
+                    // directly within the controller class was not working
+    public void init() {
+        SecurityContextHolder.setStrategyName(SecurityContextHolder.MODE_INHERITABLETHREADLOCAL);
+    }
+}
+* Cookies no Postman
+O postman pode funcionar a base de cookies.
+Após uma autenticação usando os processos mencionados nesse documento até então: é criado um cookie que pode ser visualizado em "Cookies" abaixo do botão "Send" do Postman.
+
+Uma vez criado esse cookie, pode-se tirar da guia de autenticação  "Authorization" do Postman a senha (deixar campo "Type" em "No Auth") - ele usa o cookie da memória e consegue fazer a requisição.
+
+Esse cookie que fica ali é compartilhado entre todas as requests salvas no postman.
+
+Após acessar o endpoint o endpoint de logout da seção "* Logout (usando cookies)" descrito acima, esse cookie é removido do postman, e passa a ser requerida nova autenticação para os endpoints requerendo autenticação.
+* No frontend
+const fetchUserAccountLogin = async (
+    bodyParams: opTypes.UserAccountRequestBody
+  ): Promise<string> => {
+    return httpClient
+      .post(getMountedSecurityUrl(constants.USERACCOUNT_LOGIN), bodyParams, { 
+      headers: {							// Adicionado  (Sem essa configuração são passados
+        'Content-Type': 'application/x-www-form-urlencoded',		// Adicionado   username e password vazios pro frontend)
+      },								// Adicionado
+      withCredentials: true, 						// Adicionado
+    })
+      .then(data => data.data)
+  }
+* CORS
+** O que é, e o que não é
+**CORS** is a protocol that enables scripts running on a browser client to interact with resources from a different origin. For example, if a UI app wishes to make an API call running on a different domain, it would be blocked from doing so by default due to CORS. It is a specification from W3C implemented by most browsers.
+
+So **CORS** is not a security issue/attack but the default protection provided by browsers to stop sharing the data/communication between different origins.
+** Preflight request (tab "Network" do Dev Tools do browser)
+A "Preflight request" é enviada do browser para o backend antes da chamada da API, se o servidor backend dizer que o CORs está ok, é feita a requisição da API apenas.
+** exemplo de configuração
+http.cors(cors -> cors.configurationSource(corsConfigurationSource()))
+...
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        var configuration = new CorsConfiguration();
+        configuration.setAllowCredentials(true);
+        configuration.addAllowedOriginPattern("*");
+        configuration.addAllowedHeader("*");
+        configuration.addAllowedMethod("*");
+        var source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }
+    
+* CSRF
+Geram erro HttpStatus 403.
+** Quando pode ocorrer
+By default Spring Security block all HTTP POST, PUT, DELETE, PATCH operations with an error of 403, if there is no CSRF solution implemented inside a web application. We can change this default behaviour by disabling the CSRF protection provided by Spring Security.
+
+.csrf(csrf -> csrf.disable())
+** Está correto afirmar que é aconselhável desabilitar a proteção de CSRF em APIs públicas?
+Sim, está **correto afirmar que é aconselhável desabilitar a proteção CSRF (Cross-Site Request Forgery) em APIs públicas**, mas há algumas nuances importantes a serem consideradas.
+
+### **1. Por que desabilitar CSRF em APIs públicas?**
+A proteção CSRF foi projetada para proteger **aplicações web tradicionais**, onde os usuários interagem diretamente com formulários e sessões autenticadas baseadas em cookies. No entanto, esse mecanismo **não é necessário para APIs RESTful ou públicas**, por vários motivos:
+
+- **APIs REST não usam cookies por padrão**: A autenticação em APIs é geralmente baseada em tokens (como JWT ou API keys) em vez de cookies, que são os principais alvos de ataques CSRF.
+- **CSRF depende de sessões baseadas em cookies**: Se sua API não depende de cookies para autenticação, o CSRF não se aplica.
+- **APIs são chamadas por clientes específicos**: Como aplicativos frontend (React, Angular) ou scripts, eles já devem enviar os tokens apropriados para autenticação.
+
+Por isso, desabilitar CSRF para APIs públicas simplifica a configuração e evita problemas desnecessários.
+
+### **3. Casos em que CSRF é necessário**
+Embora desabilitar CSRF para APIs públicas seja uma prática padrão, **não desabilite CSRF para aplicações que dependem de cookies de autenticação**. Isso inclui:
+
+1. **Aplicações web tradicionais (ex.: sistemas com login baseado em sessão)**.
+2. **APIs protegidas por cookies** em vez de tokens.
+
+Nestes casos, a proteção CSRF é essencial para evitar que um atacante use a sessão do usuário autenticado para realizar ações maliciosas.
+
+---
+
+### **4. Melhor alternativa para APIs públicas: segurança baseada em tokens**
+Para APIs públicas ou RESTful, em vez de depender de CSRF, implemente os seguintes mecanismos de segurança:
+
+#### a. **Autenticação baseada em tokens (JWT, OAuth2, API keys)**
+- Exija que os clientes enviem um cabeçalho `Authorization` com um token em cada requisição:
+    ```http
+    Authorization: Bearer <token>
+    ```
+- Os tokens devem ser gerados no backend e devem ter um tempo de expiração limitado.
+
+#### b. **Validação da origem e CORS**
+- Configure CORS adequadamente para permitir apenas origens confiáveis, especialmente se a API for acessada por navegadores.
+
+### **6. Conclusão**
+Sim, desabilitar CSRF para APIs públicas é uma prática recomendada e amplamente adotada, especialmente quando sua API usa autenticação baseada em tokens ou é completamente aberta. Apenas certifique-se de que outras camadas de segurança estão implementadas, como autenticação, CORS e validação adequada de entradas
+* Authentication & Authorization
+** Diferenças
+*** Authentication
+- In authentication, the identity of users are checked for providing the access to the system.  
+- Authentication (AuthN) done before authorization.  
+- It needs usually user’s login details.  
+- If authentication fails usually we will get 401 error response.  
+- For example, as a Bank customer/employee, in order to perform actions in the app, we need to first prove our identity.
+
+*** Authorization
+- In authorization, person’s or user’s authorities are checked for accessing the resources.  
+- Authorization (AuthZ) always happens after authentication.  
+- It needs user’s privilege or roles.  
+- If authorization fails usually we will get 403 error response.  
+- Once logged into the application, my roles, authorities will decide what kind of actions I can do.
+** Como atribuir permissões com authorities
+**In Spring Security the authorities requirements can be configured using the following ways,**
+
+*** hasAuthority()
+— Accepts a single authority for which the endpoint will be configured and user will be validated against the single authority mentioned. Only users having the same authority configured can invoke the endpoint.
+
+*** hasAnyAuthority()
+— Accepts multiple authorities for which the endpoint will be configured and user will be validated against the authorities mentioned. Only users having any of the authority configured can invoke the endpoint.
+
+*** access()
+— Using Spring Expression Language (SpEL) it provides you unlimited possibilities for configuring authorities which are not possible with the above methods. We can use operators like OR, AND inside access() method.
+
+**You can extract path values from the request, as seen below by using access():**
+
+```java
+http.authorizeHttpRequests((authorize) -> authorize
+    .requestMatchers("/cards/{name}").access(new WebExpressionAuthorizationManager("#name == authentication.name"))
+)
+```
+
+**You can check if the user has multiple roles, as seen below by using access():**
+
+```java
+.requestMatchers("/admin/**").access(allOf(hasAuthority("admin"), hasAuthority("manager")))
+```
+
+**You can check if the user has multiple roles, as seen below by using access():**
+
+```java
+.requestMatchers("/admin/**").access(new WebExpressionAuthorizationManager("hasAuthority('admin') && hasAuthority('manager')"))
+```
+
+
+
+** Como atribuir permissões com roles
+
+In Spring Security the ROLES requirements can be configured using the following ways,
+
+- **hasRole()** — Accepts a single role name for which the endpoint will be configured and user will be validated against the single role mentioned. Only users having the same role configured can invoke the endpoint.
+
+- **hasAnyRole()** — Accepts multiple roles for which the endpoint will be configured and user will be validated against the roles mentioned. Only users having any of the role configured can call the endpoint.
+
+- **access()** — Using Spring Expression Language (SpEL) it provides you unlimited possibilities for configuring roles which are not possible with the above methods. We can use operators like OR, AND inside access() method.
+
+**Note:**
+- ROLE_ prefix only to be used while configuring the role in DB. But when we configure the roles, we do it only by its name.
+  
+*** mudando o prefixo que não "ROLE_"
+You can configure the authorization rules to use a different prefix by providing a GrantedAuthorityDefaults bean, as shown below:
+
+@Bean
+static GrantedAuthorityDefaults grantedAuthorityDefaults() {
+    return new GrantedAuthorityDefaults("MYPREFIX_");
+}
+
+You need to expose GrantedAuthorityDefaults using a static method to ensure that Spring publishes it before initializing Spring Security's method security @Configuration classes.
+** Authorization Events
+For each denied authorization, an `AuthorizationDeniedEvent` is triggered. You can listen these events, using the below kind of logic:
+
+@EventListener
+public void onFailure(AuthorizationDeniedEvent deniedEvent) {
+    log.error("Authorization failed for the user : {} due to : {}",
+        deniedEvent.getAuthentication().get().getName(),
+        deniedEvent.getAuthorizationDecision().toString());
+}
+
+Due to the potential for `AuthorizationGrantedEvents` to generate excessive noise, they are not published by default.
+** Http Status Errors
+Authentication : 401
+Authorization : 403
+* Filtros
+** FILTERS IN SPRING SECURITY 1
+✔ Lot of times we will have situations where we need to perform some house keeping activities during the authentication and authorization flow. Few such examples are:
+- Input validation
+- Tracing, Auditing and reporting
+- Logging of input like IP Address etc.
+- Encryption and Decryption
+
+✔ All such requirements can be handled using HTTP Filters inside Spring Security. Filters are servlet concepts which are leveraged in Spring Security as well.
+
+---
+
+✔ We already saw some in built filters of Spring security framework like UsernamePasswordAuthenticationFilter, BasicAuthenticationFilter, DefaultLoginPageGeneratingFilter etc. in the previous sections.
+
+✔ A filter is a component which receives requests, processes its logic and handovers to the next filter in the chain.
+
+✔ Spring Security is based on a chain of servlet filters. Each filter has a specific responsibility and depending on the configuration, filters are added or removed. We can add our custom filters as well based on the need.
+** FILTERS IN SPRING SECURITY (como configurar para ver a relação dos filtros executados e sua ordem de execução)
+✔ **We can always check the registered filters inside Spring Security with the below configurations,**
+
+1. Adicionar na MainCalss: "@EnableWebSecurity(debug = true)"
+    – We need to enable the debugging of the security details.
+
+2. Adicionar no `application.properties`:
+   logging.level.org.springframework.security.web.FilterChainProxy=DEBUG
+
+
+**Security filter chain:**
+- DisableEncodeUrlFilter  
+- ForceEagerSessionCreationFilter  
+- ChannelProcessingFilter  
+- WebAsyncManagerIntegrationFilter  
+- SecurityContextPersistenceFilter  
+- HeaderWriterFilter  
+- CorsFilter  
+- CsrfFilter  
+- LogoutFilter  
+- UsernamePasswordAuthenticationFilter  
+- DefaultLoginPageGeneratingFilter  
+- DefaultLogoutPageGeneratingFilter  
+- BasicAuthenticationFilter  
+- CsrfCookieFilter  
+- RequestCacheAwareFilter  
+- SecurityContextHolderAwareRequestFilter  
+- AnonymousAuthenticationFilter  
+- SessionManagementFilter  
+- ExceptionTranslationFilter  
+- AuthorizationFilter  
+
+Attached are some of the internal filters of Spring Security that get executed in the authentication flow.
+** IMPLEMENTING CUSTOM FILTERS
+✔ We can create our own filters by implementing the `Filter` interface from the **jakarta.servlet** package. After that, we need to override the `doFilter()` method to implement our custom logic. This method accepts 3 parameters: ServletReques*, ServletResponse, and FilterChain.
+
+- ServletRequest: Represents the HTTP request. We use the `ServletRequest` object to retrieve details about the client's request.
+- ServletResponse: Represents the HTTP response. We use the `ServletResponse` object to modify the response before sending it back to the client or passing it along the filter chain.
+- FilterChain: The filter chain represents a collection of filters with a defined order in which they act. We use the `FilterChain` object to forward the request to the next filter in the chain.
+
+---
+
+✔ You can add a new filter to the Spring Security chain before, after, or at the position of a known filter. Each filter's position is an index (a number) and can be referred to as "the order."
+
+✔ Below are the methods available to configure a custom filter in the Spring Security flow:
+- `addFilterBefore(filter, class)` – Adds a filter before the position of the specified filter.
+- `addFilterAfter(filter, class)` – Adds a filter after the position of the specified filter.
+- `addFilterAt(filter, class)` – Adds a filter at the exact position of the specified filter.
+** Other importants filters
+Para saber qual interface implementar na criação de um filtro:
+*** GenericFilterBean
+"This is an abstract class filter bean which allows you to use the initialization parameters and configurations defined inside the deployment descriptors."
+	
+*** OncePerRequestFilter
+"Spring doesn’t guarantee that your filter will be called only once. But if we have a scenario where we need to make sure to execute our filter only once then we can use this."
+** Exemplos de implementações de filtros
+*** adição de filtro que verifica se há a string "test" no meio do username
+**** src/main/java/com/timeflowsystem/security/config/ProjectSecurityProdConfig.java
+               http (...) .addFilterBefore(new RequestValidationBeforeFilter(), BasicAuthenticationFilter.class) // The filter
+                                // RequestValidationBeforeFilter is going to be executed before the BasicAuthenticationFilter
+**** src/main/.../security/filter/RequestValidationBeforeFilter.java
+public class RequestValidationBeforeFilter implements Filter {
+
+    @Override
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+            throws IOException, ServletException {
+        HttpServletRequest req = (HttpServletRequest) request;
+        HttpServletResponse res = (HttpServletResponse) response;
+        String header = req.getHeader(HttpHeaders.AUTHORIZATION);
+        if(null != header) {
+            header = header.trim();
+            if(StringUtils.startsWithIgnoreCase(header, "Basic ")) { // Verify if the header is a Basic Auth (Need to
+                                                                           // choose this manually in case of using Postman)
+                byte[] base64Token = header.substring(6).getBytes(StandardCharsets.UTF_8);
+                byte[] decoded;
+                try {
+                    decoded = Base64.getDecoder().decode(base64Token);
+                    String token = new String(decoded, StandardCharsets.UTF_8); // format resulted: 'username:pwd'
+                    int delim = token.indexOf(":");
+                    if(delim== -1) {
+                        throw new BadCredentialsException("Invalid basic authentication token");
+                    }
+                    String email = token.substring(0,delim);
+                    if(email.toLowerCase().contains("test")) {     // Verify if in username creditial has 'test' string
+                        res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                        return;
+                    }
+                } catch (IllegalArgumentException exception) {
+                    throw new BadCredentialsException("Failed to decode basic authentication token");
+                }
+            }
+        }
+        chain.doFilter(request, response); // VERY IMPORTANT to call next filter in the chain
+    }
+*** adição de filtro que gera LOG após êxito de login
+**** src/main/java/com/timeflowsystem/security/filter/AuthoritiesLoggingAtFilter.java
+@Slf4j
+public class AuthoritiesLoggingAtFilter implements Filter {
+    /**
+     * @param request  The request to process
+     * @param response The response associated with the request
+     * @param chain    Provides access to the next filter in the chain for this filter to pass the request and response
+     *                 to for further processing
+     * @throws IOException
+     * @throws ServletException
+     */
+    @Override
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+            throws IOException, ServletException {
+        log.info("Authentication Validation is in progress");
+        chain.doFilter(request,response); // VERY IMPORTANT to call next filter in the chain
+    }
+}
+**** src/main/java/com/timeflowsystem/security/config/ProjectSecurityProdConfig.java
+           http. (...).addFilterAfter(new AuthoritiesLoggingAtFilter(), BasicAuthenticationFilter.class) // The filter
+                                // AuthoritiesLoggingAtFilter is going to be executed after the BasicAuthenticationFilter
+**** saída no console
+Security filter chain: [
+  DisableEncodeUrlFilter
+  WebAsyncManagerIntegrationFilter
+  SecurityContextHolderFilter
+  HeaderWriterFilter
+  CorsFilter
+  LogoutFilter
+  UsernamePasswordAuthenticationFilter
+  RequestValidationBeforeFilter		// aqui está o do exemplo anterior
+  BasicAuthenticationFilter 		// filtro de referência
+  AuthoritiesLoggingAtFilter			//Aqui está nosso filtro
+  RequestCacheAwareFilter
+  SecurityContextHolderAwareRequestFilter
+  AnonymousAuthenticationFilter
+  ExceptionTranslationFilter
+  AuthorizationFilter
+]
+
+*** adição de filtro que gera LOG "paralelo" a outro filtro
+Ambos filtros são executados, porém não é determinístico qual será executado primeiro.
+**** adição na classe de configurações
+.addFilterAt(new AuthoritiesLoggingAtFilter(), BasicAuthenticationFilter.class)
+**** Código fonte do pacote "filter"
+@Slf4j
+public class AuthoritiesLoggingAtFilter implements Filter {
+    /**
+     * @param request  The request to process
+     * @param response The response associated with the request
+     * @param chain    Provides access to the next filter in the chain for this filter to pass the request and response
+     *                 to for further processing
+     * @throws IOException
+     * @throws ServletException
+     */
+    @Override
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+            throws IOException, ServletException {
+        log.info("Authentication Validation is in progress");
+        chain.doFilter(request,response);
+    }
+* Dicas de cursos
+** Java  das Ruas
+https://www.youtube.com/watch?v=N4cwmvjPj8c
+* Token formats
+** Opaque Tokens x JWT Tokens
+In general, there are two token formats.  
+1) Opaque Tokens  
+2) JSON Web Tokens (JWT)
+
+*** Opaque Tokens
+Opaque tokens are typically random strings with no inherent meaning.  
+Used to reference authentication information stored on the server-side.  
+Requires a call to the authorization server or a dedicated introspection endpoint to validate and obtain user information.
+
+*** JWT Tokens
+JWTs are self-contained tokens that consist of three parts: a header, a payload, and a signature, encoded in Base64 URL.  
+Encodes user information and claims directly within the token.  
+Can be validated locally by verifying the token's signature using a public key, without needing a server call.
+
+*** Witch to use
+Opaque tokens are suitable for scenarios where token validation by a central server is feasible, such as within a secure internal network, whereas JWT tokens are ideal for stateless, distributed systems where quick token validation is needed without frequent server calls.
+
+** Características dos tokens
+*** Security
+- Limited exposure of the user credentials inside the network.
+- Tokens can be revoked during any suspicious activities without invalidating the user credentials.
+
+*** Reusability
+- Tokens can be used across different domains and services, making them suitable for single sign-on (SSO) systems.
+
+SSO (Single Sign-On) é um mecanismo de autenticação que permite que os usuários acessem vários sistemas ou aplicativos diferentes usando um único conjunto de credenciais (geralmente um nome de usuário e senha). Em vez de o usuário ter que autenticar separadamente em cada sistema, o SSO autentica o usuário uma única vez e compartilha essa autenticação entre os aplicativos ou sistemas confiáveis. (ex: serviços do Google (gmail, maps, youtube, ...).
+
+*** Cross-Platform Compatibility
+- Tokens can be used across various platforms and devices, including web applications, mobile apps, and IoT devices.
+
+*** Statelessness
+- The token contains all the information to identify the user, eliminating the need for the session state.
+- If we use a load balancer, we can pass the user to any server, instead of being bound to the same server we logged in on.
+
+*** Self-Contained (Apenas para JWT)
+- Tokens are self-contained and carry all the necessary information about the user, roles/authorities, etc.
+
+*** Expiration
+- Tokens can have specific expiration times set, ensuring tokens are valid only for a predefined duration.
+** JSON Web Tokens (JWT)
+Para JWT tokens, pode-se dizer: "jot tokens" (pronúncioa: "jót")
+
+é feito sempre o repasse do token do backend pro front, e do front pro back, e do back pro front, e ...
+*** composto por 3 partes
+pode ser gerado pelo site:
+
+	http://jwt.io
+
+Suas 3 partes são sepadas por "." - exemplo:
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+
+**** Primeira é o Header
+we store metadata/info (ex: type, algorithm) related to the token. If we chose to sign the token, the header contains the name of the algorithm that generates the signature.
+
+**Exemplo de cabeçalho:**
+```json
+{
+  "alg": "HS256",
+  "typ": "JWT"
+}
+```
+que é codificada em base64. Ex:
+	eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9
+Pode ser decodado facilmente.
+**** Segunda é o Payload
+- **In the body**, we can store details related to user, roles, etc., which can be used later for AuthN and AuthZ. Though there is no such limitation on what we can send and how much we can send in the body, but we should put our best efforts to keep it as light as possible.
+
+**Exemplo de corpo:**
+```json
+{
+  "sub": "1234567890",
+  "name": "John Doe",
+  "iat": 1516239022
+}
+```
+que é codificada em base64. Ex:
+	eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ
+Pode ser decodado facilmente.
+**** Terceira é o Signature
+É uma parte opcional. Exemplo:
+	SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+
+This part can be optional if the party that you share the JWT token with is internal and someone who you can trust but not open in the web.
+  
+But if you are sharing this token to the client applications which will be used by all the users in the open web then we need to make sure that no one changed the header and body values like Authorities, username, etc.
+
+Para garantir que ninguém adulterou os dados na rede, podemos enviar a assinatura do conteúdo no momento em que o token é inicialmente gerado. Para criar a parte da assinatura, você deve pegar o cabeçalho codificado, o payload codificado, um segredo (chave privada), o algoritmo especificado no cabeçalho e assiná-los.
+
+For example if you want to use the HMAC SHA256 algorithm (**Obs: esse algorítmo é de hasheamento**), the signature will be created in the following way:
+
+		HMACSHA256(base64UrlEncode(header) + "." + base64UrlEncode(payload), secret)
+
+The signature is used to verify the message wasn’t changed along the way, and, in the case of tokens signed with a private key, it can also verify that the sender of the JWT is who it says it is.
+
+Obs: A chave privada (secret) fica salva no backend.
+
+Se por exemplo um hacker obter o header e o payload, e modificar o profile/role do payload para um com todas permissões, o servidor que faz a autorização, ao verificar a parte signature do jwt enviado pelo cliente (que é composto pelo header+payload+secret) verá que o resultado não confere com o hash da signature gerado nele para esses mesmos valores de header e payload, uma vez que usando a key secret obteve um hash da signature diferente.
+
+No site http://jwt.io pode-se alterar no campo da esquerda os valores da encodação da base64 do header e do payload, o que aparecerá o valor correspondente do header/payload/sigature na direita - e se os valores HMACSHA256(base64UrlEncode(header) + "." + base64UrlEncode(payload), secret) não conferirem com o valor da signature obtem-se a label da página "Invalid Signature".
+* Configurações necessárias para usar Tokens JWT
+** MUITO IMPORTANTE
+Com as configurações abaixo, após acessar o endpoint:
+	GET /user
+e passar na requisição do Postman usando "Basic Auth", com usuário e senha - será retornado no Header da response, na chave "Authorization" o token JWT. É preciso pegar esse token para usá-lo nas requisições gerais do microserviço - porém nessas novas requisições de acesso geral é preciso definir a autenticação como "No Auth", e passar numa chave "Authorization" do header o token gerado pelo endpoint GET /user.
+
+É preciso fazer a geração do token uma única vez. Então pode-se usar o token gerado até que o mesmo expire.
+No frontend, pode-se gerar o token no momento do login, e popular o header com o mesmo a cada nova requisição.
+** Dependências requeridas
+		<dependency>
+			<groupId>io.jsonwebtoken</groupId>
+			<artifactId>jjwt-api</artifactId>
+			<version>0.12.5</version>
+		</dependency>
+		<dependency>
+			<groupId>io.jsonwebtoken</groupId>
+			<artifactId>jjwt-impl</artifactId>
+			<version>0.12.5</version>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>io.jsonwebtoken</groupId>
+			<artifactId>jjwt-jackson</artifactId>
+			<version>0.12.5</version>
+			<scope>runtime</scope>
+		</dependency>
+** Adicionar nas configurações do CORS:
+  configuration.setExposedHeaders(Arrays.asList("Authorization"));
+
+** Definir a sessionCreationPolicy com STATELESS
+  @Bean
+  public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+      http
+              .sessionManagement(sessionConfig -> sessionConfig.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+
+Com isso passará a não mais salvar o cookie nos clientes acessantes dos endpoints.              
+** Adicionar filtro de geração de token
+public class JWTTokenGeneratorFilter extends OncePerRequestFilter {
+
+    /**
+     * @param request
+     * @param response
+     * @param filterChain
+     * @throws ServletException
+     * @throws IOException
+     */
+    @Override
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
+            FilterChain filterChain) throws ServletException, IOException {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (null != authentication) {
+            Environment env = getEnvironment();
+            if (null != env) {
+                String secret = env.getProperty(ApplicationConstants.JWT_SECRET_KEY,
+                        ApplicationConstants.JWT_SECRET_DEFAULT_VALUE);
+                SecretKey secretKey = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
+                String jwt = Jwts.builder().issuer("Timeflow").subject("JWT Token")
+                        .claim("username", authentication.getName())
+                        .claim("authorities", authentication.getAuthorities().stream().map(
+                                GrantedAuthority::getAuthority).collect(Collectors.joining(",")))
+                        .issuedAt(new Date())
+                        .expiration(new Date((new Date()).getTime() + 30000000))
+                        .signWith(secretKey).compact();
+                response.setHeader(ApplicationConstants.JWT_HEADER, jwt);
+            }
+        }
+        filterChain.doFilter(request, response);
+    }
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+        return !request.getServletPath().equals("/user"); // Only execute the filter for this endpoint
+    }
+              
+** Adicionar filtro de verificação de token
+public class JWTTokenValidatorFilter extends OncePerRequestFilter {
+    /**
+     * @param request
+     * @param response
+     * @param filterChain
+     * @throws ServletException
+     * @throws IOException
+     */
+    @Override
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+            throws ServletException, IOException {
+       String jwt = request.getHeader(ApplicationConstants.JWT_HEADER);
+       if(null != jwt) {
+           try {
+               Environment env = getEnvironment();
+               if (null != env) {
+                   String secret = env.getProperty(ApplicationConstants.JWT_SECRET_KEY,
+                           ApplicationConstants.JWT_SECRET_DEFAULT_VALUE);
+                   SecretKey secretKey = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
+                   if(null !=secretKey) {
+                       Claims claims = Jwts.parser().verifyWith(secretKey)
+                                .build().parseSignedClaims(jwt).getPayload();
+                       String username = String.valueOf(claims.get("username"));
+                       String authorities = String.valueOf(claims.get("authorities"));
+                       Authentication authentication = new UsernamePasswordAuthenticationToken(username, null,
+                               AuthorityUtils.commaSeparatedStringToAuthorityList(authorities));
+                       SecurityContextHolder.getContext().setAuthentication(authentication);
+                   }
+               }
+
+           } catch (Exception exception) {
+               throw new BadCredentialsException("Invalid Token received!");
+           }
+       }
+        filterChain.doFilter(request,response);
+    }
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+        return request.getServletPath().equals("/user"); // If it is the endpoint /user, do not execute the filter
+                                                        // Because the JWTTokenGeneratorFilter will be executed to 
+                                                        // generate the token
+    }
+
+}
+** Adicionar agendamento da execução dos filtros acima
+http. ...
+                .addFilterAfter(new JWTTokenGeneratorFilter(), BasicAuthenticationFilter.class)
+                .addFilterBefore(new JWTTokenValidatorFilter(), BasicAuthenticationFilter.class)
+** Liberar endpoint de criação do token
+http (...)
+	.authorizeHttpRequests((requests) -> requests
+		.requestMatchers("/user").authenticated()  // Adicionar esse
+               
+* Utilizando JWT - Autenticação customizada
+Pode-se almejar implementar especificações customizadas para a obtenção do token JWT, por exemplo definindo um endpoint de recebimento do mesmo que não o padrão, bem como desejar uma forma de autenticação customizada - ou ainda escolher valores para os campos que estarão hasheados no token final. Essa seção ensina como conseguir isso.
+
+Publish an AuthenticationManager bean for custom authentication
+
+A common requirement is to publish an `AuthenticationManager` bean to enable custom authentication, such as within a `@Service` or a Spring MVC `@Controller`. For instance, you might want to authenticate users via a REST API instead of using form login. You can publish an `AuthenticationManager` for custom authentication scenarios using the following configuration:
+
+** Bean dentro da classe de configurações
+Inside `ProjectSecurityProdConfig.java` class create a bean of `AuthenticationManager` like shown below:
+
+@Bean
+public AuthenticationManager authenticationManager(
+        UserDetailsService userDetailsService,
+        PasswordEncoder passwordEncoder) {
+    EazyBankUsernamePwdAuthenticationProvider authenticationProvider =
+        new EazyBankUsernamePwdAuthenticationProvider(userDetailsService, passwordEncoder);
+    ProviderManager providerManager = new ProviderManager(authenticationProvider);
+    providerManager.setEraseCredentialsAfterAuthentication(false);
+    return providerManager;
+}
+
+** Atribuir .permitAll() pro endpoint
+.requestMatchers("/login/**").permitAll()  // poismeu endpoint é /login/apiLogin
+** Dtos
+Request and Response related record files:
+
+public record LoginRequestDto(String username, String password) {
+}
+
+public record LoginResponseDto(String status, String jwtToken) {
+}
+
+** Classe Controller
+Inside the controller class add the logic to manually authenticate and generate a token if the authentication is successful. Also make sure to `permitAll` and add CSRF ignoringRequestMatchers for the `/apiLogin` API inside the `ProjectSecurityConfig` class.
+
+@RequiredArgsConstructor
+public class LoginController {
+
+    private final AuthenticationManager authenticationManager;
+    private final Environment env;
+
+
+    @PostMapping("/apiLogin") // endpoint escolhido que retornará o token
+    public ResponseEntity<LoginResponseDto> apiLogin (@RequestBody LoginRequestDto loginRequest) {
+        String jwt = "";
+        Authentication authentication = UsernamePasswordAuthenticationToken.unauthenticated(loginRequest.username(),
+                loginRequest.password());
+        Authentication authenticationResponse = authenticationManager.authenticate(authentication);
+        if(null != authenticationResponse && authenticationResponse.isAuthenticated()) {
+            if (null != env) {
+                String secret = env.getProperty(ApplicationConstants.JWT_SECRET_KEY,
+                        ApplicationConstants.JWT_SECRET_DEFAULT_VALUE);
+                SecretKey secretKey = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
+                jwt = Jwts.builder().issuer("Timeflow").subject("JWT Token")
+                        .claim("username", authenticationResponse.getName())
+                        .claim("authorities", authenticationResponse.getAuthorities().stream().map(
+                                GrantedAuthority::getAuthority).collect(Collectors.joining(",")))
+                        .issuedAt(new java.util.Date())
+                        .expiration(new java.util.Date((new java.util.Date()).getTime() + 30000000))
+                        .signWith(secretKey).compact();
+            }
+        }
+        return ResponseEntity.status(HttpStatus.OK).header(ApplicationConstants.JWT_HEADER,jwt)  // Estamos enviando o token aqui no HEADER
+                .body(new LoginResponseDto(HttpStatus.OK.getReasonPhrase(), jwt));               // Estamos enviando o mesmo token no cody aqui tb
+                										     // Em um projeto em produção podemos enviar em 1
+	                                                                                             // só lugar apenas
+    }
+
+** Testando
+fazer requisição POST no endpoint
+passando um body, com configuração de autenticação: "No Auth"
+
+{
+    "username": "oswaldo",
+    "password": "123"
+}
+
+exemplo de response:
+{
+    "status": "OK",
+    "jwtToken": "eyJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJUaW1lZmxvdyIsInN1YiI6IkpXVCBUb2tlbiIsInVzZXJuYW1lIjoib3N3YWxkbyIsImF1dGhvcml0aWVzIjoiUk9MRV9BRE1JTixST0xFX1VTRVIiLCJpYXQiOjE3MzcyMzE0MDUsImV4cCI6MTczNzI2MTQwNX0.AoS6PQMW9YXu90i_nK-4Z8BXN1J45UfrFIgQUubITjk"
+}
+
+Copiar esse token e usá-lo no campo "Authorization" para requisições que exigem atutenticação.
+	
+* Aplicando Segurança no nível dos Métodos
+** Configuração da MainClass
+colocar na MainClass
+@EnableMethodSecurity(jsr250Enabled = true,securedEnabled = true) // By deault, the prePostEnabled is set to true, 
+	// that's why we don't need to set it here
+        -------
+
+As of now we have applied authorization rules on the API paths/URLs using spring security but method level security allows to apply the authorization rules at any layer of an application like in service layer or repository layer etc. Method level security can be enabled using the annotation `@EnableMethodSecurity` on the configuration class (or in the MainClass of the project).
+
+Method level security will also help authorization rules even in the non-web applications where we will not have any endpoints.
+
+Method level security provides the below approaches to apply the authorization rules and executing your business logic,
+
+- **Invocation authorization** – Validates if someone can invoke a method or not based on their roles/authorities.
+- **Filtering authorization** – Validates what a method can receive through its parameters and what the invoker can receive back from the method post business logic execution.
+
+Spring security will use the aspects from the AOP module and have the interceptors in between the method invocation to apply the authorization rules configured.
+
+Method level security offers below 3 different styles for configuring the authorization rules on top of the methods:
+
+- The `prePostEnabled` property which enabled by default enables Spring Security `@PreAuthorize` & `@PostAuthorize` annotations.
+- The `securedEnabled` property enables `@Secured` annotation.
+- The `jsr250Enabled` property enables `@RoleAllowed` annotation.
+
+```java
+@Configuration
+@EnableMethodSecurity(prePostEnabled = true, securedEnabled = true, jsr250Enabled = true)
+public class ProjectSecurityConfig {
+    ...
+}
+```
+
+`@Secured` and `@RoleAllowed` are less powerful compared to `@PreAuthorize` and `@PostAuthorize`.
+
+** preauthorization / postauthorization
+- Using invocation authorization we can decide if a user is authorized to invoke a method before the method executes (preauthorization) or after the method execution is completed (postauthorization). For filtering the parameters before calling the method we can use Prefiltering.
+
+*** @PreAuthorize
+```java
+@Service
+public class LoansService {
+
+    @PreAuthorize("hasAuthority('VIEWLOANS')")
+    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
+    @PreAuthorize("#username == authentication.principal.username")
+    public Loan getLoanDetails(String username) {
+        return loansRepository.loadLoanDetailsByUserName(username);
+    }
+}
+```
+Obs1: foram apresentadas várias vezes a anotação @PreAuthorize como ilustração, mas na prática só é possível declará-la uma vez.
+Se o usuário não se enquadrar nas limitações da anotação declarada acima, é lançado HttpStatus 403 (Forbidden) (Diferente do 401 Unauthorized, onde o problema pode ser a falta de autenticação, o 403 Forbidden indica que a autenticação foi feita corretamente, mas o usuário ou sistema não tem as permissões necessárias).
+Obs2: Repare que foi declarado role "ADMIN" e não "ROLE_ADMIN" (esse último é como está o registro no banco de dados na coluna 'name').
+
+*** @PostAuthorize
+- For applying postauthorization rules below is the sample configuration:
+
+```java
+@Service
+public class LoanService {
+
+    @PostAuthorize("hasAuthority('VIEWLOANS')")
+    @PostAuthorize("hasRole('ADMIN')")
+    @PostAuthorize("hasAnyRole('ADMIN', 'USER')")
+    @PostAuthorize("returnObject.username == authentication.principal.username")
+    public Loan getLoanDetails(String username) {
+        return loanRepository.loadLoanByUserName(username);
+    }
+}
+```
+
+Obs1: foram apresentadas várias vezes a anotação @PostAuthorize como ilustração, mas na prática só é possível declará-la uma vez.
+Se o usuário não se enquadrar nas limitações da anotação declarada acima, é lançado HttpStatus 403  (Forbidden) (Diferente do 401 Unauthorized, onde o problema pode ser a falta de autenticação, o 403 Forbidden indica que a autenticação foi feita corretamente, mas o usuário ou sistema não tem as permissões necessárias).
+Obs2: Repare que foi declarado role "ADMIN" e não "ROLE_ADMIN" (esse último é como está o registro no banco de dados na coluna 'name').
+** Filtering
+- If we have a scenario where we don’t want to control the invocation of the method but we want to make sure that the parameters sent and received to/from the method need to follow authorization rules or filtering criteria, then we can consider filtering.
+  
+*** @PreFilter
+- For filtering the parameters before calling the method we can use PreFilter annotation. But please note that the filterObject should be of type Collection interface.
+
+```java
+@RestController
+public class ContactController {
+
+    @PreFilter("filterObject.contactName != 'Test'")
+    public List<Contact> saveContactInquiryDetails(@RequestBody List<Contact> contacts) {
+        // business logic
+        return contacts;
+    }
+}
+```
+exemplo:
+@PostMapping("/contact")
+@PreFilter("filterObject.contactName != 'Test'") //Se fornecido o campo com atributo "Test", e se for o único elemento fornecido, a collection contacts vai ser empty. Obs: a HttpStatus de retorno é 200 mesmo assim
+public Contact saveContactInquiryDetails(@RequestBody List<Contact> contacts) {
+    if (!contacts.isEmpty()) {
+        Contact contact = contacts.getFirst();
+        contact.setContactId(getServiceReqNumber());
+        contact.setCreateDt(new Date(System.currentTimeMillis()));
+        return contactRepository.save(contact);
+    } else {
+        return null;
+    }
+}
+
+"filterObject" vai ser do tipo "Contact" (tipo da collection)
+
+*** @PostFilter
+- For filtering the parameters after executing the method we can use PostFilter annotation. But please note that the filterObject should be of type Collection interface.
+
+```java
+@RestController
+public class ContactController {
+
+    @PostFilter("filterObject.contactName != 'Test'")
+    public List<Contact> saveContactInquiryDetails(@RequestBody List<Contact> contacts) {
+        // business logic
+        return contacts;
+    }
+}
+```
+
+- We can use the `@PostFilter` on the Spring Data repository methods as well to filter any unwanted data coming from the database.
+
+  Exemplo:
+    @PostMapping("/contact")
+    @PostFilter("filterObject.contactName != 'Test'") /Se fornecido o campo com atributo "Test", e se for o único elemento fornecido, a collection contacts vai te-lo como 1 elemento.
+    public List<Contact> saveContactInquiryDetails(@RequestBody List<Contact> contacts) {
+        List<Contact> returnContacts = new ArrayList<>();
+        if(!contacts.isEmpty()) {
+            Contact contact = contacts.getFirst();
+            contact.setContactId(getServiceReqNumber());
+            contact.setCreateDt(new Date(System.currentTimeMillis()));
+            Contact savedContact = contactRepository.save(contact);
+            returnContacts.add(savedContact);
+        }
+        return returnContacts; // Porém, apesar de ter recebido 1 elemento, a collection retornada é vazia, e HttpStatus de retorno é 200
+    }
+    
+
+* commit messages
+//copilot:
+A commit message is a message that is associated with a specific change made to a file in a repository. It is a way to communicate to other developers why a change was made, what the change was, and how it was made. A good commit message is clear, concise, and informative. It should explain the purpose of the change, the motivation behind it, and any relevant details about how the change was implemented. A commit message should also be written in the imperative mood, meaning it should describe what the change does, not what it did. For example, "Add feature X" is a good commit message, while "Added feature X" is not as clear. A commit message is an important part of the development process because it helps other developers understand the history of a project and the reasoning behind specific changes. It also helps with code reviews, debugging, and tracking down issues in the future.
