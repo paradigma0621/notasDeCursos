@@ -161,6 +161,12 @@ Recomendação: Não procure bugs não relacionados a threads com os relacionado
 ** final (pg 276)
 Também exclui a palavra reservada 'final' das declarações de parâmetros e variáveis. Até onde pude entender, ela não adicionava nenhum valor real, só adiciona mais coisas aos restos inúteis. Eliminar essas 'final' contraria alguns conhecimentos convencionais, Por exemplo, Robert Simons nos aconselha a "... colocar final e, todo o seu código". Obviamente, eu discordo. Acho que há alguns poucos usos para o final, como a constante 'final', mas fora isso, as palavras reservadas acrescentam pouca coisa e criam muito lixo. Talvez eu me sinta dessa forma porque os tipos de erros que 'final' possa capturar, os testes de unidade que escrevi já capturam.
 * Exemplos de código
+** retonar enum à partir de seu id
+    public static Optional<ExpirationStatusEnum> get(Long expirationStatusId) {
+        return Arrays.stream(ExpirationStatusEnum.values())
+                .filter(expirationStatusEnum -> expirationStatusEnum.getId().equals(expirationStatusId))
+                .findFirst();
+    }
 ** pg 278 - parse String -> Object
 #+BEGIN_SRC java
 public static Month parse(String s) {
